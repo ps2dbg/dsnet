@@ -1,6 +1,6 @@
 #include "dsidb_prototypes.h"
 
-char *ds_stamp_str[2] = { "Version " DSNET_VERSION_STRING " Wed Jun  4 13:16:06 JST 2003", DSNET_VERSION_STRING };
+char *ds_stamp_str[2] = { DSNET_STAMP_STRING, DSNET_VERSION_STRING };
 char *ds_version_str = DSNET_VERSION_STRING;
 
 static int f_nx = 0;

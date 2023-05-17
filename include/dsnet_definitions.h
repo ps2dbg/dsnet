@@ -3,6 +3,10 @@
 #define DSNET_VERSION_STRING "1.23.1"
 #endif
 
+#ifndef DSNET_STAMP_STRING
+#define DSNET_STAMP_STRING "Version " DSNET_VERSION_STRING " " __DATE__ " " __TIME__
+#endif
+
 #include <string.h>
 #include <stddef.h>
 #include <stdarg.h>
