@@ -1,0 +1,10 @@
+*.o
+.DS_Store
+*.a
+*.exe
+*.7z
+build-*
+build_*
+build
+.externalNativeBuild
+.gradle
