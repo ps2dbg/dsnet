@@ -21,6 +21,10 @@ add_definitions(
 	-Werror=implicit-function-declaration
 )
 
+if(WIN32)
+add_link_options(-static -static-libgcc)
+endif()
+
 include_directories(include)
 set(DSNET_LIB_SRC
 	lib/cmds.c
