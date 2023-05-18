@@ -51,16 +51,14 @@ static int __cdecl ds_path_or_symbol_completion(DS_HISTBUF *hb, char *str);
 
 int __cdecl ds_shell_cmd(int ac, char **av)
 {
-  int *v3; // eax
   char *v4; // eax
   char *v5; // eax
-  int *v6; // eax
   char *v7; // eax
   int v8; // eax
   int v9; // eax
   int n; // [esp+0h] [ebp-428h]
   int i; // [esp+4h] [ebp-424h]
-  __sighandler_t sigint; // [esp+8h] [ebp-420h]
+  sig_t sigint; // [esp+8h] [ebp-420h]
   int r; // [esp+Ch] [ebp-41Ch]
   int r_1; // [esp+Ch] [ebp-41Ch]
   int fd; // [esp+10h] [ebp-418h]
@@ -107,14 +105,13 @@ int __cdecl ds_shell_cmd(int ac, char **av)
       else
         v5 = av[1];
       execlp(shell, shell, "-c", v5, 0);
-      v6 = __errno_location();
-      v7 = strerror(*v6);
+      v7 = strerror(errno);
       printf("execlp - %s\n", v7);
       exit(1);
     }
-    sigint = signal(2, (__sighandler_t)1);
+    sigint = signal(SIGINT, SIG_IGN);
     r_1 = wait(&status);
-    signal(2, sigint);
+    signal(SIGINT, sigint);
     if ( r_1 < 0 )
       goto LABEL_30;
     v8 = 0;
@@ -129,8 +126,7 @@ LABEL_30:
   }
   else
   {
-    v3 = __errno_location();
-    v4 = strerror(*v3);
+    v4 = strerror(errno);
     r = ds_error("fork - %s", v4);
   }
   if ( raw )

@@ -519,7 +519,7 @@ static int __cdecl xrecv_dev(DS_DESC *desc)
             return ds_error("xrecv_dev: paritial read");
           }
         }
-        else if ( *__errno_location() == 32 )
+        else if ( errno == 32 )
         {
           ds_free_buf(db);
           return -3;
@@ -540,7 +540,7 @@ static int __cdecl xrecv_dev(DS_DESC *desc)
       return ds_error("xrecv_dev - too short (%d)", nbytes);
     }
   }
-  else if ( *__errno_location() == 32 )
+  else if ( errno == 32 )
   {
     return -3;
   }
@@ -641,7 +641,7 @@ static int __cdecl xrecv_net(DS_DESC *desc)
       r = ds_read(desc->fd, desc->rptr, nbytes);
     if ( r < 0 )
     {
-      if ( *__errno_location() == 11 )
+      if ( errno == 11 )
         return 0;
       else
         return -1;
@@ -677,7 +677,7 @@ static int __cdecl xrecv_net(DS_DESC *desc)
       r_1 = ds_read(desc->fd, desc->rptr, n_2);
     if ( r_1 < 0 )
     {
-      if ( *__errno_location() == 11 )
+      if ( errno == 11 )
         return 0;
       else
         return -1;
@@ -721,7 +721,7 @@ static int __cdecl xrecv_comport(DS_DESC *desc)
       return -1;
     }
   }
-  else if ( *__errno_location() == 11 )
+  else if ( errno == 11 )
   {
     return 0;
   }
@@ -791,7 +791,7 @@ static int __cdecl xsend_net(DS_DESC *desc)
       return 0;
     }
   }
-  else if ( *__errno_location() == 11 )
+  else if ( errno == 11 )
   {
     return 0;
   }
@@ -857,7 +857,7 @@ LABEL_20:
       return 0;
     goto LABEL_20;
   }
-  if ( *__errno_location() == 11 )
+  if ( errno == 11 )
     return 0;
   else
     return -1;
@@ -951,19 +951,19 @@ int __cdecl ds_select_desc(int sec, int usec)
   int r; // [esp+10h] [ebp-118h]
   struct timeval *tv; // [esp+14h] [ebp-114h]
   struct timeval tval; // [esp+18h] [ebp-110h] BYREF
-  __fd_set wfds; // [esp+20h] [ebp-108h] BYREF
-  __fd_set rfds; // [esp+A0h] [ebp-88h] BYREF
+  fd_set wfds; // [esp+20h] [ebp-108h] BYREF
+  fd_set rfds; // [esp+A0h] [ebp-88h] BYREF
   DS_DESC *q; // [esp+120h] [ebp-8h]
   DS_DESC *p; // [esp+124h] [ebp-4h]
 
   tv = 0;
-  memset(&rfds, 0, sizeof(rfds));
-  memset(&wfds, 0, sizeof(wfds));
+  FD_ZERO(&rfds);
+  FD_ZERO(&wfds);
   for ( p = ds_select_list.head; p; p = p->forw )
   {
-    _bittestandset((signed __int32 *)&rfds.fds_bits[(unsigned int)p->fd >> 5], p->fd & 0x1F);
+    FD_SET(p->fd, &rfds);
     if ( (p->type & 0x7A) != 0 && (p->sque.head || p->sbuf) )
-      _bittestandset((signed __int32 *)&wfds.fds_bits[(unsigned int)p->fd >> 5], p->fd & 0x1F);
+      FD_SET(p->fd, &wfds);
   }
   if ( sec >= 0 && usec >= 0 )
   {
@@ -979,7 +979,7 @@ int __cdecl ds_select_desc(int sec, int usec)
       for ( p = ds_select_list.head; p; p = q )
       {
         q = p->forw;
-        if ( _bittest((const signed __int32 *)&rfds.fds_bits[(unsigned int)p->fd >> 5], p->fd & 0x1F)
+        if ( FD_ISSET(p->fd, &rfds)
           && (unsigned int)(p->type - 1) <= 0x3F )
         {
           switch ( p->type )
@@ -997,7 +997,7 @@ int __cdecl ds_select_desc(int sec, int usec)
       for ( p = ds_select_list.head; p; p = q )
       {
         q = p->forw;
-        if ( _bittest((const signed __int32 *)&wfds.fds_bits[(unsigned int)p->fd >> 5], p->fd & 0x1F) )
+        if ( FD_ISSET(p->fd, &wfds) )
         {
           switch ( p->type )
           {
@@ -1028,7 +1028,7 @@ int __cdecl ds_select_desc(int sec, int usec)
       return 0;
     }
   }
-  else if ( *__errno_location() == 4 )
+  else if ( errno == 4 )
   {
     return 1;
   }

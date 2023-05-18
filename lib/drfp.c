@@ -422,9 +422,6 @@ static void __cdecl ds_option_expand(char *path, char *name)
 
 static DSP_BUF *__cdecl recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
-  int *v7; // eax
-  int *v8; // eax
   size_t v9; // eax
   char *v10; // eax
   char *v11; // [esp-4h] [ebp-484h]
@@ -490,19 +487,16 @@ static DSP_BUF *__cdecl recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
     }
     else
     {
-      v8 = __errno_location();
-      v18 = drfp_err(*v8);
+      v18 = drfp_err(errno);
     }
     if ( v18 )
       close(r);
   }
   else
   {
-    v6 = __errno_location();
-    v11 = strerror(*v6);
+    v11 = strerror(errno);
     drfp_errmsg(dh->protocol, "open", path, v11);
-    v7 = __errno_location();
-    v18 = drfp_err(*v7);
+    v18 = drfp_err(errno);
   }
   fd = handle;
   return send_drfp(desc, db, dh, 1u, seq, v18, &fd, 4u);
@@ -510,8 +504,6 @@ static DSP_BUF *__cdecl recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
 
 static DSP_BUF *__cdecl recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
-  int *v7; // eax
   size_t v8; // eax
   char *v9; // eax
   int v10; // eax
@@ -567,11 +559,9 @@ static DSP_BUF *__cdecl recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   }
   else
   {
-    v6 = __errno_location();
-    v12 = strerror(*v6);
+    v12 = strerror(errno);
     drfp_errmsg(dh->protocol, "dopen", path, v12);
-    v7 = __errno_location();
-    result = drfp_err(*v7);
+    result = drfp_err(errno);
   }
   fd = handle;
   return send_drfp(desc, db, dh, 0x13u, seq, result, &fd, 4u);
@@ -707,8 +697,6 @@ static int __cdecl getsce_stat(char *name, struct sce_stat *data)
 
 static DSP_BUF *__cdecl recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
-  int *v7; // eax
   char *v8; // [esp-4h] [ebp-45Ch]
   struct sce_stat data; // [esp+0h] [ebp-458h] BYREF
   char path[1025]; // [esp+40h] [ebp-418h] BYREF
@@ -732,11 +720,9 @@ static DSP_BUF *__cdecl recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR 
   }
   else
   {
-    v6 = __errno_location();
-    v8 = strerror(*v6);
+    v8 = strerror(errno);
     drfp_errmsg(dh->protocol, "getstat", path, v8);
-    v7 = __errno_location();
-    result = drfp_err(*v7);
+    result = drfp_err(errno);
   }
   send_drfp(desc, db, dh, 0x19u, seq, result, &data, len);
   return 0;
@@ -744,7 +730,6 @@ static DSP_BUF *__cdecl recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR 
 
 static DSP_BUF *__cdecl recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
   int ino; // eax
   char path[1025]; // [esp+0h] [ebp-414h] BYREF
   int v9; // [esp+404h] [ebp-10h]
@@ -772,14 +757,12 @@ static DSP_BUF *__cdecl recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
       return send_drfp(desc, db, dh, 0xDu, seq, result, 0, 0);
     }
   }
-  v6 = __errno_location();
-  result = drfp_err(*v6);
+  result = drfp_err(errno);
   return send_drfp(desc, db, dh, 0xDu, seq, result, 0, 0);
 }
 
 static DSP_BUF *__cdecl recv_drfp_rename(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
   int ino; // eax
   char newpath[1025]; // [esp+0h] [ebp-81Ch] BYREF
   char oldpath[1025]; // [esp+404h] [ebp-418h] BYREF
@@ -824,8 +807,7 @@ static DSP_BUF *__cdecl recv_drfp_rename(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
       return send_drfp(desc, db, dh, 0x1Fu, seq, result, 0, 0);
     }
   }
-  v6 = __errno_location();
-  result = drfp_err(*v6);
+  result = drfp_err(errno);
   return send_drfp(desc, db, dh, 0x1Fu, seq, result, 0, 0);
 }
 
@@ -844,8 +826,6 @@ static DSP_BUF *__cdecl recv_drfp_chdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
 static DSP_BUF *__cdecl recv_drfp_rmdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int ino; // eax
-  int *v7; // eax
-  int *v8; // eax
   char *v9; // [esp-4h] [ebp-418h]
   char path[1025]; // [esp+0h] [ebp-414h] BYREF
   int v11; // [esp+404h] [ebp-10h]
@@ -866,13 +846,11 @@ static DSP_BUF *__cdecl recv_drfp_rmdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
     v11 = rmdir(path);
     if ( v11 < 0 )
     {
-      v7 = __errno_location();
-      v9 = strerror(*v7);
+      v9 = strerror(errno);
       drfp_errmsg(dh->protocol, "rmdir", path, v9);
     }
 LABEL_8:
-    v8 = __errno_location();
-    result = drfp_err(*v8);
+    result = drfp_err(errno);
     return send_drfp(desc, db, dh, 0x21u, seq, result, 0, 0);
   }
   result = drfp_err(0x10u);
@@ -881,8 +859,6 @@ LABEL_8:
 
 static DSP_BUF *__cdecl recv_drfp_mkdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
-  int *v7; // eax
   char *v8; // [esp-4h] [ebp-41Ch]
   char path[1025]; // [esp+0h] [ebp-418h] BYREF
   int r; // [esp+404h] [ebp-14h]
@@ -904,18 +880,15 @@ static DSP_BUF *__cdecl recv_drfp_mkdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   r = mkdir(path, mode);
   if ( r < 0 )
   {
-    v6 = __errno_location();
-    v8 = strerror(*v6);
+    v8 = strerror(errno);
     drfp_errmsg(dh->protocol, "mkdir", path, v8);
-    v7 = __errno_location();
-    result = drfp_err(*v7);
+    result = drfp_err(errno);
   }
   return send_drfp(desc, db, dh, 0xFu, seq, result, 0, 0);
 }
 
 static DSP_BUF *__cdecl recv_drfp_dclose(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
   DIR *dirent; // [esp+0h] [ebp-14h]
   int handle; // [esp+8h] [ebp-Ch]
   unsigned int v9; // [esp+Ch] [ebp-8h]
@@ -935,8 +908,7 @@ static DSP_BUF *__cdecl recv_drfp_dclose(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
     }
     else
     {
-      v6 = __errno_location();
-      v9 = drfp_err(*v6);
+      v9 = drfp_err(errno);
     }
   }
   else
@@ -948,7 +920,6 @@ static DSP_BUF *__cdecl recv_drfp_dclose(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
 
 static DSP_BUF *__cdecl recv_drfp_close(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
   int fd; // [esp+0h] [ebp-10h]
   int handle; // [esp+4h] [ebp-Ch]
   unsigned int v9; // [esp+8h] [ebp-8h]
@@ -968,8 +939,7 @@ static DSP_BUF *__cdecl recv_drfp_close(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
     }
     else
     {
-      v6 = __errno_location();
-      v9 = drfp_err(*v6);
+      v9 = drfp_err(errno);
     }
   }
   else
@@ -981,7 +951,6 @@ static DSP_BUF *__cdecl recv_drfp_close(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
 
 static DSP_BUF *__cdecl recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
   int fd; // [esp+0h] [ebp-20h]
   int r; // [esp+8h] [ebp-18h]
   unsigned __int8 *data; // [esp+Ch] [ebp-14h]
@@ -1010,8 +979,7 @@ static DSP_BUF *__cdecl recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
       }
       else
       {
-        v6 = __errno_location();
-        v10 = drfp_err(*v6);
+        v10 = drfp_err(errno);
         len = 0;
       }
     }
@@ -1033,7 +1001,6 @@ static DSP_BUF *__cdecl recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
 
 static DSP_BUF *__cdecl recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
   int fd; // [esp+0h] [ebp-1Ch]
   int handle; // [esp+4h] [ebp-18h]
   int r; // [esp+8h] [ebp-14h]
@@ -1063,8 +1030,7 @@ static DSP_BUF *__cdecl recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
     }
     else
     {
-      v6 = __errno_location();
-      v10 = drfp_err(*v6);
+      v10 = drfp_err(errno);
       len = 0;
     }
   }
@@ -1077,8 +1043,6 @@ static DSP_BUF *__cdecl recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
 
 static DSP_BUF *__cdecl recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
-  int *v7; // eax
   int v8; // [esp+0h] [ebp-24h]
   int newpos; // [esp+4h] [ebp-20h]
   int fd; // [esp+8h] [ebp-1Ch]
@@ -1104,8 +1068,7 @@ static DSP_BUF *__cdecl recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
     v8 = lseek(fd, 0, 1);
     if ( v8 == -1 || (newpos = lseek(fd, off, base), newpos == -1) )
     {
-      v6 = __errno_location();
-      result = drfp_err(*v6);
+      result = drfp_err(errno);
     }
     else if ( (unsigned int)newpos <= 0x7FFFFFFF )
     {
@@ -1116,8 +1079,7 @@ static DSP_BUF *__cdecl recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
       result = drfp_err(0x1Bu);
       if ( lseek(fd, v8, 0) == -1 )
       {
-        v7 = __errno_location();
-        result = drfp_err(*v7);
+        result = drfp_err(errno);
       }
       pos = v8;
     }
@@ -1131,8 +1093,6 @@ static DSP_BUF *__cdecl recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
 
 static DSP_BUF *__cdecl recv_drfp_seek64(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
-  int *v7; // eax
   int curpos; // [esp+0h] [ebp-34h]
   int newpos; // [esp+4h] [ebp-30h]
   unsigned int pos[2]; // [esp+8h] [ebp-2Ch] BYREF
@@ -1164,16 +1124,14 @@ static DSP_BUF *__cdecl recv_drfp_seek64(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
     curpos = lseek(fd, 0, 1);
     if ( curpos == -1 )
     {
-      v6 = __errno_location();
-      result = drfp_err(*v6);
+      result = drfp_err(errno);
     }
     else
     {
       newpos = lseek(fd, looff, whence);
       if ( newpos == -1 )
       {
-        v7 = __errno_location();
-        result = drfp_err(*v7);
+        result = drfp_err(errno);
         lopos = curpos;
       }
       else
@@ -1196,7 +1154,6 @@ static DSP_BUF *__cdecl recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
 {
   size_t v6; // ebx
   size_t v7; // eax
-  int *v8; // eax
   char *dest; // [esp+4h] [ebp-24h]
   DIR *dirstream; // [esp+8h] [ebp-20h]
   struct sce_dirent *sce_dent; // [esp+Ch] [ebp-1Ch]
@@ -1245,8 +1202,7 @@ static DSP_BUF *__cdecl recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
     }
     else
     {
-      v8 = __errno_location();
-      result = drfp_err(*v8);
+      result = drfp_err(errno);
       len = 0;
       ds_free_mem_low(sce_dent, "drfp.c", "recv_drfp_dread");
     }
@@ -1265,8 +1221,6 @@ LABEL_15:
 
 static DSP_BUF *__cdecl recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
-  int *v7; // eax
   char *v8; // [esp-4h] [ebp-81Ch]
   unsigned int result; // [esp+0h] [ebp-818h]
   unsigned int seq; // [esp+4h] [ebp-814h]
@@ -1284,11 +1238,9 @@ static DSP_BUF *__cdecl recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR 
   ds_option_expand(newpath, newname);
   if ( symlink(existpath, newname) )
   {
-    v6 = __errno_location();
-    v8 = strerror(*v6);
+    v8 = strerror(errno);
     drfp_errmsg(dh->protocol, "symlink", newpath, v8);
-    v7 = __errno_location();
-    result = drfp_err(*v7);
+    result = drfp_err(errno);
   }
   else
   {
@@ -1299,7 +1251,6 @@ static DSP_BUF *__cdecl recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR 
 
 static DSP_BUF *__cdecl recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
   unsigned int len; // [esp+0h] [ebp-81Ch]
   unsigned int len_1; // [esp+0h] [ebp-81Ch]
   unsigned int result; // [esp+4h] [ebp-818h]
@@ -1318,8 +1269,7 @@ static DSP_BUF *__cdecl recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR
   len = readlink(existpath, newpath, 0x400u);
   if ( len == -1 )
   {
-    v6 = __errno_location();
-    result = drfp_err(*v6);
+    result = drfp_err(errno);
     len_1 = 0;
     newname = 0;
   }
@@ -1334,8 +1284,6 @@ static DSP_BUF *__cdecl recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR
 
 static DSP_BUF *__cdecl recv_drfp_chstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
-  int *v6; // eax
-  int *v7; // eax
   char *v8; // [esp-4h] [ebp-474h]
   struct stat data; // [esp+4h] [ebp-46Ch] BYREF
   char path[1025]; // [esp+5Ch] [ebp-414h] BYREF
@@ -1361,11 +1309,9 @@ static DSP_BUF *__cdecl recv_drfp_chstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
     }
     else
     {
-      v6 = __errno_location();
-      v8 = strerror(*v6);
+      v8 = strerror(errno);
       drfp_errmsg(dh->protocol, "lseek", path, v8);
-      v7 = __errno_location();
-      result = drfp_err(*v7);
+      result = drfp_err(errno);
     }
   }
   if ( (v11 & 2) != 0 || (v11 & 4) != 0 || (v11 & 8) != 0 || (v11 & 0x10) != 0 || (v11 & 0x20) != 0 || (v11 & 0x40) != 0 )

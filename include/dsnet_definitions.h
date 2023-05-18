@@ -15,31 +15,31 @@
 #include <sys/types.h>
 #include <time.h>
 #include <stdint.h>
-#include <sys/select.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <setjmp.h>
-#include <termios.h>
-#include <netdb.h>
 #include <dirent.h>
-#include <pwd.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
 #include <sys/time.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
 #include <stdio.h>
-#include <sys/socket.h>
 #include <signal.h>
 #include <stddef.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
+#include <ctype.h>
+
+#include <sys/select.h>
+#include <termios.h>
+#include <netdb.h>
+#include <pwd.h>
+#include <sys/wait.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <sys/mman.h>
-#include <ctype.h>
 
 #define qmemcpy memcpy
 
@@ -135,21 +135,6 @@ typedef uint64_t _QWORD;
 #define __PAIR16__(high, low)   (((uint16_t) (high) <<  8) | (uint8_t) (low))
 #define __PAIR32__(high, low)   (((uint32_t) (high) << 16) | (uint16_t)(low))
 #define __PAIR64__(high, low)   (((uint64_t) (high) << 32) | (uint32_t)(low))
-
-#define __fd_set fd_set
-#define fds_bits __fds_bits
-
-#define _bittest(a, b) (((*(a)) >> (b)) & 1)
-
-#define PSNIP_BUILTIN__BITTESTANDSET_DEFINE_PORTABLE(f_n, T, UT)	\
-  static inline						\
-  unsigned char psnip_intrin_##f_n(T* a, T b) {				\
-    const char r = (*a >> b) & 1;					\
-    *a |= ((UT) 1) << b;						\
-    return r;								\
-  }
-PSNIP_BUILTIN__BITTESTANDSET_DEFINE_PORTABLE(bittestandset, int32_t, uint32_t)
-#    define _bittestandset(a, b) psnip_intrin_bittestandset(a, b)
 
 #ifndef CONTAINING_RECORD
 #define CONTAINING_RECORD(address,type,field) ((type *)((char *)(address) - (uintptr_t)(&((type *)0)->field)))
@@ -303,7 +288,7 @@ typedef struct st_proto ST_PROTO;
 typedef struct {unsigned int bid; unsigned int master; unsigned int eegs; unsigned int gif; unsigned int iop;} PAMP_VERSION;
 struct iop_data {unsigned int addr; unsigned int spu2core0; unsigned int spu2core1; unsigned int cdrom; unsigned int dev9; unsigned int sif; unsigned int read; unsigned int write; unsigned int enable; unsigned int addrmask; unsigned int data; unsigned int datamask;};
 typedef struct iop_data TRIG_DATA;
-struct id_mi_name {int id; ILOADP_MODINFO_DATA mi; char name[100];};
+struct id_mi_name {int id; ILOADP_MODINFO_DATA *mi; char name[100];};
 typedef struct {char *str; unsigned int val;} trig_st;
 typedef struct {char *str; unsigned int putvblank; unsigned int putreg; unsigned int putintc;} gif_st;
 typedef struct {char *str; unsigned int putvblank; unsigned int putdata; unsigned int putintc;} iop_st;

@@ -217,7 +217,6 @@ static void __cdecl sigchld(int arg)
 
 int __cdecl ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
 {
-  int *v3; // eax
   char *v4; // eax
   int fd; // [esp+0h] [ebp-Ch]
   int pid; // [esp+4h] [ebp-8h]
@@ -238,13 +237,12 @@ int __cdecl ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
         close(fd);
     }
     execlp(shell, shell, "-c", cmd, 0);
-    v3 = __errno_location();
-    v4 = strerror(*v3);
+    v4 = strerror(errno);
     printf("execlp - %s\n", v4);
     exit(1);
   }
-  signal(2, (__sighandler_t)1);
-  signal(17, (__sighandler_t)sigchld);
+  signal(SIGINT, SIG_IGN);
+  signal(SIGCHLD /* This was 17 (SIGSTOP), which was incorrect */, (sig_t)sigchld);
   return 0;
 }
 
@@ -255,8 +253,8 @@ int __cdecl ds_read(int fd, void *ptr, int n)
   r = read(fd, ptr, n);
   if ( r < 0 )
   {
-    ds_errno = *__errno_location();
-    if ( *__errno_location() != 11 && *__errno_location() != 32 && *__errno_location() != 104 )
+    ds_errno = errno;
+    if ( errno != 11 && errno != 32 && errno != 104 )
       ds_error("!ds_read");
   }
   return r;
@@ -269,8 +267,8 @@ int __cdecl ds_write(int fd, void *ptr, int n)
   r = write(fd, ptr, n);
   if ( r < 0 )
   {
-    ds_errno = *__errno_location();
-    if ( *__errno_location() != 11 && *__errno_location() != 32 && *__errno_location() != 104 )
+    ds_errno = errno;
+    if ( errno != 11 && errno != 32 && errno != 104 )
       ds_error("!ds_write");
   }
   return r;
@@ -483,8 +481,8 @@ DS_DESC *__cdecl ds_open_netdev(char *name, DS_RECV_FUNC *recv_func)
 
 int __cdecl ds_comp_main(char *device, int escape)
 {
-  __fd_set wfds; // [esp+10h] [ebp-10Ch] BYREF
-  __fd_set rfds; // [esp+90h] [ebp-8Ch] BYREF
+  fd_set wfds; // [esp+10h] [ebp-10Ch] BYREF
+  fd_set rfds; // [esp+90h] [ebp-8Ch] BYREF
   int dsp; // [esp+110h] [ebp-Ch]
   int kbd; // [esp+114h] [ebp-8h]
   int dev; // [esp+118h] [ebp-4h]
@@ -498,24 +496,24 @@ int __cdecl ds_comp_main(char *device, int escape)
   dsp = 1;
   do
   {
-    memset(&rfds, 0, sizeof(rfds));
+    FD_ZERO(&rfds);
     if ( kbdq.len <= 255 )
-      _bittestandset((signed __int32 *)&rfds.fds_bits[(unsigned int)kbd >> 5], kbd & 0x1F);
+      FD_SET(kbd, &rfds);
     if ( devq.len <= 255 )
-      _bittestandset((signed __int32 *)&rfds.fds_bits[(unsigned int)dev >> 5], dev & 0x1F);
-    memset(&wfds, 0, sizeof(wfds));
+      FD_SET(dev, &rfds);
+    FD_ZERO(&wfds);
     if ( kbdq.len > 0 )
-      _bittestandset((signed __int32 *)&wfds.fds_bits[(unsigned int)dev >> 5], dev & 0x1F);
+      FD_SET(dev, &wfds);
     if ( devq.len > 0 )
-      _bittestandset((signed __int32 *)&wfds.fds_bits[(unsigned int)dsp >> 5], dsp & 0x1F);
+      FD_SET(dsp, &wfds);
     if ( select(256, &rfds, &wfds, 0, 0) < 0 )
       return ds_error("!select");
   }
-  while ( (!_bittest((const signed __int32 *)&rfds.fds_bits[(unsigned int)kbd >> 5], kbd & 0x1F)
+  while ( (!FD_ISSET(kbd, &rfds)
         || !read_kbd(kbd, escape))
-       && (!_bittest((const signed __int32 *)&rfds.fds_bits[(unsigned int)dev >> 5], dev & 0x1F) || !read_dev(dev))
-       && (!_bittest((const signed __int32 *)&wfds.fds_bits[(unsigned int)dev >> 5], dev & 0x1F) || !write_dev(dev))
-       && (!_bittest((const signed __int32 *)&wfds.fds_bits[(unsigned int)dsp >> 5], dsp & 0x1F) || !write_dsp(dsp)) );
+       && (!FD_ISSET(dev, &rfds) || !read_dev(dev))
+       && (!FD_ISSET(dev, &wfds) || !write_dev(dev))
+       && (!FD_ISSET(dsp, &wfds) || !write_dsp(dsp)) );
   ds_printf("\n");
   close(dev);
   return 0;

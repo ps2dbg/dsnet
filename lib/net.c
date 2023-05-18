@@ -112,13 +112,12 @@ static int __cdecl getaddr_net(char *name, struct sockaddr_in *sin)
 
 static int __cdecl setup_net(int s)
 {
-  int *v2; // eax
   char *v3; // eax
   int flag; // [esp+0h] [ebp-Ch]
   int hold; // [esp+4h] [ebp-8h] BYREF
   struct protoent *protoent; // [esp+8h] [ebp-4h]
 
-  signal(13, (__sighandler_t)1);
+  signal(SIGPIPE, SIG_IGN);
   hold = 1;
   if ( setsockopt(s, 1, 9, &hold, 4u) < 0 )
     return ds_error("!setsockopt(KEEPALIVE)");
@@ -132,10 +131,9 @@ static int __cdecl setup_net(int s)
   if ( !protoent )
     return ds_error("!getprotobyname(ip)");
   hold = 16;
-  if ( setsockopt(s, protoent->p_proto, 1, &hold, 4u) < 0 && *__errno_location() != 92 )
+  if ( setsockopt(s, protoent->p_proto, 1, &hold, 4u) < 0 && errno != 92 )
   {
-    v2 = __errno_location();
-    v3 = strerror(*v2);
+    v3 = strerror(errno);
     ds_error("setsockopt(IP_TOS) - %s (ignored)", v3);
   }
   flag = fcntl(s, 3, 0);
@@ -153,7 +151,7 @@ static DS_DESC *__cdecl ds_open_dev(char *name, DS_RECV_FUNC *recv_func)
   fd = open(name, 2050);
   if ( fd >= 0 )
   {
-    if ( ds_ioctl(fd, 1093009410, 0) >= 0 || *__errno_location() == 32 )
+    if ( ds_ioctl(fd, 1093009410, 0) >= 0 || errno == 32 )
     {
       return ds_add_select_list(2, fd, name, 0, recv_func);
     }
@@ -201,7 +199,7 @@ DS_DESC *__cdecl ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
     if ( !connect(fd, (const struct sockaddr *)&sin, 0x10u) )
       break;
     close(fd);
-    if ( *__errno_location() != 111 )
+    if ( errno != 111 )
     {
       ds_error("!unable to connect");
       return 0;

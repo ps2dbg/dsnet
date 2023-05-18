@@ -10,7 +10,7 @@ static int dsip_id = 20;
 static DSP_BUF *last_db_2 = NULL;
 
 // FIXME: VLAs nested in structs cause ICE in GCC
-static const ILOADP_MODINFO_DATA mi_01 = {
+static ILOADP_MODINFO_DATA mi_01 = {
       257u,
       0u,
       2080u,
@@ -22,9 +22,9 @@ static const ILOADP_MODINFO_DATA mi_01 = {
       0u,
       0u,
       0u,
-      // { 1953724787u, 1830841701u, 1919905125u, 1634541689u, 1701273966u }
+      { 1953724787u, 1830841701u, 1919905125u, 1634541689u, 1701273966u }
     };
-static const ILOADP_MODINFO_DATA mi_02 = {
+static ILOADP_MODINFO_DATA mi_02 = {
       257u,
       0u,
       5152u,
@@ -36,9 +36,9 @@ static const ILOADP_MODINFO_DATA mi_02 = {
       0u,
       0u,
       0u,
-      // { 1684107116u, 1663070821u, 6648431u }
+      { 1684107116u, 1663070821u, 6648431u }
     };
-static const ILOADP_MODINFO_DATA mi_03 = {
+static ILOADP_MODINFO_DATA mi_03 = {
       257u,
       0u,
       10784u,
@@ -50,9 +50,9 @@ static const ILOADP_MODINFO_DATA mi_03 = {
       0u,
       0u,
       0u,
-      // { 1701017701u, 1869182064u, 1634541678u, 1701273966u }
+      { 1701017701u, 1869182064u, 1634541678u, 1701273966u }
     };
-static const ILOADP_MODINFO_DATA mi_04 = {
+static ILOADP_MODINFO_DATA mi_04 = {
       257u,
       0u,
       13088u,
@@ -64,9 +64,9 @@ static const ILOADP_MODINFO_DATA mi_04 = {
       0u,
       0u,
       0u,
-      // { 1702129225u, 1886745202u, 1632444532u, 1701273966u }
+      { 1702129225u, 1886745202u, 1632444532u, 1701273966u }
     };
-static const ILOADP_MODINFO_DATA mi_05 = {
+static ILOADP_MODINFO_DATA mi_05 = {
       257u,
       0u,
       16160u,
@@ -78,9 +78,9 @@ static const ILOADP_MODINFO_DATA mi_05 = {
       0u,
       0u,
       0u,
-      // { 1953724787u, 1126198629u, 1651076128u }
+      { 1953724787u, 1126198629u, 1651076128u }
     };
-static const ILOADP_MODINFO_DATA mi_06 = {
+static ILOADP_MODINFO_DATA mi_06 = {
       257u,
       0u,
       22816u,
@@ -92,10 +92,10 @@ static const ILOADP_MODINFO_DATA mi_06 = {
       0u,
       0u,
       0u,
-      // { 1177505609u, 543517801u, 1634623821u, 7497063u }
+      { 1177505609u, 543517801u, 1634623821u, 7497063u }
     };
-static const ILOADP_MODINFO_DATA mi_07 = { 257u, 0u, 31520u, 1264u, 64u, 16u, 0u, 0u, 0u, 0u, 0u, /* { 1768191091u } */ };
-static const ILOADP_MODINFO_DATA mi_08 = {
+static ILOADP_MODINFO_DATA mi_07 = { 257u, 0u, 31520u, 1264u, 64u, 16u, 0u, 0u, 0u, 0u, 0u, { 1768191091u } };
+static ILOADP_MODINFO_DATA mi_08 = {
       257u,
       0u,
       33056u,
@@ -107,9 +107,9 @@ static const ILOADP_MODINFO_DATA mi_08 = {
       0u,
       0u,
       0u,
-      // { 542134089u, 541477203u, 1634623853u, 7497063u }
+      { 542134089u, 541477203u, 1634623853u, 7497063u }
     };
-static const ILOADP_MODINFO_DATA mi_09 = {
+static ILOADP_MODINFO_DATA mi_09 = {
       257u,
       0u,
       41248u,
@@ -121,9 +121,9 @@ static const ILOADP_MODINFO_DATA mi_09 = {
       0u,
       0u,
       0u,
-      // { 1768121668u, 1634541618u, 1701273966u }
+      { 1768121668u, 1634541618u, 1701273966u }
     };
-static const ILOADP_MODINFO_DATA mi_10 = {
+static ILOADP_MODINFO_DATA mi_10 = {
       257u,
       0u,
       24096u,
@@ -135,16 +135,16 @@ static const ILOADP_MODINFO_DATA mi_10 = {
       0u,
       0u,
       0u,
-      // {
-      //   1768121668u,
-      //   1229987890u,
-      //   1852383302u,
-      //   1718773108u,
-      //   543515489u,
-      //   1986622052u
-      // }
+      {
+        1768121668u,
+        1229987890u,
+        1852383302u,
+        1718773108u,
+        543515489u,
+        1986622052u
+      }
     };
-static const ILOADP_MODINFO_DATA mi_11 = {
+static ILOADP_MODINFO_DATA mi_11 = {
       257u,
       0u,
       29216u,
@@ -156,17 +156,17 @@ static const ILOADP_MODINFO_DATA mi_11 = {
       0u,
       0u,
       0u,
-      // {
-      //   1768121668u,
-      //   1230184498u,
-      //   1763717702u,
-      //   1919251566u,
-      //   1701011814u,
-      //   1769104416u,
-      //   7497078u
-      // }
+      {
+        1768121668u,
+        1230184498u,
+        1763717702u,
+        1919251566u,
+        1701011814u,
+        1769104416u,
+        7497078u
+      }
     };
-static const ILOADP_MODINFO_DATA mi_12 = {
+static ILOADP_MODINFO_DATA mi_12 = {
       257u,
       0u,
       33056u,
@@ -178,9 +178,9 @@ static const ILOADP_MODINFO_DATA mi_12 = {
       0u,
       0u,
       0u,
-      // { 1768121668u, 1414799410u, 1229336409u, 1679836492u, 1702259058u }
+      { 1768121668u, 1414799410u, 1229336409u, 1679836492u, 1702259058u }
     };
-static const ILOADP_MODINFO_DATA mi_13 = {
+static ILOADP_MODINFO_DATA mi_13 = {
       257u,
       0u,
       40736u,
@@ -192,9 +192,9 @@ static const ILOADP_MODINFO_DATA mi_13 = {
       0u,
       0u,
       0u,
-      // { 1768121668u, 1869357106u, 1830839393u, 1734438497u }
+      { 1768121668u, 1869357106u, 1830839393u, 1734438497u }
     };
-static const ILOADP_MODINFO_DATA mi_14 = {
+static ILOADP_MODINFO_DATA mi_14 = {
       257u,
       0u,
       43968u,
@@ -206,30 +206,56 @@ static const ILOADP_MODINFO_DATA mi_14 = {
       0u,
       0u,
       0u,
-      // { 1953264973u, 1750359913u, 1684104562u, 1851870559u, 1919248225u }
+      { 1953264973u, 1750359913u, 1684104562u, 1851870559u, 1919248225u }
     };
-static const ILOADP_MODINFO_DATA mi_15 = {
-      0u,
-      0u,
-      0u,
-      0u,
-      0u,
-      0u,
-      0u,
-      0u,
-      0u,
-      0u,
-      0u,
-      // {
-      //   0u
-      // }
-    };
+#define EMPTY_MI(ind) \
+      static ILOADP_MODINFO_DATA mi_##ind = { \
+            0u, \
+            0u, \
+            0u, \
+            0u, \
+            0u, \
+            0u, \
+            0u, \
+            0u, \
+            0u, \
+            0u, \
+            0u, \
+            { \
+              0u \
+            } \
+          };
+EMPTY_MI(15)
+EMPTY_MI(16)
+EMPTY_MI(17)
+EMPTY_MI(18)
+EMPTY_MI(19)
+EMPTY_MI(20)
+EMPTY_MI(21)
+EMPTY_MI(22)
+EMPTY_MI(23)
+EMPTY_MI(24)
+EMPTY_MI(25)
+EMPTY_MI(26)
+EMPTY_MI(27)
+EMPTY_MI(28)
+EMPTY_MI(29)
+EMPTY_MI(30)
+EMPTY_MI(31)
+EMPTY_MI(32)
+EMPTY_MI(33)
+EMPTY_MI(34)
+EMPTY_MI(35)
+EMPTY_MI(36)
+EMPTY_MI(37)
+EMPTY_MI(38)
+EMPTY_MI(39)
 
 static struct id_mi_name id_mi_names[] =
 {
   {
     1,
-    mi_01,
+    &mi_01,
     {
       's',
       'y',
@@ -335,7 +361,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     2,
-    mi_02,
+    &mi_02,
     {
       'l',
       'o',
@@ -441,7 +467,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     4,
-    mi_03,
+    &mi_03,
     {
       'e',
       'x',
@@ -547,7 +573,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     5,
-    mi_04,
+    &mi_04,
     {
       'I',
       'n',
@@ -653,7 +679,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     6,
-    mi_05,
+    &mi_05,
     {
       's',
       'y',
@@ -759,7 +785,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     7,
-    mi_06,
+    &mi_06,
     {
       'I',
       'O',
@@ -865,7 +891,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     8,
-    mi_07,
+    &mi_07,
     {
       's',
       't',
@@ -971,7 +997,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     9,
-    mi_08,
+    &mi_08,
     {
       'I',
       'O',
@@ -1077,7 +1103,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     10,
-    mi_09,
+    &mi_09,
     {
       'D',
       'e',
@@ -1183,7 +1209,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     11,
-    mi_10,
+    &mi_10,
     {
       'D',
       'e',
@@ -1289,7 +1315,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     12,
-    mi_11,
+    &mi_11,
     {
       'D',
       'e',
@@ -1395,7 +1421,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     13,
-    mi_12,
+    &mi_12,
     {
       'D',
       'e',
@@ -1501,7 +1527,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     14,
-    mi_13,
+    &mi_13,
     {
       'D',
       'e',
@@ -1607,7 +1633,7 @@ static struct id_mi_name id_mi_names[] =
   },
   {
     15,
-    mi_14,
+    &mi_14,
     {
       'M',
       'u',
@@ -1714,127 +1740,127 @@ static struct id_mi_name id_mi_names[] =
   // TODO: count the NULLs
   {
     0,
-    mi_15,
+    &mi_15,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_16,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_17,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_18,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_19,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_20,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_21,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_22,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_23,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_24,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_25,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_26,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_27,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_28,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_29,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_30,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_31,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_32,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_33,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_34,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_35,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_36,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_37,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_38,
     ""
   },
   {
     0,
-    mi_15,
+    &mi_39,
     ""
   }
 };
@@ -2438,8 +2464,10 @@ static int __cdecl send_iloadp_reply(DS_DESC *desc, ILOADP_HDR *dsip, void *ptr,
   int v4; // edx
   unsigned int list[40]; // [esp+4h] [ebp-C8h] BYREF
   void *rptr; // [esp+A4h] [ebp-28h]
+  void *rptr1;
   int v8; // [esp+A8h] [ebp-24h]
   int rlen; // [esp+ACh] [ebp-20h]
+  int rlen1;
   int id; // [esp+B0h] [ebp-1Ch]
   int j; // [esp+B4h] [ebp-18h]
   int v12; // [esp+B8h] [ebp-14h]
@@ -2449,8 +2477,10 @@ static int __cdecl send_iloadp_reply(DS_DESC *desc, ILOADP_HDR *dsip, void *ptr,
   DSP_BUF *db; // [esp+C8h] [ebp-4h]
 
   rlen = 0;
+  rlen1 = 0;
   v8 = 0;
   rptr = 0;
+  rptr1 = 0;
   id = dsip->module_id;
   switch ( dsip->cmd )
   {
@@ -2468,16 +2498,18 @@ static int __cdecl send_iloadp_reply(DS_DESC *desc, ILOADP_HDR *dsip, void *ptr,
         p->id = dsip_id;
         id = v4;
         ++dsip_id;
-        p->mi.version = 258;
-        p->mi.mod_addr = p->id << 16;
-        p->mi.text_size = p->id << 10;
-        p->mi.data_size = (p->id + 1) << 10;
-        p->mi.bss_size = (p->id + 2) << 10;
+        p->mi->version = 258;
+        p->mi->mod_addr = p->id << 16;
+        p->mi->text_size = p->id << 10;
+        p->mi->data_size = (p->id + 1) << 10;
+        p->mi->bss_size = (p->id + 2) << 10;
         ds_sprintf(p->name, "start-%d", p->id);
         if ( (dsip->action & 4) != 0 )
         {
           rptr = &p->mi;
-          rlen = strlen(p->name) + 33;
+          rptr1 = p->name;
+          rlen = 32;
+          rlen1 = strlen(p->name) + 1;
         }
       }
       else
@@ -2534,7 +2566,7 @@ static int __cdecl send_iloadp_reply(DS_DESC *desc, ILOADP_HDR *dsip, void *ptr,
       break;
   }
 LABEL_28:
-  db = ds_alloc_buf(336, 72, 0, rlen + 8);
+  db = ds_alloc_buf(336, 72, 0, (rlen + rlen1) + 8);
   if ( !db )
     return -1;
   dh = (DECI2_HDR *)db->buf;
@@ -2548,6 +2580,11 @@ LABEL_28:
   {
     if ( rlen > 0 )
       memcpy(&rh[1], rptr, rlen);
+  }
+  if ( rptr1 )
+  {
+    if ( rlen1 > 0 )
+      memcpy(((char *)&rh[1]) + rlen, rptr1, rlen1);
   }
   ds_send_desc(desc, db);
   return 0;

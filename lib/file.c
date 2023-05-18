@@ -1,6 +1,6 @@
 #include "dsnet_prototypes.h"
 
-static __sighandler_t sigint;
+static sig_t sigint;
 static int kbd_raw = 0;
 
 int __cdecl ds_ioctl(int fd, int cmd, void *arg)
@@ -121,7 +121,7 @@ void *__cdecl ds_popen(char *cmd, char *type)
 {
   void *r; // [esp+0h] [ebp-4h]
 
-  sigint = signal(2, (__sighandler_t)1);
+  sigint = signal(SIGINT, SIG_IGN);
   kbd_raw = ds_resume_kbd();
   r = popen(cmd, type);
   if ( !r )
@@ -138,7 +138,7 @@ int __cdecl ds_pclose(void *stream)
     r = pclose((FILE *)stream);
   if ( kbd_raw )
     ds_raw_kbd();
-  signal(2, sigint);
+  signal(SIGINT, sigint);
   return r;
 }
 

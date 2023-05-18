@@ -406,7 +406,6 @@ int ds_sprintf(char *buf, char *fmt, ...)
 
 int ds_error(char *fmt, ...)
 {
-  int *v1; // eax
   char *v2; // eax
   char *estr; // [esp+0h] [ebp-408h]
   char buf[1024]; // [esp+4h] [ebp-404h] BYREF
@@ -419,8 +418,7 @@ int ds_error(char *fmt, ...)
   if ( *fmt == 33 )
   {
     ++fmt;
-    v1 = __errno_location();
-    v2 = strerror(*v1);
+    v2 = strerror(errno);
   }
   else
   {

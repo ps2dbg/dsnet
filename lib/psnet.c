@@ -43,7 +43,7 @@ static int __cdecl set_deci1_hdr(DS_PSNETD_PRIV *priv, DS_DECI1 *p, unsigned int
 
 static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
 {
-  __pid_t v2; // ebx
+  pid_t v2; // ebx
   char *v3; // eax
   int v4; // eax
   int n; // [esp+8h] [ebp-10h]
@@ -215,7 +215,7 @@ int __cdecl ds_read_psnet(DS_DESC *desc, char *buf, int len)
           *((_BYTE *)&p->rcv_hdr.mag + i) = *((_BYTE *)&p->rcv_hdr.mag + i + 1);
         --p->rcv_ptr;
         --p->rcv_len;
-        *__errno_location() = 11;
+        errno = 11;
         return -1;
       }
       if ( p->rcv_hdr.len <= 0x1Fu )
@@ -230,7 +230,7 @@ int __cdecl ds_read_psnet(DS_DESC *desc, char *buf, int len)
       if ( sum != p->rcv_hdr.sum )
       {
         p->rcv_len = 0;
-        *__errno_location() = 11;
+        errno = 11;
         return -1;
       }
       v11 = p->rcv_hdr.len;
@@ -257,7 +257,7 @@ int __cdecl ds_read_psnet(DS_DESC *desc, char *buf, int len)
       if ( v11 > v7 )
       {
 LABEL_12:
-        *__errno_location() = 11;
+        errno = 11;
         return -1;
       }
     }
@@ -265,7 +265,7 @@ LABEL_12:
     {
       p->rcv_len = 0;
       p->rcv_buf = (char *)ds_free_mem_low(p->rcv_buf, "psnet.c", "_ds_read_psnet");
-      *__errno_location() = 11;
+      errno = 11;
       return -1;
     }
   }
