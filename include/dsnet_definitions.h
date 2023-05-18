@@ -29,6 +29,9 @@
 #include <errno.h>
 #include <ctype.h>
 
+#ifdef _WIN32
+#include <winsock.h>
+#else
 #include <sys/select.h>
 #include <termios.h>
 #include <netdb.h>
@@ -40,21 +43,26 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <sys/mman.h>
+#endif
 
 #define qmemcpy memcpy
 
+#ifndef __cdecl
 #define __cdecl
+#endif
 
 #define __int8 char
 #define __int16 short
 #define __int32 int
+#ifndef _WIN32
 typedef uint8_t BYTE;
-typedef uint8_t _BYTE;
 typedef uint16_t WORD;
-typedef uint16_t _WORD;
 typedef uint32_t DWORD;
-typedef uint32_t _DWORD;
 typedef uint64_t QWORD;
+#endif
+typedef uint8_t _BYTE;
+typedef uint16_t _WORD;
+typedef uint32_t _DWORD;
 typedef uint64_t _QWORD;
 
 #define LAST_IND(x,part_type)    (sizeof(x)/sizeof(part_type) - 1)
@@ -65,10 +73,22 @@ typedef uint64_t _QWORD;
 #define WORDn(x, n)   (*((_WORD*)&(x)+n))
 #define DWORDn(x, n)  (*((_DWORD*)&(x)+n))
 
+#ifdef LOBYTE
+#undef LOBYTE
+#endif
 #define LOBYTE(x)  BYTEn(x,LOW_IND(x,_BYTE))
+#ifdef LOWORD
+#undef LOWORD
+#endif
 #define LOWORD(x)  WORDn(x,LOW_IND(x,_WORD))
 #define LODWORD(x) DWORDn(x,LOW_IND(x,_DWORD))
+#ifdef HIBYTE
+#undef HIBYTE
+#endif
 #define HIBYTE(x)  BYTEn(x,HIGH_IND(x,_BYTE))
+#ifdef HIWORD
+#undef HIWORD
+#endif
 #define HIWORD(x)  WORDn(x,HIGH_IND(x,_WORD))
 #define HIDWORD(x) DWORDn(x,HIGH_IND(x,_DWORD))
 #define BYTE1(x)   BYTEn(x,  1)

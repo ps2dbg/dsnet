@@ -91,7 +91,7 @@ static void __cdecl drfp_errmsg(int proto, char *tag, char *fname, char *err)
     msg = (char *)ds_alloc_mem_low("drfp.c", "drfp_errmsg", v7 + 3 + v6 + 15);
     if ( msg )
     {
-      bzero(msg, 4u);
+      ds_bzero(msg, 4u);
       msg[4] = 10;
       msg[5] = 42;
       msg[6] = 42;
@@ -166,31 +166,47 @@ static void __cdecl free_handle(int handle)
 
 static int __cdecl get_ino(char *name)
 {
+#ifndef _WIN32
   struct stat stat; // [esp+0h] [ebp-58h] BYREF
 
   lstat(name, &stat);
   return stat.st_ino;
+#else
+  return 0;
+#endif
 }
 
 static int __cdecl is_found(char *name)
 {
+#ifndef _WIN32
   struct stat stat; // [esp+0h] [ebp-58h] BYREF
 
   return lstat(name, &stat) >= 0;
+#else
+  return 0;
+#endif
 }
 
 static int __cdecl is_dir(char *name)
 {
+#ifndef _WIN32
   struct stat stat; // [esp+0h] [ebp-58h] BYREF
 
   return lstat(name, &stat) >= 0 && (stat.st_mode & 0xF000) == 0x4000;
+#else
+  return 0;
+#endif
 }
 
 static int __cdecl is_file(char *name)
 {
+#ifndef _WIN32
   struct stat stat; // [esp+0h] [ebp-58h] BYREF
 
   return lstat(name, &stat) >= 0 && (stat.st_mode & 0xF000) == 0x8000;
+#else
+  return 0;
+#endif
 }
 
 static int __cdecl is_opened_ino(int ino)
@@ -520,6 +536,7 @@ static DSP_BUF *__cdecl recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   handle = -1;
   if ( (unsigned int)arglen <= 4 )
     return db;
+#ifndef _WIN32
   seq = *args;
   s2 = (char *)(args + 1);
   ds_option_expand(path, (char *)args + 4);
@@ -563,6 +580,9 @@ static DSP_BUF *__cdecl recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
     drfp_errmsg(dh->protocol, "dopen", path, v12);
     result = drfp_err(errno);
   }
+#else
+  result = drfp_err(0x18u);
+#endif
   fd = handle;
   return send_drfp(desc, db, dh, 0x13u, seq, result, &fd, 4u);
 }
@@ -877,7 +897,11 @@ static DSP_BUF *__cdecl recv_drfp_mkdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   s2 = (char *)(argsa + 1);
   mode = sce_mode2st_mode(HIWORD(mode));
   ds_option_expand(path, (char *)argsa + 4);
+#ifndef _WIN32
   r = mkdir(path, mode);
+#else
+  r = mkdir(path);
+#endif
   if ( r < 0 )
   {
     v8 = strerror(errno);
@@ -1236,6 +1260,7 @@ static DSP_BUF *__cdecl recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR 
   newname = (char *)args + strlen((const char *)args + 4) + 5;
   ds_option_expand(existpath, (char *)args + 4);
   ds_option_expand(newpath, newname);
+#ifndef _WIN32
   if ( symlink(existpath, newname) )
   {
     v8 = strerror(errno);
@@ -1243,6 +1268,7 @@ static DSP_BUF *__cdecl recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR 
     result = drfp_err(errno);
   }
   else
+#endif
   {
     result = 0;
   }
@@ -1266,6 +1292,7 @@ static DSP_BUF *__cdecl recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR
   existname = (char *)(args + 1);
   ds_option_expand(existpath, (char *)args + 4);
   memset(newpath, 0, sizeof(newpath));
+#ifndef _WIN32
   len = readlink(existpath, newpath, 0x400u);
   if ( len == -1 )
   {
@@ -1279,6 +1306,11 @@ static DSP_BUF *__cdecl recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR
     len_1 = len + 1;
     newname = newpath;
   }
+#else
+  result = drfp_err(0x18u);
+  len_1 = 0;
+  newname = 0;
+#endif
   return send_drfp(desc, db, dh, 0x2Fu, seq, result, newname, len_1);
 }
 

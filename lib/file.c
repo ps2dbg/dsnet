@@ -1,11 +1,18 @@
 #include "dsnet_prototypes.h"
 
+#ifndef _WIN32
 static sig_t sigint;
+#endif
 static int kbd_raw = 0;
 
 int __cdecl ds_ioctl(int fd, int cmd, void *arg)
 {
+#ifndef _WIN32
   return ioctl(fd, cmd, arg);
+#else
+  ds_error("ioctl not supported on this platform");
+  return 0;
+#endif
 }
 
 void *__cdecl ds_fopen(char *fname, char *mode)
@@ -121,11 +128,16 @@ void *__cdecl ds_popen(char *cmd, char *type)
 {
   void *r; // [esp+0h] [ebp-4h]
 
+#ifndef _WIN32
   sigint = signal(SIGINT, SIG_IGN);
   kbd_raw = ds_resume_kbd();
   r = popen(cmd, type);
   if ( !r )
     ds_error("!popen(\"%s\", \"%s\")", cmd, type);
+#else
+  r = NULL;
+  ds_error("popen not supported on this platform");
+#endif
   return r;
 }
 
@@ -134,11 +146,13 @@ int __cdecl ds_pclose(void *stream)
   int r; // [esp+0h] [ebp-4h]
 
   r = 0;
+#ifndef _WIN32
   if ( stream )
     r = pclose((FILE *)stream);
   if ( kbd_raw )
     ds_raw_kbd();
   signal(SIGINT, sigint);
+#endif
   return r;
 }
 

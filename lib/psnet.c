@@ -12,7 +12,7 @@ static int __cdecl set_deci1_hdr(DS_PSNETD_PRIV *priv, DS_DECI1 *p, unsigned int
   unsigned int *wp; // [esp+8h] [ebp-8h]
   unsigned int sum; // [esp+Ch] [ebp-4h]
 
-  bzero(p, 0x20u);
+  ds_bzero(p, 0x20u);
   p->mag = -24244;
   p->len = len + 32;
   p->cid = priv->cid;
@@ -60,7 +60,7 @@ static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
   p = (DS_PSNETD_PRIV *)ds_alloc_mem_low("psnet.c", "init_psnet", sizeof(DS_PSNETD_PRIV));
   if ( !p )
     return 0;
-  bzero(p, 0x50u);
+  ds_bzero(p, 0x50u);
   v2 = getpid();
   p->cid = time(0) ^ v2;
   p->cid ^= p->cid >> 16;
@@ -73,7 +73,7 @@ static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
   if ( !v3 )
     return 0;
   cp = p->snd_buf;
-  bzero(cp, p->snd_len);
+  ds_bzero(cp, p->snd_len);
   cp_1 = &cp[set_deci1_hdr(p, (DS_DECI1 *)cp, 0x54080101u, 80)];
   *(_DWORD *)cp_1 = 18;
   cp_1 += 4;
@@ -299,7 +299,7 @@ static int __cdecl send_treset(DS_PSNETD_PRIV *p)
   if ( !v1 )
     return -1;
   cp = p->snd_buf;
-  bzero(cp, p->snd_len);
+  ds_bzero(cp, p->snd_len);
   *(_DWORD *)&cp[set_deci1_hdr(p, (DS_DECI1 *)cp, 0x54010000u, 4)] = 1;
   return 0;
 }

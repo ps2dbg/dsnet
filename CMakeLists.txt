@@ -18,6 +18,7 @@ endif()
 add_definitions(
 	-DDSNET_VERSION_STRING="${DSNET_VERSION}"
 	-DDSNET_STAMP_STRING="Version ${DSNET_VERSION} https://github.com/ps2dbg/dsnet"
+	-Werror=implicit-function-declaration
 )
 
 include_directories(include)
@@ -49,6 +50,9 @@ set(DSNET_LIB_SRC
 	lib/check_sss.c
 )
 add_library(dsnet STATIC ${DSNET_LIB_SRC})
+if(WIN32)
+target_link_libraries(dsnet -lws2_32)
+endif()
 
 add_executable(dscomp src/dscomp.c)
 

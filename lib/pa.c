@@ -447,25 +447,41 @@ static unsigned int __cdecl GetPLXRegister(unsigned int sam_fd)
   void *p_2; // [esp+0h] [ebp-8h]
   unsigned int base; // [esp+4h] [ebp-4h] BYREF
 
-  ioctl(sam_fd, 0x53414D05u, &base);
+  ds_ioctl(sam_fd, 0x53414D05u, &base);
+#ifndef _WIN32
   p = mmap(0, 0x1000u, 3, 1, sam_fd, base);
+#else
+  p = (void *)-1;
+#endif
   if ( p != (void *)-1 )
   {
     plcrs = (unsigned int *)((char *)p + (base & 0xFFF));
     *(_DWORD *)((char *)p + (base & 0xFFF) + 4) = 268435457;
     plcrs[61] = 1;
-    ioctl(sam_fd, 0x53414D06u, &base);
+    ds_ioctl(sam_fd, 0x53414D06u, &base);
+#ifndef _WIN32
     p_1 = mmap(0, 0x100000u, 3, 1, sam_fd, base);
+#else
+    p_1 = (void *)-1;
+#endif
     if ( p_1 != (void *)-1 )
     {
       screg = (unsigned int *)((char *)p_1 + (base & 0xFFF));
-      ioctl(sam_fd, 0x53414D07u, &base);
+      ds_ioctl(sam_fd, 0x53414D07u, &base);
+#ifndef _WIN32
       p_2 = mmap(0, 0x10000000u, 3, 1, sam_fd, base);
+#else
+      p_2 = (void *)-1;
+#endif
       if ( p_2 != (void *)-1 )
       {
         prgn2 = (unsigned int *)((char *)p_2 + (base & 0xFFF));
         mem_fd = open("/dev/mem", 0);
+#ifndef _WIN32
         pmem = (char *)mmap(0, 0x200000u, 1, 2, mem_fd, 209715200);
+#else
+        pmem = (void *)-1;
+#endif
         if ( pmem != (char *)-1 )
           return 0;
       }
@@ -1339,7 +1355,7 @@ static DSP_BUF *__cdecl recv_pamp_reset(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   screg[8] = 0x80000000;
   screg[8] = 0;
   screg[12] = 0;
-  ioctl(sam_fd, 0x53414D01u, 30);
+  ds_ioctl(sam_fd, 0x53414D01u, 30);
   while ( (screg[16422] & 0x80000000) == 0 )
     ;
   while ( (screg[32806] & 0x80000000) == 0 )

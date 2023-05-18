@@ -85,6 +85,7 @@ int __cdecl ds_send_netmp_default_msg(DS_DESC *desc)
   char *host; // [esp+18h] [ebp-50h]
   char *user; // [esp+1Ch] [ebp-4Ch]
   char hostname[64]; // [esp+20h] [ebp-48h] BYREF
+#ifndef _WIN32
   struct passwd *pw; // [esp+60h] [ebp-8h]
   unsigned int uid; // [esp+64h] [ebp-4h]
 
@@ -94,6 +95,9 @@ int __cdecl ds_send_netmp_default_msg(DS_DESC *desc)
     pw_name = pw->pw_name;
   else
     pw_name = "unknown-user";
+#else
+  pw_name = "unknown-user";
+#endif
   user = pw_name;
   if ( gethostname(hostname, 0x40u) < 0 )
     v2 = "unknown-host";

@@ -181,6 +181,7 @@ int __cdecl ds_fork()
 {
   int pid; // [esp+0h] [ebp-4h]
 
+#ifndef _WIN32
   pid = fork();
   if ( pid <= 0 )
   {
@@ -201,9 +202,14 @@ int __cdecl ds_fork()
   open("/dev/null", 0);
   open("/dev/null", 1);
   open("/dev/null", 1);
+#else
+  ds_error("!fork");
+  ds_exit(140);
+#endif
   return 0;
 }
 
+#ifndef _WIN32
 static void __cdecl sigchld(int arg)
 {
   int status; // [esp+4h] [ebp-4h] BYREF
@@ -214,6 +220,7 @@ static void __cdecl sigchld(int arg)
     *pstatus_by_child = (status & 0xFF00) >> 8;
   }
 }
+#endif
 
 int __cdecl ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
 {
@@ -222,6 +229,7 @@ int __cdecl ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
   int pid; // [esp+4h] [ebp-8h]
   char *shell; // [esp+8h] [ebp-4h]
 
+#ifndef _WIN32
   shell = getenv("SHELL");
   if ( !shell )
     shell = "/bin/sh";
@@ -244,6 +252,9 @@ int __cdecl ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
   signal(SIGINT, SIG_IGN);
   signal(SIGCHLD /* This was 17 (SIGSTOP), which was incorrect */, (sig_t)sigchld);
   return 0;
+#else
+  return ds_error("Fork not supported on this platform");
+#endif
 }
 
 int __cdecl ds_read(int fd, void *ptr, int n)
@@ -292,7 +303,11 @@ char *__cdecl ds_getenv(char *env)
 
 void __cdecl ds_bzero(void *ptr, int len)
 {
+#ifdef _WIN32
+  memset(ptr, 0, len);
+#else
   bzero(ptr, len);
+#endif
 }
 
 int __cdecl ds_gettime(int *psec, int *pusec)
@@ -322,7 +337,9 @@ int __cdecl ds_strncmp(char *s1, char *s2, int n)
 
 char *__cdecl ds_tilde_expand(char *buf, char *str)
 {
+#ifndef _WIN32
   struct passwd *pw; // [esp+4h] [ebp-410h]
+#endif
   char *home; // [esp+8h] [ebp-40Ch]
   char *dp; // [esp+Ch] [ebp-408h]
   char *sp; // [esp+10h] [ebp-404h]
@@ -337,6 +354,7 @@ char *__cdecl ds_tilde_expand(char *buf, char *str)
   *dp = 0;
   if ( *sp == 47 )
     ++sp;
+#ifndef _WIN32
   if ( user[0] )
   {
     pw = getpwnam(user);
@@ -348,6 +366,7 @@ char *__cdecl ds_tilde_expand(char *buf, char *str)
     return buf;
   }
   else
+#endif
   {
     home = getenv("HOME");
     if ( !home )

@@ -1,18 +1,23 @@
 #include "dsnet_prototypes.h"
 
+#ifndef _WIN32
 static struct termios oterm_area;
 
 static struct termios *oterm = NULL;
+#endif
 
 int __cdecl ds_raw_kbd()
 {
+#ifndef _WIN32
   unsigned int c_oflag; // ecx
   unsigned int c_lflag; // ecx
   struct termios new_area; // [esp+4h] [ebp-44h] BYREF
   struct termios *old; // [esp+40h] [ebp-8h]
+#endif
   int fd; // [esp+44h] [ebp-4h]
 
   fd = 0;
+#ifndef _WIN32
   old = &oterm_area;
   if ( oterm )
     return -1;
@@ -26,11 +31,12 @@ int __cdecl ds_raw_kbd()
   c_lflag = new_area.c_lflag;
   LOBYTE(c_lflag) = new_area.c_lflag & 0xF4;
   new_area.c_lflag = c_lflag;
-  bzero(new_area.c_cc, 0x20u);
+  ds_bzero(new_area.c_cc, 0x20u);
   new_area.c_cc[6] = 1;
   if ( tcsetattr(fd, 0, &new_area) < 0 )
     return ds_error("!tcsetattr()");
   oterm = old;
+#endif
   return fd;
 }
 
@@ -39,12 +45,14 @@ int __cdecl ds_resume_kbd()
   int r; // [esp+0h] [ebp-4h]
 
   r = 0;
+#ifndef _WIN32
   if ( oterm )
   {
     tcsetattr(0, 0, oterm);
     r = 1;
   }
   oterm = 0;
+#endif
   return r;
 }
 

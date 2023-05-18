@@ -58,7 +58,9 @@ int __cdecl ds_shell_cmd(int ac, char **av)
   int v9; // eax
   int n; // [esp+0h] [ebp-428h]
   int i; // [esp+4h] [ebp-424h]
+#ifndef _WIN32
   sig_t sigint; // [esp+8h] [ebp-420h]
+#endif
   int r; // [esp+Ch] [ebp-41Ch]
   int r_1; // [esp+Ch] [ebp-41Ch]
   int fd; // [esp+10h] [ebp-418h]
@@ -86,6 +88,7 @@ int __cdecl ds_shell_cmd(int ac, char **av)
     *bp = 0;
     av[1] = buf;
   }
+#ifndef _WIN32
   shell = getenv("SHELL");
   if ( !shell )
     shell = "/bin/sh";
@@ -131,6 +134,9 @@ LABEL_30:
   }
   if ( raw )
     ds_raw_kbd();
+#else
+  r = ds_error("Fork not supported on this platform");
+#endif
   return r;
 }
 

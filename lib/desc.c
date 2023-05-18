@@ -556,7 +556,7 @@ int __cdecl ds_reset_info(DS_DESC *desc)
 
   if ( desc->type != 2 )
     return -1;
-  r = ioctl(desc->fd, 0x41260003u, 0);
+  r = ds_ioctl(desc->fd, 0x41260003u, 0);
   if ( r >= 0 )
     return r;
   else

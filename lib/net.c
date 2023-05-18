@@ -87,7 +87,7 @@ static int __cdecl getaddr_net(char *name, struct sockaddr_in *sin)
   }
   if ( !*hostp )
     hostp = "127.0.0.1";
-  bzero(sin, 0x10u);
+  ds_bzero(sin, 0x10u);
   temp = inet_addr(hostp);
   if ( temp == -1 )
   {
@@ -117,7 +117,9 @@ static int __cdecl setup_net(int s)
   int hold; // [esp+4h] [ebp-8h] BYREF
   struct protoent *protoent; // [esp+8h] [ebp-4h]
 
+#ifndef _WIN32
   signal(SIGPIPE, SIG_IGN);
+#endif
   hold = 1;
   if ( setsockopt(s, 1, 9, &hold, 4u) < 0 )
     return ds_error("!setsockopt(KEEPALIVE)");
@@ -136,12 +138,16 @@ static int __cdecl setup_net(int s)
     v3 = strerror(errno);
     ds_error("setsockopt(IP_TOS) - %s (ignored)", v3);
   }
+#ifndef _WIN32
   flag = fcntl(s, 3, 0);
   if ( flag == -1 )
     return ds_error("!fcntl(F_GETFL)");
   if ( fcntl(s, 4, flag | 0x800) >= 0 )
     return 0;
   return ds_error("!fcntl(F_SETFL)");
+#else
+  return 0;
+#endif
 }
 
 static DS_DESC *__cdecl ds_open_dev(char *name, DS_RECV_FUNC *recv_func)
@@ -229,7 +235,7 @@ DS_DESC *__cdecl ds_listen_net(char *portp, int (__cdecl *accept_func)(DS_DESC *
   int fd; // [esp+404h] [ebp-14h]
   struct sockaddr_in sin; // [esp+408h] [ebp-10h] BYREF
 
-  bzero(&sin, 0x10u);
+  ds_bzero(&sin, 0x10u);
   sin.sin_family = 2;
   sin.sin_port = getport_net(portp);
   if ( !sin.sin_port )
