@@ -310,13 +310,16 @@ void __cdecl ds_bzero(void *ptr, int len)
 #endif
 }
 
-int __cdecl ds_gettime(int *psec, int *pusec)
+int __cdecl ds_gettime(int64_t *psec, int64_t *pusec)
 {
   struct timeval tval; // [esp+0h] [ebp-8h] BYREF
 
   if ( gettimeofday(&tval, 0) < 0 )
     return ds_error("!gettimeofday");
-  *(struct timeval *)psec = tval;
+
+  *psec = tval.tv_sec;
+  *pusec = tval.tv_usec;
+
   return 0;
 }
 

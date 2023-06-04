@@ -839,10 +839,10 @@ static void __cdecl show_statics(int tb, int tst, int tut)
 int __cdecl pa_sg_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-2Ch]
-  int u; // [esp+4h] [ebp-28h] BYREF
-  int s; // [esp+8h] [ebp-24h] BYREF
-  int tu0; // [esp+Ch] [ebp-20h] BYREF
-  int ts0; // [esp+10h] [ebp-1Ch] BYREF
+  int64_t u; // [esp+4h] [ebp-28h] BYREF
+  int64_t s; // [esp+8h] [ebp-24h] BYREF
+  int64_t tu0; // [esp+Ch] [ebp-20h] BYREF
+  int64_t ts0; // [esp+10h] [ebp-1Ch] BYREF
   int v8; // [esp+14h] [ebp-18h]
   unsigned int v9; // [esp+18h] [ebp-14h]
   int left; // [esp+1Ch] [ebp-10h]
@@ -900,10 +900,10 @@ int __cdecl pa_sg_cmd(int ac, char **av)
 int __cdecl pa_sgi_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
-  int tut; // [esp+4h] [ebp-24h] BYREF
-  int s; // [esp+8h] [ebp-20h] BYREF
-  int tu0; // [esp+Ch] [ebp-1Ch] BYREF
-  int psec; // [esp+10h] [ebp-18h] BYREF
+  int64_t tut; // [esp+4h] [ebp-24h] BYREF
+  int64_t s; // [esp+8h] [ebp-20h] BYREF
+  int64_t tu0; // [esp+Ch] [ebp-1Ch] BYREF
+  int64_t psec; // [esp+10h] [ebp-18h] BYREF
   unsigned int total; // [esp+14h] [ebp-14h]
   int left; // [esp+18h] [ebp-10h]
   void *fpw; // [esp+1Ch] [ebp-Ch]
@@ -959,10 +959,10 @@ int __cdecl pa_sgi_cmd(int ac, char **av)
 int __cdecl pa_sei_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
-  int tut; // [esp+4h] [ebp-24h] BYREF
-  int s; // [esp+8h] [ebp-20h] BYREF
-  int tu0; // [esp+Ch] [ebp-1Ch] BYREF
-  int psec; // [esp+10h] [ebp-18h] BYREF
+  int64_t tut; // [esp+4h] [ebp-24h] BYREF
+  int64_t s; // [esp+8h] [ebp-20h] BYREF
+  int64_t tu0; // [esp+Ch] [ebp-1Ch] BYREF
+  int64_t psec; // [esp+10h] [ebp-18h] BYREF
   unsigned int total; // [esp+14h] [ebp-14h]
   int left; // [esp+18h] [ebp-10h]
   void *fpw; // [esp+1Ch] [ebp-Ch]
@@ -1018,10 +1018,10 @@ int __cdecl pa_sei_cmd(int ac, char **av)
 int __cdecl pa_sii_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
-  int tut; // [esp+4h] [ebp-24h] BYREF
-  int s; // [esp+8h] [ebp-20h] BYREF
-  int tu0; // [esp+Ch] [ebp-1Ch] BYREF
-  int psec; // [esp+10h] [ebp-18h] BYREF
+  int64_t tut; // [esp+4h] [ebp-24h] BYREF
+  int64_t s; // [esp+8h] [ebp-20h] BYREF
+  int64_t tu0; // [esp+Ch] [ebp-1Ch] BYREF
+  int64_t psec; // [esp+10h] [ebp-18h] BYREF
   unsigned int total; // [esp+14h] [ebp-14h]
   int left; // [esp+18h] [ebp-10h]
   void *fpw; // [esp+1Ch] [ebp-Ch]
@@ -1077,10 +1077,10 @@ int __cdecl pa_sii_cmd(int ac, char **av)
 int __cdecl pa_si_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
-  int u; // [esp+4h] [ebp-24h] BYREF
-  int s; // [esp+8h] [ebp-20h] BYREF
-  int tu0; // [esp+Ch] [ebp-1Ch] BYREF
-  int psec; // [esp+10h] [ebp-18h] BYREF
+  int64_t u; // [esp+4h] [ebp-24h] BYREF
+  int64_t s; // [esp+8h] [ebp-20h] BYREF
+  int64_t tu0; // [esp+Ch] [ebp-1Ch] BYREF
+  int64_t psec; // [esp+10h] [ebp-18h] BYREF
   unsigned int v8; // [esp+14h] [ebp-14h]
   int left; // [esp+18h] [ebp-10h]
   void *fpw; // [esp+1Ch] [ebp-Ch]
@@ -1141,10 +1141,10 @@ int __cdecl pa_save_cmd(int ac, char **av)
 int __cdecl pa_se_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
-  int u; // [esp+4h] [ebp-24h] BYREF
-  int s; // [esp+8h] [ebp-20h] BYREF
-  int tu0; // [esp+Ch] [ebp-1Ch] BYREF
-  int psec; // [esp+10h] [ebp-18h] BYREF
+  int64_t u; // [esp+4h] [ebp-24h] BYREF
+  int64_t s; // [esp+8h] [ebp-20h] BYREF
+  int64_t tu0; // [esp+Ch] [ebp-1Ch] BYREF
+  int64_t psec; // [esp+10h] [ebp-18h] BYREF
   unsigned int v8; // [esp+14h] [ebp-14h]
   int left; // [esp+18h] [ebp-10h]
   void *fpw; // [esp+1Ch] [ebp-Ch]

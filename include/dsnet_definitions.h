@@ -226,7 +226,7 @@ struct _dsp_buf {struct _dsp_buf *forw; struct _dsp_buf *back; char buf[];};
 typedef struct _dsp_buf DSP_BUF;
 typedef struct {DSP_BUF *head; DSP_BUF *tail;} DSP_QUE;
 struct _ds_recv_func_desc;
-struct _ds_desc {struct _ds_desc *forw; struct _ds_desc *back; int id; int type; int f_psnet; void *psnet_priv; int fd; DSP_QUE sque; DECI2_HDR rhdr; char *sptr; char *rptr; int slen; int rlen; DSP_BUF *sbuf; DSP_BUF *rbuf; int sec; int usec; int comport; char *msg; int tty_len; struct __anon_struct_58 {struct _ds_recv_func_desc *head; struct _ds_recv_func_desc *tail;} recv_func_list; int (*accept_func)(struct _ds_desc *desc); NETMP_PROTOS *protos; int nprotos;};
+struct _ds_desc {struct _ds_desc *forw; struct _ds_desc *back; int id; int type; int f_psnet; void *psnet_priv; int fd; DSP_QUE sque; DECI2_HDR rhdr; char *sptr; char *rptr; int slen; int rlen; DSP_BUF *sbuf; DSP_BUF *rbuf; int64_t sec; int64_t usec; int comport; char *msg; int tty_len; struct __anon_struct_58 {struct _ds_recv_func_desc *head; struct _ds_recv_func_desc *tail;} recv_func_list; int (*accept_func)(struct _ds_desc *desc); NETMP_PROTOS *protos; int nprotos;};
 typedef struct _ds_desc DS_DESC;
 typedef DSP_BUF * (DS_RECV_FUNC)(DS_DESC *desc, DSP_BUF *db);
 struct _ds_recv_func_desc {struct _ds_recv_func_desc *forw; struct _ds_recv_func_desc *back; int proto; int type; int code; DS_RECV_FUNC *func;};
@@ -299,7 +299,7 @@ typedef struct {unsigned int sadr; unsigned int eadr;} ADRS;
 struct mdebug {struct mdebug *forw; struct mdebug *back; char *path; int id; int base; SYM_HDR *shdr; unsigned char *lins; unsigned char *line; PDT *pdts; PDT *pdte; SYM *lsyms; SYM *lsyme; char *lstrs; char *lstre; EXT_SYM *esyms; EXT_SYM *esyme; char *estrs; char *estre; FDT *fdts; FDT *fdte; ADRS *fdt_adrs; ADRS *pdt_adrs;};
 typedef struct mdebug MDEBUG;
 struct handle {int fd; DIR *dir; int ino; char *name;};
-struct seq_time {struct seq_time *forw; struct seq_time *back; int seq; int s; int u;};
+struct seq_time {struct seq_time *forw; struct seq_time *back; int seq; int64_t s; int64_t u;};
 typedef struct seq_time SEQ_TIME;
 typedef struct {int off; int bit; char *name;} IOP_REGS;
 

@@ -1294,8 +1294,8 @@ void __cdecl ds_flush_desc_by_proto(int proto)
 void __cdecl ds_status_desc()
 {
   int psec; // [esp+Ch] [ebp-24h]
-  int usec; // [esp+14h] [ebp-1Ch] BYREF
-  int sec; // [esp+18h] [ebp-18h] BYREF
+  int64_t usec; // [esp+14h] [ebp-1Ch] BYREF
+  int64_t sec; // [esp+18h] [ebp-18h] BYREF
   int i_3; // [esp+1Ch] [ebp-14h]
   int n; // [esp+20h] [ebp-10h]
   NETMP_PROTOS *protos; // [esp+24h] [ebp-Ch]

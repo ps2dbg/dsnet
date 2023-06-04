@@ -112,7 +112,7 @@ extern int __cdecl ds_write(int fd, void *ptr, int n);
 extern char *__cdecl ds_basename(char *name);
 extern char *__cdecl ds_getenv(char *env);
 extern void __cdecl ds_bzero(void *ptr, int len);
-extern int __cdecl ds_gettime(int *psec, int *pusec);
+extern int __cdecl ds_gettime(int64_t *psec, int64_t *pusec);
 extern char *__cdecl ds_strchr(char *str, int ch);
 extern char *__cdecl ds_strcat(char *dst, char *src);
 extern int __cdecl ds_strncmp(char *s1, char *s2, int n);

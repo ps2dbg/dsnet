@@ -877,16 +877,16 @@ static void __cdecl show_statics(int tb, int mst, int mut, int tst, int tut)
 
 int __cdecl bload_cmd(int ac, char **av)
 {
-  int tu0; // [esp+0h] [ebp-44h] BYREF
-  int psec; // [esp+4h] [ebp-40h] BYREF
+  int64_t tu0; // [esp+0h] [ebp-44h] BYREF
+  int64_t psec; // [esp+4h] [ebp-40h] BYREF
   int tut; // [esp+8h] [ebp-3Ch]
   int tst; // [esp+Ch] [ebp-38h]
-  int mu0; // [esp+10h] [ebp-34h] BYREF
-  int v8; // [esp+14h] [ebp-30h] BYREF
+  int64_t mu0; // [esp+10h] [ebp-34h] BYREF
+  int64_t v8; // [esp+14h] [ebp-30h] BYREF
   int mut; // [esp+18h] [ebp-2Ch]
   int mst; // [esp+1Ch] [ebp-28h]
-  int u; // [esp+20h] [ebp-24h] BYREF
-  int s; // [esp+24h] [ebp-20h] BYREF
+  int64_t u; // [esp+20h] [ebp-24h] BYREF
+  int64_t s; // [esp+24h] [ebp-20h] BYREF
   int tb; // [esp+28h] [ebp-1Ch]
   int len; // [esp+2Ch] [ebp-18h]
   int r; // [esp+30h] [ebp-14h]
@@ -962,16 +962,16 @@ LABEL_25:
 int __cdecl bsave_cmd(int ac, char **av)
 {
   int v3; // eax
-  int tu0; // [esp+0h] [ebp-48h] BYREF
-  int psec; // [esp+4h] [ebp-44h] BYREF
+  int64_t tu0; // [esp+0h] [ebp-48h] BYREF
+  int64_t psec; // [esp+4h] [ebp-44h] BYREF
   int tut; // [esp+8h] [ebp-40h]
   int tst; // [esp+Ch] [ebp-3Ch]
-  int mu0; // [esp+10h] [ebp-38h] BYREF
-  int v9; // [esp+14h] [ebp-34h] BYREF
+  int64_t mu0; // [esp+10h] [ebp-38h] BYREF
+  int64_t v9; // [esp+14h] [ebp-34h] BYREF
   int mut; // [esp+18h] [ebp-30h]
   int mst; // [esp+1Ch] [ebp-2Ch]
-  int u; // [esp+20h] [ebp-28h] BYREF
-  int s; // [esp+24h] [ebp-24h] BYREF
+  int64_t u; // [esp+20h] [ebp-28h] BYREF
+  int64_t s; // [esp+24h] [ebp-24h] BYREF
   int tb; // [esp+28h] [ebp-20h]
   int cnt; // [esp+2Ch] [ebp-1Ch] BYREF
   int n; // [esp+30h] [ebp-18h]
