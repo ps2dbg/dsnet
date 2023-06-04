@@ -105,7 +105,7 @@ quad regbuf_vals[11][32];
 unsigned int regbuf_mask[11];
 
 static void __cdecl ntoh_word_copy(unsigned int *dest, unsigned int *src, int len);
-static DSP_BUF *__cdecl alloc_dbgp(int id, int group, int type, int code, int result, int count, void *pp, int len);
+static DSP_BUF *__cdecl alloc_dbgp(int id, int group, int type, int code, int result, int count, void **pp, int len);
 static void __cdecl print_prompt();
 static void __cdecl erase_input_line();
 static void __cdecl redraw_input_line(int f_force);
@@ -163,7 +163,7 @@ static void __cdecl ntoh_word_copy(unsigned int *dest, unsigned int *src, int le
     *dest++ = *src++;
 }
 
-static DSP_BUF *__cdecl alloc_dbgp(int id, int group, int type, int code, int result, int count, void *pp, int len)
+static DSP_BUF *__cdecl alloc_dbgp(int id, int group, int type, int code, int result, int count, void **pp, int len)
 {
   DSP_BUF *db; // [esp+1Ch] [ebp-Ch]
 
@@ -178,7 +178,7 @@ static DSP_BUF *__cdecl alloc_dbgp(int id, int group, int type, int code, int re
   db->buf[13] = count;
   *(_WORD *)&db->buf[14] = 0;
   if ( pp )
-    *(_DWORD *)pp = &db->buf[16];
+    *pp = &db->buf[16];
   return db;
 }
 
