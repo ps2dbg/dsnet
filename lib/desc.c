@@ -26,89 +26,85 @@ DS_DESC *__cdecl ds_add_select_list(
         int (__cdecl *accept_func)(DS_DESC *desc),
         DS_RECV_FUNC *recv_func)
 {
-  int v5; // eax
   DS_DESC *tail; // edx
-  int len; // [esp+8h] [ebp-Ch]
+  unsigned len; // [esp+8h] [ebp-Ch]
   char *msg; // [esp+Ch] [ebp-8h]
   DS_DESC *desc; // [esp+10h] [ebp-4h]
 
   msg = 0;
   if ( name )
-    v5 = strlen(name) + 1;
+    len = strlen(name) + 1;
   else
-    v5 = 0;
-  len = v5;
-  desc = (DS_DESC *)ds_alloc_mem_low("desc.c", "ds_add_select_list", v5 + sizeof(DS_DESC) + 8 /* FIXME: allocated size is 108 */);
-  if ( desc )
-  {
-    ds_bzero(desc, sizeof(DS_DESC) + 8);
-    if ( type == 2 )
-    {
-      if ( dev_desc_id < 0 )
-        dev_desc_id = desc_id++;
-      desc->id = dev_desc_id;
-    }
-    else
-    {
-      desc->id = desc_id++;
-    }
-    desc->type = type;
-    desc->f_psnet = 0;
-    desc->psnet_priv = 0;
-    desc->fd = fd;
-    ds_gettime(&desc->sec, &desc->usec);
-    desc->comport = 0;
-    desc->msg = 0;
-    desc->tty_len = 0;
-    desc->recv_func_list.tail = 0;
-    desc->recv_func_list.head = 0;
-    desc->accept_func = accept_func;
-    desc->protos = 0;
-    desc->nprotos = 0;
-    if ( name && len > 0 )
-      memcpy(&desc[1], name, len);
-    switch ( type )
-    {
-      case 2:
-      case 32:
-      case 64:
-        msg = "open";
-        break;
-      case 4:
-        msg = "listen";
-        break;
-      case 8:
-        msg = "accept";
-        break;
-      case 16:
-        msg = "connect";
-        break;
-    }
-    if ( msg )
-      ds_add_log(desc, msg, 0);
-    tail = ds_select_list.tail;
-    desc->back = ds_select_list.tail;
-    if ( tail )
-      desc->back->forw = desc;
-    else
-      ds_select_list.head = desc;
-    desc->forw = 0;
-    ds_select_list.tail = desc;
-    if ( type == 8 && accept_func && accept_func(desc) < 0
-      || recv_func && !ds_add_recv_func(desc, -1, -1, -1, recv_func) )
-    {
-      return ds_close_desc(desc);
-    }
-    else
-    {
-      return desc;
-    }
-  }
-  else
+    len = 0;
+
+  desc = ds_alloc_mem_low("desc.c", "ds_add_select_list", len + sizeof(DS_DESC) + 8 /* FIXME: allocated size is 108 */);
+  if ( !desc )
   {
     close(fd);
     return 0;
   }
+
+  ds_bzero(desc, sizeof(DS_DESC) + 8);
+  if ( type == 2 )
+  {
+    if ( dev_desc_id < 0 )
+      dev_desc_id = desc_id++;
+    desc->id = dev_desc_id;
+  }
+  else
+  {
+    desc->id = desc_id++;
+  }
+  desc->type = type;
+  desc->f_psnet = 0;
+  desc->psnet_priv = 0;
+  desc->fd = fd;
+  ds_gettime(&desc->sec, &desc->usec);
+  desc->comport = 0;
+  desc->msg = 0;
+  desc->tty_len = 0;
+  desc->recv_func_list.tail = 0;
+  desc->recv_func_list.head = 0;
+  desc->accept_func = accept_func;
+  desc->protos = 0;
+  desc->nprotos = 0;
+  if ( name && len > 0 )
+    memcpy(&desc[1], name, len);
+  switch ( type )
+  {
+    case 2:
+    case 32:
+    case 64:
+      msg = "open";
+      break;
+    case 4:
+      msg = "listen";
+      break;
+    case 8:
+      msg = "accept";
+      break;
+    case 16:
+      msg = "connect";
+      break;
+  }
+  if ( msg )
+    ds_add_log(desc, msg, 0);
+  tail = ds_select_list.tail;
+  desc->back = ds_select_list.tail;
+  if ( tail )
+    desc->back->forw = desc;
+  else
+    ds_select_list.head = desc;
+  desc->forw = 0;
+  ds_select_list.tail = desc;
+
+  if ( type == 8 && accept_func && accept_func(desc) < 0
+    || recv_func && !ds_add_recv_func(desc, -1, -1, -1, recv_func) )
+  {
+    return ds_close_desc(desc);
+  }
+
+  return desc;
 }
 
 DS_RECV_FUNC_DESC *__cdecl ds_add_recv_func(DS_DESC *desc, int proto, int type, int code, DS_RECV_FUNC *func)
@@ -959,83 +955,102 @@ int __cdecl ds_select_desc(int sec, int usec)
   tv = 0;
   FD_ZERO(&rfds);
   FD_ZERO(&wfds);
+
   for ( p = ds_select_list.head; p; p = p->forw )
   {
     FD_SET(p->fd, &rfds);
     if ( (p->type & 0x7A) != 0 && (p->sque.head || p->sbuf) )
       FD_SET(p->fd, &wfds);
   }
+
   if ( sec >= 0 && usec >= 0 )
   {
     tv = &tval;
     tval.tv_sec = sec;
     tval.tv_usec = usec;
   }
+
   r = select(256, &rfds, &wfds, 0, tv);
-  if ( r >= 0 )
+  if ( r < 0 )
   {
-    if ( r )
+    if ( errno == EINTR )
     {
-      for ( p = ds_select_list.head; p; p = q )
-      {
-        q = p->forw;
-        if ( FD_ISSET(p->fd, &rfds)
-          && (unsigned int)(p->type - 1) <= 0x3F )
-        {
-          switch ( p->type )
-          {
-            case 1:
-              xrecv_kbd(p);
-              break;
-            case 2:
-              if ( xrecv_dev(p) == -3 )
-                ds_close_desc(p);
-              break;
-          }
-        }
-      }
-      for ( p = ds_select_list.head; p; p = q )
-      {
-        q = p->forw;
-        if ( FD_ISSET(p->fd, &wfds) )
-        {
-          switch ( p->type )
-          {
-            case 2:
-              if ( xsend_dev(p) < 0 )
-                ds_close_desc(p);
-              break;
-            case 8:
-            case 0x10:
-              if ( xsend_net(p) < 0 )
-                ds_close_desc(p);
-              break;
-            case 0x20:
-              if ( xsend_comport(p) < 0 )
-                ds_close_desc(p);
-              break;
-            default:
-              if ( p->type == 64 && xsend_netdev(p) < 0 )
-                ds_close_desc(p);
-              break;
-          }
-        }
-      }
       return 1;
     }
     else
     {
-      return 0;
+      return ds_error("!select");
     }
   }
-  else if ( errno == 4 )
+
+  if ( !r )
   {
-    return 1;
+    return 0;
   }
-  else
+
+  for ( p = ds_select_list.head; p; p = q )
   {
-    return ds_error("!select");
+    // list_for_each_safe
+    q = p->forw;
+    if ( FD_ISSET(p->fd, &rfds))
+    {
+      switch ( p->type )
+      {
+        case 1:
+          xrecv_kbd(p);
+          break;
+        case 2:
+          if ( xrecv_dev(p) == -3 )
+            ds_close_desc(p);
+          break;
+        case 4:
+            ds_accept(p->fd, p->accept_func);
+          break;
+        case 8:
+        case 16:
+          if ( xrecv_net(p) == -2 )
+            ds_close_desc(p);
+          break;
+        case 32:
+          xrecv_comport(p);
+          break;
+        case 64:
+          xrecv_netdev(p);
+          break;
+      }
+    }
   }
+
+  for ( p = ds_select_list.head; p; p = q )
+  {
+    // list_for_each_safe
+    q = p->forw;
+    if ( FD_ISSET(p->fd, &wfds) )
+    {
+      switch ( p->type )
+      {
+        case 2:
+          if ( xsend_dev(p) < 0 )
+            ds_close_desc(p);
+          break;
+        case 8:
+        case 16:
+          if ( xsend_net(p) < 0 )
+            ds_close_desc(p);
+          break;
+        case 32:
+          if ( xsend_comport(p) < 0 )
+            ds_close_desc(p);
+          break;
+        default:
+          if ( p->type == 64 && xsend_netdev(p) < 0 )
+            ds_close_desc(p);
+          break;
+      }
+    }
+  }
+
+  return 1;
 }
 
 DS_DESC *__cdecl ds_desc_by_proto(int proto)
@@ -1386,4 +1401,3 @@ static int __cdecl isttyp(int proto)
     return 1;
   return proto == 1043;
 }
-

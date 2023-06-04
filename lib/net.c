@@ -120,34 +120,29 @@ static int __cdecl setup_net(int s)
 #ifndef _WIN32
   signal(SIGPIPE, SIG_IGN);
 #endif
+
   hold = 1;
-  if ( setsockopt(s, 1, 9, &hold, 4u) < 0 )
+  if ( setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &hold, 4u) < 0 )
     return ds_error("!setsockopt(KEEPALIVE)");
-  protoent = getprotobyname("tcp");
-  if ( !protoent )
-    return ds_error("!getprotobyname(tcp)");
   hold = 1;
-  if ( setsockopt(s, protoent->p_proto, 1, &hold, 4u) < 0 )
+  if ( setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &hold, 4u) < 0 )
     return ds_error("!setsockopt(TCP_NODELAY)");
-  protoent = getprotobyname("ip");
-  if ( !protoent )
-    return ds_error("!getprotobyname(ip)");
   hold = 16;
-  if ( setsockopt(s, protoent->p_proto, 1, &hold, 4u) < 0 && errno != 92 )
+  if ( setsockopt(s, IPPROTO_IP, IP_TOS, &hold, 4u) < 0 && errno != ENOPROTOOPT)
   {
     v3 = strerror(errno);
     ds_error("setsockopt(IP_TOS) - %s (ignored)", v3);
   }
+
 #ifndef _WIN32
-  flag = fcntl(s, 3, 0);
+  flag = fcntl(s, F_GETFL);
   if ( flag == -1 )
     return ds_error("!fcntl(F_GETFL)");
-  if ( fcntl(s, 4, flag | 0x800) >= 0 )
-    return 0;
-  return ds_error("!fcntl(F_SETFL)");
-#else
-  return 0;
+  if ( fcntl(s, F_SETFL, flag | O_NONBLOCK ) < 0 )
+    return ds_error("!fcntl(F_SETFL)");
 #endif
+
+  return 0;
 }
 
 static DS_DESC *__cdecl ds_open_dev(char *name, DS_RECV_FUNC *recv_func)
@@ -177,8 +172,8 @@ static DS_DESC *__cdecl ds_open_dev(char *name, DS_RECV_FUNC *recv_func)
 
 DS_DESC *__cdecl ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
 {
-  char *v3; // eax
-  int v4; // [esp-4h] [ebp-474h]
+  char *addr; // eax
+  int port; // [esp-4h] [ebp-474h]
   char name[1024]; // [esp+0h] [ebp-470h] BYREF
   int i; // [esp+400h] [ebp-70h]
   int fd; // [esp+404h] [ebp-6Ch]
@@ -212,76 +207,72 @@ DS_DESC *__cdecl ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
     }
     sleep(1u);
   }
-  if ( setup_net(fd) >= 0 )
-  {
-    v4 = ntohs(sin.sin_port);
-    v3 = inet_ntoa(sin.sin_addr);
-    sprintf(name, "%s:%d", v3, v4);
-    return ds_add_select_list(16, fd, name, 0, recv_func);
-  }
-  else
+
+  if ( setup_net(fd) < 0 )
   {
     close(fd);
     return 0;
   }
+
+  port = ntohs(sin.sin_port);
+  addr = inet_ntoa(sin.sin_addr);
+  sprintf(name, "%s:%d", addr, port);
+
+  return ds_add_select_list(16, fd, name, 0, recv_func);
 }
 
 DS_DESC *__cdecl ds_listen_net(char *portp, int (__cdecl *accept_func)(DS_DESC *desc))
 {
-  char *v3; // eax
-  int v4; // [esp-4h] [ebp-41Ch]
+  char *addr; // eax
+  int port; // [esp-4h] [ebp-41Ch]
   char name[1024]; // [esp+0h] [ebp-418h] BYREF
   int hold; // [esp+400h] [ebp-18h] BYREF
   int fd; // [esp+404h] [ebp-14h]
   struct sockaddr_in sin; // [esp+408h] [ebp-10h] BYREF
 
-  ds_bzero(&sin, 0x10u);
-  sin.sin_family = 2;
+  ds_bzero(&sin, sizeof(sin));
+  sin.sin_family = AF_INET;
   sin.sin_port = getport_net(portp);
+  sin.sin_addr.s_addr = 0;
+
   if ( !sin.sin_port )
     return 0;
-  sin.sin_addr.s_addr = 0;
-  fd = socket(2, 1, 0);
-  if ( fd >= 0 )
-  {
-    hold = 1;
-    if ( setsockopt(fd, 1, 2, &hold, 4u) >= 0 )
-    {
-      if ( bind(fd, (const struct sockaddr *)&sin, 0x10u) >= 0 )
-      {
-        if ( listen(fd, 5) >= 0 )
-        {
-          v4 = ntohs(sin.sin_port);
-          v3 = inet_ntoa(sin.sin_addr);
-          sprintf(name, "%s:%d", v3, v4);
-          return ds_add_select_list(4, fd, name, accept_func, 0);
-        }
-        else
-        {
-          close(fd);
-          ds_error("!listen");
-          return 0;
-        }
-      }
-      else
-      {
-        close(fd);
-        ds_error("!bind");
-        return 0;
-      }
-    }
-    else
-    {
-      close(fd);
-      ds_error("!setsockopt(REUSEADDR)");
-      return 0;
-    }
-  }
-  else
-  {
+
+  fd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+  if (fd < 0) {
     ds_error("!socket");
     return 0;
   }
+
+  if ( setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &hold, sizeof(hold)) < 0 )
+  {
+    close(fd);
+    ds_error("!setsockopt(REUSEADDR)");
+    return 0;
+
+  }
+
+  hold = 1;
+  if ( bind(fd, (const struct sockaddr *)&sin, 0x10u) < 0 )
+  {
+    close(fd);
+    ds_error("!bind");
+    return 0;
+
+  }
+
+  if ( listen(fd, 5) < 0 )
+  {
+    close(fd);
+    ds_error("!listen");
+    return 0;
+  }
+
+  port = ntohs(sin.sin_port);
+  addr = inet_ntoa(sin.sin_addr);
+  sprintf(name, "%s:%d", addr, port);
+
+  return ds_add_select_list(4, fd, name, accept_func, 0);
 }
 
 DS_DESC *__cdecl ds_accept(int s, int (__cdecl *accept_func)(DS_DESC *desc))
