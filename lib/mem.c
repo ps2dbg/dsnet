@@ -80,36 +80,33 @@ void *__cdecl ds_alloc_mem_low(char *file, char *func, int size)
   MEM *tail; // edx
   MEM *p; // [esp+4h] [ebp-4h]
 
-  if ( size >= 0 )
-  {
-    p = (MEM *)malloc(size + sizeof(MEM));
-    if ( p )
-    {
-      p->file = file;
-      p->func = func;
-      p->size = size;
-      p->magic = 1296395586;
-      tail = mems.tail;
-      p->back = mems.tail;
-      if ( tail )
-        p->back->forw = p;
-      else
-        mems.head = p;
-      p->forw = 0;
-      mems.tail = p;
-      return &p[1];
-    }
-    else
-    {
-      ds_error("!malloc");
-      return 0;
-    }
-  }
-  else
+  if ( size < 0 )
   {
     ds_error("malloc - no space");
     return 0;
   }
+
+  p = malloc(size + sizeof(MEM));
+  if (!p)
+  {
+    ds_error("!malloc");
+    return 0;
+  }
+
+  p->file = file;
+  p->func = func;
+  p->size = size;
+  p->magic = 'MEmB';
+  tail = mems.tail;
+  p->back = mems.tail;
+  if ( tail )
+    p->back->forw = p;
+  else
+    mems.head = p;
+  p->forw = 0;
+  mems.tail = p;
+
+  return &p[1];
 }
 
 void *__cdecl ds_free_mem_low(void *ptr, char *file, char *func)
@@ -119,12 +116,12 @@ void *__cdecl ds_free_mem_low(void *ptr, char *file, char *func)
   if ( ptr )
   {
     p = (MEM *)((char *)ptr - sizeof(MEM));
-    if ( *((_DWORD *)ptr - 1) != 1296395586 )
+    if ( *((_DWORD *)ptr - 1) != 'MEmB')
     {
       ds_printf("ds_free_mem: bad free from %s:%s()\n", file, func);
       return 0;
     }
-    p->magic = 1296395590;
+    p->magic = 'MEmF';
     if ( p->forw )
       p->forw->back = p->back;
     else

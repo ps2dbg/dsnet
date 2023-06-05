@@ -134,8 +134,8 @@ int __cdecl ds_send_netmp_default_msg(DS_DESC *desc)
 int __cdecl ds_send_netmp_status_reply(DS_DESC *desc)
 {
   int sec; // [esp+8h] [ebp-34h]
-  int cusec; // [esp+Ch] [ebp-30h] BYREF
-  int csec; // [esp+10h] [ebp-2Ch] BYREF
+  uint64_t cusec; // [esp+Ch] [ebp-30h] BYREF
+  uint64_t csec; // [esp+10h] [ebp-2Ch] BYREF
   int len; // [esp+14h] [ebp-28h]
   int v8; // [esp+18h] [ebp-24h]
   int ml; // [esp+1Ch] [ebp-20h]

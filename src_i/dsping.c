@@ -12,9 +12,9 @@ static int pkt_timeout = 0;
 static int send_count = 0;
 static int recv_count = 0;
 static int loss_count = 0;
-static int rt_min = 2147483647;
-static int rt_max = -1;
-static int rt_avg = 0;
+static int64_t rt_min = INT64_MAX;
+static int64_t rt_max = -1;
+static int64_t rt_avg = 0;
 static int rt_cnt = 0;
 
 static int seq_4 = 0;
@@ -91,7 +91,7 @@ static void __cdecl statics()
     ds_printf(" %d%% packet loss\n", 100 * (send_count - recv_count) / send_count);
   if ( rt_cnt > 0 )
     rt_avg /= rt_cnt;
-  if ( rt_min == 0x7FFFFFFF )
+  if ( rt_min == INT64_MAX)
     rt_min = 0;
   if ( rt_max == -1 )
     rt_max = 0;
@@ -108,9 +108,9 @@ static void __cdecl statics()
 
 static void __cdecl check_timeout()
 {
-  int v0; // [esp+4h] [ebp-14h]
-  int cu; // [esp+8h] [ebp-10h] BYREF
-  int psec; // [esp+Ch] [ebp-Ch] BYREF
+  int64_t v0; // [esp+4h] [ebp-14h]
+  int64_t cu; // [esp+8h] [ebp-10h] BYREF
+  int64_t psec; // [esp+Ch] [ebp-Ch] BYREF
   SEQ_TIME *q; // [esp+10h] [ebp-8h]
   SEQ_TIME *p; // [esp+14h] [ebp-4h]
 
@@ -137,9 +137,9 @@ static void __cdecl check_timeout()
 static DSP_BUF *__cdecl recv_echor(DSP_BUF *db, DECI2_HDR *dh, DCMP_HDR *ch)
 {
   SEQ_TIME *p; // [esp+4h] [ebp-20h]
-  int s; // [esp+Ch] [ebp-18h]
-  int cu; // [esp+10h] [ebp-14h] BYREF
-  int cs; // [esp+14h] [ebp-10h] BYREF
+  int64_t s; // [esp+Ch] [ebp-18h]
+  int64_t cu; // [esp+10h] [ebp-14h] BYREF
+  int64_t cs; // [esp+14h] [ebp-10h] BYREF
   int seq; // [esp+18h] [ebp-Ch]
   int len; // [esp+1Ch] [ebp-8h]
   DCMP_ECHO_DATA *ed; // [esp+20h] [ebp-4h]
