@@ -2201,26 +2201,21 @@ static void __cdecl set_options_to_default()
   opt_di_instruction_word = ds_set_option("di_instruction_word", 2, 0, 0, 1);
   opt_di_branch_address = ds_set_option("di_branch_address", 2, 0, 0, 1);
   opt_di_macro = ds_set_option("di_macro", 2, 0, 1, 1);
-  if ( !langenv )
-    goto LABEL_14;
-  if ( strcmp("ja_JP.eucJP", langenv) && strcmp("ja_JP.EUC", langenv) && !strcmp("ja_JP.ujis", langenv) )
-  {
-    if ( !strcmp("ja_JP.jisJP", langenv) || !strcmp("ja_JP.JIS", langenv) )
-    {
+
+  if (langenv)  {
+    if (!strcmp("ja_JP.eucJP", langenv) || !strcmp("ja_JP.EUC", langenv)) {
+      opt_help_lang = ds_set_option("help_lang", 3, "euc", 0, 1);
+    } else if (!strcmp("ja_JP.jisJP", langenv) || !strcmp("ja_JP.JIS", langenv)) {
       opt_help_lang = ds_set_option("help_lang", 3, "jis", 0, 1);
-      goto LABEL_15;
-    }
-    if ( !strcmp("ja_JP.sjisJP", langenv) || !strcmp("ja_JP.SJIS", langenv) )
-    {
+    } else if (!strcmp("ja_JP.sjisJP", langenv) || !strcmp("ja_JP.SJIS", langenv)) {
       opt_help_lang = ds_set_option("help_lang", 3, "sjis", 0, 1);
-      goto LABEL_15;
+    } else {
+      opt_help_lang = ds_set_option("help_lang", 3, "eng", 0, 1);
     }
-LABEL_14:
+  } else {
     opt_help_lang = ds_set_option("help_lang", 3, "eng", 0, 1);
-    goto LABEL_15;
   }
-  opt_help_lang = ds_set_option("help_lang", 3, "euc", 0, 1);
-LABEL_15:
+
   opt_help_pager = ds_set_option("help_pager", 3, (char *)"", 0, 1);
   ds_opt_standard_init();
   opt_iopconf = ds_set_option("IOPCONF", 3, "/usr/local/sce/iop/modules", 0, 1);
