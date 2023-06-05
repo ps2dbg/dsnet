@@ -117,7 +117,7 @@ int __cdecl dt_cmd(int ac, char **av)
   int i_3; // [esp+0h] [ebp-28h]
   BT_REG br; // [esp+4h] [ebp-24h] BYREF
   DBGP_EE_THREADLIST_DATA *p_result; // [esp+10h] [ebp-18h]
-  unsigned int pv; // [esp+14h] [ebp-14h] BYREF
+  void* pv; // [esp+14h] [ebp-14h] BYREF
   int cnt; // [esp+18h] [ebp-10h]
   DBGP_HDR *tcbhdr; // [esp+1Ch] [ebp-Ch]
   DBGP_HDR *listhdr; // [esp+20h] [ebp-8h]
@@ -144,7 +144,7 @@ int __cdecl dt_cmd(int ac, char **av)
       aca = ac - 1;
       for ( ava = av + 1; aca > 0 && **ava == 45; ++ava )
       {
-        for ( pv = (unsigned int)(*ava + 1); *(_BYTE *)pv; ++pv )
+        for ( pv = (*ava + 1); *(_BYTE *)pv; ++pv )
         {
           switch ( *(_BYTE *)pv )
           {
@@ -278,7 +278,7 @@ int __cdecl dt_cmd(int ac, char **av)
     else
     {
       p_result = (DBGP_EE_THREADLIST_DATA *)&listhdr[1];
-      pv = (unsigned int)&listhdr[1].result;
+      pv = &listhdr[1].result;
       ds_printf("tid prio      pc       sp      status cause sid wakeup count function\n");
       for ( i_3 = 0; p_result->id > i_3; ++i_3 )
       {
