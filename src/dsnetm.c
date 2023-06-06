@@ -595,8 +595,14 @@ int __cdecl main(int ac, char **av)
   char *port_name; // [esp+0h] [ebp-4h]
   int argc; // [esp+Ch] [ebp+8h]
   char **argv; // [esp+10h] [ebp+Ch]
+  char *ps2name;
 
   port_name = 0;
+  ps2name = ds_getenv("PS2HOSTNAME");
+  if (ps2name) {
+    device_name = ps2name;
+  }
+
   ds_program_name = ds_basename(*av);
   ds_printf("%s (%s)\n", ds_program_name, ds_stamp_str[0]);
   opt_psnet = ds_set_option("psnet", 1, 0, 0, 1);
