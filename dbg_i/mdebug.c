@@ -426,66 +426,58 @@ int __cdecl load_mdebug(
         int base,
         char *path)
 {
-  char *v8; // eax
-  ADRS *v9; // eax
-  ADRS *v10; // eax
   MDEBUG *tail; // edx
   unsigned int pdt_eadr; // [esp+Ch] [ebp-40h]
   unsigned int pdt_sadr; // [esp+10h] [ebp-3Ch]
   unsigned int fdt_eadr; // [esp+14h] [ebp-38h]
   unsigned int fdt_sadr; // [esp+18h] [ebp-34h]
-  EXT_SYM *esym; // [esp+1Ch] [ebp-30h]
   SYM *syme; // [esp+20h] [ebp-2Ch]
   SYM *syms; // [esp+24h] [ebp-28h]
-  SYM *i; // [esp+28h] [ebp-24h]
-  SYM *sym_1; // [esp+28h] [ebp-24h]
+  SYM *sym; // [esp+28h] [ebp-24h]
   PDT *pdte; // [esp+2Ch] [ebp-20h]
   PDT *pdt; // [esp+30h] [ebp-1Ch]
-  PDT *pdt_1; // [esp+30h] [ebp-1Ch]
-  FDT *fdt; // [esp+34h] [ebp-18h]
-  FDT *fdt_1; // [esp+34h] [ebp-18h]
   MDEBUG *md; // [esp+38h] [ebp-14h]
-  unsigned __int8 *buf; // [esp+40h] [ebp-Ch]
-  int size; // [esp+44h] [ebp-8h]
-  int offset; // [esp+48h] [ebp-4h]
+  SYM_HDR* shdr; // [esp+40h] [ebp-Ch]
+  unsigned int size; // [esp+44h] [ebp-8h]
+  unsigned offset; // [esp+48h] [ebp-4h]
   int ida; // [esp+64h] [ebp+18h]
 
-  ida = look_iopmod(stream, elf_header, section_header, id, base, (void (__cdecl *)())clear_mdebug_with_id);
+  ida = look_iopmod(stream, elf_header, section_header, id, base, clear_mdebug_with_id);
   if ( ida < 0 )
     return -1;
+
   offset = section_header[mindex].offset;
   size = section_header[mindex].size;
-  buf = (unsigned __int8 *)ds_fload(stream, 0, offset, size, 1);
-  if ( !buf )
+
+  shdr = ds_fload(stream, 0, offset, size, 1);
+  if ( !shdr )
     return -1;
-  md = (MDEBUG *)ds_alloc_mem_low("mdebug.c", "load_mdebug", sizeof(MDEBUG));
+
+  md = ds_alloc_mem_low("mdebug.c", "load_mdebug", sizeof(MDEBUG));
   if ( !md )
   {
-    ds_free_mem_low(buf, "mdebug.c", "load_mdebug");
+    ds_free_mem_low(shdr, "mdebug.c", "load_mdebug");
     return -1;
   }
+
   ds_bzero(md, sizeof(MDEBUG));
-  v8 = set_abs_path(path);
-  md->path = v8;
-  if ( !v8 )
-    goto LABEL_91;
-  md->shdr = (SYM_HDR *)buf;
-  md->pdt_adrs = 0;
-  md->fdt_adrs = 0;
-  if ( *((_DWORD *)buf + 2) )
+
+  md->path = set_abs_path(path);
+  if ( !md->path )
+    goto error;
+
+  md->shdr = (SYM_HDR *)shdr;
+  md->pdt_adrs = NULL;
+  md->fdt_adrs = NULL;
+
+  if ( shdr->cbLine )
   {
-    md->lins = &buf[*((_DWORD *)buf + 3) - offset];
-    md->line = &md->lins[*((_DWORD *)buf + 2)];
-    if ( buf > md->lins || md->line > &buf[size] )
+    md->lins = (unsigned char*)shdr + shdr->cblineOffset - offset;
+    md->line = &md->lins[shdr->cbLine];
+    if ( (ptrdiff_t)shdr > (ptrdiff_t)md->lins || (ptrdiff_t)md->line > (ptrdiff_t)shdr + size )
     {
       ds_error("invalid cblineOffset,cbLine");
-LABEL_91:
-      ds_free_mem_low(md->shdr, "mdebug.c", "load_mdebug");
-      ds_free_mem_low(md->fdt_adrs, "mdebug.c", "load_mdebug");
-      ds_free_mem_low(md->pdt_adrs, "mdebug.c", "load_mdebug");
-      ds_free_mem_low(md->path, "mdebug.c", "load_mdebug");
-      ds_free_mem_low(md, "mdebug.c", "load_mdebug");
-      return -1;
+      goto error;
     }
   }
   else
@@ -493,14 +485,15 @@ LABEL_91:
     md->line = 0;
     md->lins = 0;
   }
-  if ( *((_DWORD *)buf + 6) )
+
+  if ( shdr->ipdMax )
   {
-    md->pdts = (PDT *)&buf[*((_DWORD *)buf + 7) - offset];
-    md->pdte = &md->pdts[*((_DWORD *)buf + 6)];
-    if ( (PDT *)buf > md->pdts || md->pdte > (PDT *)&buf[size] )
+    md->pdts = (PDT *)((unsigned char*)shdr + shdr->cbPdOffset - offset);
+    md->pdte = &md->pdts[shdr->ipdMax];
+    if ( (ptrdiff_t)shdr > (ptrdiff_t)md->pdts || (ptrdiff_t)md->pdte > (ptrdiff_t)shdr + size )
     {
       ds_error("invalid cbPdOffset,ipdMax");
-      goto LABEL_91;
+      goto error;
     }
   }
   else
@@ -508,16 +501,18 @@ LABEL_91:
     md->pdte = 0;
     md->pdts = 0;
   }
-  for ( pdt = md->pdts; md->pdte > pdt; ++pdt )
+
+  for ( PDT *pdt = md->pdts; md->pdte > pdt; ++pdt )
     ;
-  if ( *((_DWORD *)buf + 8) )
+
+  if ( shdr->isymMax )
   {
-    md->lsyms = (SYM *)&buf[*((_DWORD *)buf + 9) - offset];
-    md->lsyme = &md->lsyms[*((_DWORD *)buf + 8)];
-    if ( (SYM *)buf > md->lsyms || md->lsyme > (SYM *)&buf[size] )
+    md->lsyms = (SYM *)((unsigned char*)shdr + shdr->cbSymOffset - offset);
+    md->lsyme = &md->lsyms[shdr->isymMax];
+    if ( (ptrdiff_t)shdr > (ptrdiff_t)md->lsyms || (ptrdiff_t)md->lsyme > (ptrdiff_t)shdr + size )
     {
       ds_error("invalid cbSymOffset,isymMax");
-      goto LABEL_91;
+      goto error;
     }
   }
   else
@@ -525,16 +520,18 @@ LABEL_91:
     md->lsyme = 0;
     md->lsyms = 0;
   }
-  for ( i = md->lsyms; md->lsyme > i; ++i )
+
+  for ( SYM *i = md->lsyms; md->lsyme > i; ++i )
     ;
-  if ( *((_DWORD *)buf + 14) )
+
+  if ( shdr->issMax )
   {
-    md->lstrs = (char *)&buf[*((_DWORD *)buf + 15) - offset];
-    md->lstre = &md->lstrs[*((_DWORD *)buf + 14)];
-    if ( (char *)buf > md->lstrs || md->lstre > (char *)&buf[size] )
+    md->lstrs = (char *)shdr + shdr->cbSsOffset - offset;
+    md->lstre = &md->lstrs[shdr->issMax];
+    if ( (ptrdiff_t)shdr > (ptrdiff_t)md->lstrs || (ptrdiff_t)md->lstre > (ptrdiff_t)shdr + size )
     {
       ds_error("invalid cbSsOffset,issMax");
-      goto LABEL_91;
+      goto error;
     }
   }
   else
@@ -542,14 +539,15 @@ LABEL_91:
     md->lstre = 0;
     md->lstrs = 0;
   }
-  if ( *((_DWORD *)buf + 22) )
+
+  if ( shdr->iextMax )
   {
-    md->esyms = (EXT_SYM *)&buf[*((_DWORD *)buf + 23) - offset];
-    md->esyme = &md->esyms[*((_DWORD *)buf + 22)];
-    if ( (EXT_SYM *)buf > md->esyms || md->esyme > (EXT_SYM *)&buf[size] )
+    md->esyms = (EXT_SYM *)((char*)shdr + shdr->cbExtOffset - offset);
+    md->esyme = &md->esyms[shdr->iextMax];
+    if ( (ptrdiff_t)shdr > (ptrdiff_t)md->esyms || (ptrdiff_t)md->esyme > (ptrdiff_t)shdr + size )
     {
       ds_error("invalid cbExtOffset,iextMax");
-      goto LABEL_91;
+      goto error;
     }
   }
   else
@@ -557,16 +555,18 @@ LABEL_91:
     md->esyme = 0;
     md->esyms = 0;
   }
-  for ( esym = md->esyms; md->esyme > esym; ++esym )
+
+  for ( EXT_SYM *esym = md->esyms; md->esyme > esym; ++esym )
     ;
-  if ( *((_DWORD *)buf + 16) )
+
+  if ( shdr->issExtMax )
   {
-    md->estrs = (char *)&buf[*((_DWORD *)buf + 17) - offset];
-    md->estre = &md->estrs[*((_DWORD *)buf + 16)];
-    if ( (char *)buf > md->estrs || md->estre > (char *)&buf[size] )
+    md->estrs = (char *)shdr + shdr->cbSsExtOffset - offset;
+    md->estre = &md->estrs[shdr->issExtMax];
+    if ( (ptrdiff_t)shdr > (ptrdiff_t)md->estrs || (ptrdiff_t)md->estre > (ptrdiff_t)shdr + size )
     {
       ds_error("invalid cbSsExtOffset,issExtMax");
-      goto LABEL_91;
+      goto error;
     }
   }
   else
@@ -574,14 +574,15 @@ LABEL_91:
     md->estre = 0;
     md->estrs = 0;
   }
-  if ( *((_DWORD *)buf + 18) )
+
+  if ( shdr->ifdMax )
   {
-    md->fdts = (FDT *)&buf[*((_DWORD *)buf + 19) - offset];
-    md->fdte = &md->fdts[*((_DWORD *)buf + 18)];
-    if ( (FDT *)buf > md->fdts || md->fdte > (FDT *)&buf[size] )
+    md->fdts = (FDT *)((char*)shdr + shdr->cbFdOffset - offset);
+    md->fdte = &md->fdts[shdr->ifdMax];
+    if ( (ptrdiff_t)shdr > (ptrdiff_t)md->fdts || (ptrdiff_t)md->fdte > (ptrdiff_t)shdr + size )
     {
       ds_error("invalid cbFdOffset,ifdMax");
-      goto LABEL_91;
+      goto error;
     }
   }
   else
@@ -589,70 +590,95 @@ LABEL_91:
     md->fdte = 0;
     md->fdts = 0;
   }
-  for ( fdt = md->fdts; md->fdte > fdt; ++fdt )
+
+  for ( FDT *fdt = md->fdts; md->fdte > fdt; ++fdt )
     ;
-  v9 = (ADRS *)ds_alloc_mem_low("mdebug.c", "load_mdebug", sizeof(ADRS) * *((_DWORD *)buf + 18));
-  md->fdt_adrs = v9;
-  if ( !v9 )
-    goto LABEL_91;
-  v10 = (ADRS *)ds_alloc_mem_low("mdebug.c", "load_mdebug", sizeof(ADRS) * *((_DWORD *)buf + 6));
-  md->pdt_adrs = v10;
-  if ( !v10 )
-    goto LABEL_91;
-  for ( fdt_1 = md->fdts; md->fdte > fdt_1; ++fdt_1 )
+
+  md->fdt_adrs = ds_alloc_mem_low("mdebug.c", "load_mdebug", sizeof(ADRS) * shdr->ifdMax);
+
+  if ( !md->fdt_adrs )
+    goto error;
+
+  md->pdt_adrs = ds_alloc_mem_low("mdebug.c", "load_mdebug", sizeof(ADRS) * shdr->ipdMax);
+
+  if ( !md->pdt_adrs)
+    goto error;
+
+  for ( FDT *fdt = md->fdts; fdt < md->fdte ; ++fdt )
   {
-    fdt_eadr = fdt_1->adr;
-    fdt_sadr = fdt_1->adr;
-    pdt_1 = &md->pdts[fdt_1->ipdFirst];
-    pdte = &pdt_1[fdt_1->cpd];
-    while ( pdte > pdt_1 )
+    fdt_eadr = fdt->adr;
+    fdt_sadr = fdt->adr;
+    pdt = &md->pdts[fdt->ipdFirst];
+    pdte = &pdt[fdt->cpd];
+
+    while ( pdte > pdt )
     {
-      pdt_eadr = pdt_1->adr + fdt_1->adr;
+      pdt_eadr = pdt->adr + fdt->adr;
       pdt_sadr = pdt_eadr;
       syme = 0;
       syms = 0;
-      for ( sym_1 = &md->lsyms[fdt_1->isymBase + pdt_1->isym]; md->lsyme > sym_1; ++sym_1 )
+      for ( sym = &md->lsyms[fdt->isymBase + pdt->isym]; md->lsyme > sym; ++sym )
       {
-        if ( !syms && ((sym_1->st_sc_index & 0x3F) == 6 || (sym_1->st_sc_index & 0x3F) == 14) )
+        if ( !syms && ((sym->st_sc_index & 0x3F) == 6 || (sym->st_sc_index & 0x3F) == 14) )
         {
-          syms = sym_1;
+          syms = sym;
         }
-        else if ( (sym_1->st_sc_index & 0x3F) == 8 )
+        else if ( (sym->st_sc_index & 0x3F) == 8 )
         {
-          syme = sym_1;
+          syme = sym;
           break;
         }
       }
+
       if ( syms )
       {
         pdt_eadr = syms->value;
         pdt_sadr = pdt_eadr;
       }
+
       if ( syme )
         pdt_eadr += syme->value;
-      md->pdt_adrs[(-991146299 * ((char *)pdt_1 - (char *)md->pdts)) >> 2].sadr = pdt_sadr;
-      md->pdt_adrs[(-991146299 * ((char *)pdt_1 - (char *)md->pdts)) >> 2].eadr = pdt_eadr;
+
+      md->pdt_adrs[((ptrdiff_t)pdt - (ptrdiff_t)md->pdts) / sizeof(*pdt)].sadr = pdt_sadr;
+      md->pdt_adrs[((ptrdiff_t)pdt - (ptrdiff_t)md->pdts) / sizeof(*pdt)].eadr = pdt_eadr;
+
       if ( fdt_sadr > pdt_sadr )
         fdt_sadr = pdt_sadr;
+
       if ( pdt_eadr > fdt_eadr )
         fdt_eadr = pdt_eadr;
-      ++pdt_1;
+
+      ++pdt;
     }
-    md->fdt_adrs[(954437177 * ((char *)fdt_1 - (char *)md->fdts)) >> 3].sadr = fdt_sadr;
-    md->fdt_adrs[(954437177 * ((char *)fdt_1 - (char *)md->fdts)) >> 3].eadr = fdt_eadr;
+
+    md->fdt_adrs[((ptrdiff_t)fdt - (ptrdiff_t)md->fdts) / sizeof(*fdt)].sadr = fdt_sadr;
+    md->fdt_adrs[((ptrdiff_t)fdt - (ptrdiff_t)md->fdts) / sizeof(*fdt)].eadr = fdt_eadr;
+
   }
   md->id = ida;
   md->base = base;
   tail = mdebug_list.tail;
   md->back = mdebug_list.tail;
+
   if ( tail )
     md->back->forw = md;
   else
     mdebug_list.head = md;
+
   md->forw = 0;
   mdebug_list.tail = md;
   clear_source_line_buffer();
+
   return 0;
+
+error:
+  ds_free_mem_low(md->shdr, "mdebug.c", "load_mdebug");
+  ds_free_mem_low(md->fdt_adrs, "mdebug.c", "load_mdebug");
+  ds_free_mem_low(md->pdt_adrs, "mdebug.c", "load_mdebug");
+  ds_free_mem_low(md->path, "mdebug.c", "load_mdebug");
+  ds_free_mem_low(md, "mdebug.c", "load_mdebug");
+
+  return -1;
 }
 
 unsigned int __cdecl file_and_line_to_address(int line, char *path)
