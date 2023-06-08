@@ -1,4 +1,5 @@
-#include "dsedb_prototypes.h"
+
+#include "dsxdb_prototypes.h"
 
 static const char *help_db[] =
 {
@@ -3606,9 +3607,11 @@ static void __cdecl print_jis(void *stream, char *s)
   int c1; // [esp+0h] [ebp-Ch]
   int c0; // [esp+4h] [ebp-8h]
   int ki; // [esp+8h] [ebp-4h]
+#ifdef DSNET_COMPILING_E
   _DWORD *savedregs; // [esp+Ch] [ebp+0h] BYREF
 
   savedregs = &savedregs;
+#endif /* DSNET_COMPILING_E */
   ki = 0;
   while ( *s )
   {
@@ -3934,7 +3937,12 @@ static int __cdecl valid_delim(int lang, char *p)
 {
   if ( *p != 45 )
     return 0;
+#ifdef DSNET_COMPILING_E
   return p[1] == 45 || p[1] == 69;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  return p[1] == 45 || p[1] == 73;
+#endif /* DSNET_COMPILING_I */
 }
 
 static int __cdecl valid_lang(int lang, HELP_MAP *hm)

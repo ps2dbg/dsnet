@@ -8,7 +8,12 @@ static int f_ncmv = 1;
 static int f_nttyp = 0;
 static int f_nostty = 0;
 static int f_ndrfp = 0;
+#ifdef DSNET_COMPILING_E
+static int f_wait = 0;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
 static int f_wait = 1;
+#endif /* DSNET_COMPILING_I */
 static int stamp = 240;
 static int id = 0;
 static int dsm_waiting = -1;
@@ -16,13 +21,32 @@ static int to_sec = 120;
 static int to_usec = 0;
 static int waiting_startr = 0;
 static int waiting_status = 0;
+#ifdef DSNET_COMPILING_E
+static int proto_drfp = 291;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
 static int proto_drfp = 292;
+#endif /* DSNET_COMPILING_I */
 
 static DS_DESC *target_desc;
 static int arg_siz;
 static char args[160];
+#ifdef DSNET_COMPILING_I
 static DS_OPTION *opt_iopconf;
 static DS_OPTION *opt_iopmodules;
+#endif /* DSNET_COMPILING_I */
+
+#ifdef DSNET_COMPILING_E
+static void __cdecl drfp_error(DSP_BUF *db);
+static void __cdecl send_xstart();
+static DSP_BUF *__cdecl recv_xloadp(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *__cdecl recv_dstp(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db);
+static void __cdecl set_proto(char *prog);
+static void __cdecl set_args(int ac, char **av);
+static int __cdecl usage(int f_true);
+#endif /* DSNET_COMPILING_E */
 
 static void __cdecl drfp_error(DSP_BUF *db)
 {
@@ -36,7 +60,12 @@ static void __cdecl send_xstart()
 {
   DSP_BUF *db; // [esp+8h] [ebp-4h]
 
+#ifdef DSNET_COMPILING_E
+  db = ds_alloc_buf(592, 69, 0, arg_siz + 8);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   db = ds_alloc_buf(336, 73, 0, arg_siz + 8);
+#endif /* DSNET_COMPILING_I */
   if ( !db )
     ds_exit(135);
   db->buf[8] = 0;
@@ -55,9 +84,19 @@ static DSP_BUF *__cdecl recv_xloadp(DS_DESC *desc, DSP_BUF *db)
   int r; // [esp+0h] [ebp-Ch]
   int r_1; // [esp+0h] [ebp-Ch]
   int r_2; // [esp+0h] [ebp-Ch]
+#ifdef DSNET_COMPILING_E
+  ELOADP_HDR *lp; // [esp+4h] [ebp-8h]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   ILOADP_HDR *lp; // [esp+4h] [ebp-8h]
+#endif /* DSNET_COMPILING_I */
 
+#ifdef DSNET_COMPILING_E
+  lp = (ELOADP_HDR *)&db->buf[8];
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   lp = (ILOADP_HDR *)&db->buf[8];
+#endif /* DSNET_COMPILING_I */
   if ( !db )
     ds_exit(130);
   if ( f_verbose )
@@ -129,7 +168,12 @@ static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
     ds_exit(130);
   if ( ch->type == 3 )
   {
+#ifdef DSNET_COMPILING_E
+    if ( *(_WORD *)&db->buf[16] == 592 && !db->buf[20] )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     if ( *(_WORD *)&db->buf[16] == 336 && !db->buf[20] )
+#endif /* DSNET_COMPILING_I */
     {
       v2 = (unsigned __int8)db->buf[9];
       if ( v2 == 2 )
@@ -178,7 +222,12 @@ static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
     }
     else
     {
+#ifdef DSNET_COMPILING_E
+      if ( db->buf[9] || *(_WORD *)&db->buf[12] != 69 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
       if ( db->buf[9] || *(_WORD *)&db->buf[12] != 73 )
+#endif /* DSNET_COMPILING_I */
         return ds_free_buf(db);
       waiting_status &= ~1u;
     }
@@ -275,7 +324,12 @@ static void __cdecl set_args(int ac, char **av)
   p_1 = args;
   if ( !f_dev )
   {
+#ifdef DSNET_COMPILING_E
+    strcpy(args, "host3:");
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     strcpy(args, "host4:");
+#endif /* DSNET_COMPILING_I */
     p_1 = &args[6];
   }
   for ( i = 0; ac > i; ++i )
@@ -304,18 +358,44 @@ static int __cdecl usage(int f_true)
   ds_printf("    -ncmv                      do not check manager version\n");
   ds_printf("    -cmv                       check manager version\n");
   ds_printf("    -v                         display send/recv packets\n");
+#ifdef DSNET_COMPILING_E
+  ds_printf("    -nt                        do not handle E[0-9K]TTYP\n");
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   ds_printf("    -nt                        do not handle I[0-9K]TTYP\n");
+#endif /* DSNET_COMPILING_I */
   ds_printf("    -ns                        do not handle STTYP\n");
+#ifdef DSNET_COMPILING_E
+  ds_printf("    -nf                        do not handle DRFP3\n");
+  ds_printf("    -w                         wait ELOADP is enabled\n");
+  ds_printf("    -nw                        no wait ELOADP is enabled [default]\n");
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   ds_printf("    -nf                        do not handle DRFP4\n");
   ds_printf("    -iopconf <IOPCONF>         set IOPCONF variable\n");
   ds_printf("    -iopmodules <IOPMODULES>   set IOPMODULES variable\n");
   ds_printf("    -w                         wait ELOADP is enabled [default]\n");
   ds_printf("    -nw                        no wait ELOADP is enabled\n");
+#endif /* DSNET_COMPILING_I */
   return ds_exit(129);
 }
 
 int __cdecl main(int ac, char **av)
 {
+#ifdef DSNET_COMPILING_E
+  NETMP_PROTOS *_p; // [esp+4h] [ebp-4Ch]
+  NETMP_PROTOS *_p_3; // [esp+4h] [ebp-4Ch]
+  NETMP_PROTOS *_p_4; // [esp+4h] [ebp-4Ch]
+  NETMP_PROTOS *_p_5; // [esp+4h] [ebp-4Ch]
+  int i; // [esp+8h] [ebp-48h]
+  int r; // [esp+Ch] [ebp-44h]
+  NETMP_PROTOS *p; // [esp+10h] [ebp-40h]
+  NETMP_PROTOS protos[14]; // [esp+14h] [ebp-3Ch] BYREF
+  char *target_name; // [esp+4Ch] [ebp-4h]
+  int argc; // [esp+58h] [ebp+8h]
+  char **argv; // [esp+5Ch] [ebp+Ch]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   NETMP_PROTOS *_p; // [esp+4h] [ebp-54h]
   NETMP_PROTOS *_p_3; // [esp+4h] [ebp-54h]
   NETMP_PROTOS *_p_4; // [esp+4h] [ebp-54h]
@@ -332,6 +412,7 @@ int __cdecl main(int ac, char **av)
 
   iopconf = 0;
   iopmodules = 0;
+#endif /* DSNET_COMPILING_I */
   ds_program_name = ds_basename(*av);
   target_name = ds_getenv("DSNETM");
   argc = ac - 1;
@@ -374,6 +455,7 @@ int __cdecl main(int ac, char **av)
     {
       f_wait = 0;
     }
+#ifdef DSNET_COMPILING_I
     else if ( !strcmp("-iopconf", *argv) )
     {
       usage(--argc <= 0);
@@ -384,6 +466,7 @@ int __cdecl main(int ac, char **av)
       usage(--argc <= 0);
       iopmodules = *++argv;
     }
+#endif /* DSNET_COMPILING_I */
     else
     {
       usage(1);
@@ -392,6 +475,7 @@ int __cdecl main(int ac, char **av)
   }
   if ( !argc )
     usage(1);
+#ifdef DSNET_COMPILING_I
   if ( !iopconf )
     iopconf = "/usr/local/sce/iop/modules";
   if ( !iopmodules )
@@ -403,6 +487,7 @@ int __cdecl main(int ac, char **av)
   }
   opt_iopconf = ds_set_option("IOPCONF", 3, iopconf, 0, 1);
   opt_iopmodules = ds_set_option("IOPMODULES", 3, iopmodules, 0, 1);
+#endif /* DSNET_COMPILING_I */
   set_proto(*argv);
   set_args(argc, argv);
   target_desc = ds_connect_net(target_name, 0);
@@ -413,26 +498,56 @@ int __cdecl main(int ac, char **av)
   if ( !ds_add_recv_func(target_desc, 1024, -1, -1, recv_netmp) )
     ds_exit(135);
   ds_bzero(protos, sizeof(protos));
+#ifdef DSNET_COMPILING_E
+  if ( !ds_add_recv_func(target_desc, 592, -1, -1, recv_xloadp) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   if ( !ds_add_recv_func(target_desc, 336, -1, -1, recv_xloadp) )
+#endif /* DSNET_COMPILING_I */
     ds_exit(135);
   p = &protos[1];
   protos[0].pri = -32;
+#ifdef DSNET_COMPILING_E
+  protos[0].proto = 592;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   protos[0].proto = 336;
+#endif /* DSNET_COMPILING_I */
   if ( !f_nttyp )
   {
     for ( i = 0; i <= 9; ++i )
     {
+#ifdef DSNET_COMPILING_E
+      if ( !ds_add_recv_func(target_desc, i + 528, -1, -1, recv_dstp) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
       if ( !ds_add_recv_func(target_desc, i + 272, -1, -1, recv_dstp) )
+#endif /* DSNET_COMPILING_I */
         ds_exit(135);
       _p = p++;
       _p->pri = -32;
+#ifdef DSNET_COMPILING_E
+      _p->proto = i + 528;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
       _p->proto = i + 272;
+#endif /* DSNET_COMPILING_I */
     }
+#ifdef DSNET_COMPILING_E
+    if ( !ds_add_recv_func(target_desc, 543, -1, -1, recv_dstp) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     if ( !ds_add_recv_func(target_desc, 287, -1, -1, recv_dstp) )
+#endif /* DSNET_COMPILING_I */
       ds_exit(135);
     _p_3 = p++;
     _p_3->pri = -32;
+#ifdef DSNET_COMPILING_E
+    _p_3->proto = 543;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     _p_3->proto = 287;
+#endif /* DSNET_COMPILING_I */
   }
   if ( !f_nostty )
   {
@@ -460,23 +575,53 @@ int __cdecl main(int ac, char **av)
     if ( r < 0 )
       return ds_exit(0);
     if ( r )
+#ifdef DSNET_COMPILING_E
+      goto LABEL_66;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
       goto LABEL_76;
+#endif /* DSNET_COMPILING_I */
     if ( dsm_waiting == 5 )
+#ifdef DSNET_COMPILING_E
+      goto LABEL_64;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
       goto LABEL_74;
+#endif /* DSNET_COMPILING_I */
     if ( dsm_waiting > 5 )
     {
       if ( dsm_waiting == 11 )
+#ifdef DSNET_COMPILING_E
+        goto LABEL_65;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
         goto LABEL_75;
+#endif /* DSNET_COMPILING_I */
     }
     else if ( dsm_waiting == 1 )
     {
       ds_exit(136);
+#ifdef DSNET_COMPILING_E
+LABEL_64:
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
 LABEL_74:
+#endif /* DSNET_COMPILING_I */
       ds_exit(146);
+#ifdef DSNET_COMPILING_E
+LABEL_65:
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
 LABEL_75:
+#endif /* DSNET_COMPILING_I */
       ds_exit(147);
     }
+#ifdef DSNET_COMPILING_E
+LABEL_66:
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
 LABEL_76:
+#endif /* DSNET_COMPILING_I */
     if ( !f_wait && (waiting_status & 2) != 0 )
       ds_exit(151);
   }

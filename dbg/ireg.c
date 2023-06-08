@@ -1,4 +1,5 @@
-#include "dsidb_prototypes.h"
+
+#include "dsxdb_prototypes.h"
 
 extern int dsc_connected; // defined in dbg.c
 static IOP_REGS iop_regs[] =

@@ -1,4 +1,5 @@
-#include "dsidb_prototypes.h"
+
+#include "dsxdb_prototypes.h"
 
 unsigned int dot = 1048576u;
 unsigned int current_entry_point = 0u;
@@ -1112,48 +1113,134 @@ int __cdecl pload_cmd(int ac, char **av)
     }
     if ( aca > 1 )
       goto LABEL_11;
+#ifdef DSNET_COMPILING_E
+LABEL_23:
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
 LABEL_22:
+#endif /* DSNET_COMPILING_I */
     stream = ds_fopen(path, "r");
     if ( !stream )
+#ifdef DSNET_COMPILING_E
+      goto LABEL_85;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
       goto LABEL_96;
+#endif /* DSNET_COMPILING_I */
     ehdr = (DS_ELF_EHDR *)ds_fload(stream, 0, 0, 52, 1);
     if ( !ehdr )
+#ifdef DSNET_COMPILING_E
+      goto LABEL_85;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
       goto LABEL_96;
+#endif /* DSNET_COMPILING_I */
     v9 = (unsigned __int8 *)ehdr;
     if ( ehdr->ident[0] == 98 && v9[1] == 1 || *v9 == 1 && v9[1] == 98 )
     {
       if ( !sload )
         ds_printf("ECOFF is not supported\n");
+#ifdef DSNET_COMPILING_E
+      goto LABEL_85;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
       goto LABEL_96;
+#endif /* DSNET_COMPILING_I */
     }
     for ( symndx = 0; (unsigned int)symndx <= 0xF; ++symndx )
     {
       if ( ehdr->ident[symndx] != TARG_IDENT[symndx] )
       {
         ds_printf("ident error\n");
+#ifdef DSNET_COMPILING_E
+        goto LABEL_85;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
         goto LABEL_96;
+#endif /* DSNET_COMPILING_I */
       }
     }
+#ifdef DSNET_COMPILING_E
+    if ( ehdr->machine == 8 && (ehdr->type == 2 || ehdr->type == 0xFF91) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     if ( ehdr->machine == 8 && (ehdr->type == 2 || ehdr->type == 0xFF80 || ehdr->type == 0xFF81) )
+#endif /* DSNET_COMPILING_I */
     {
       if ( ehdr->ehsize == 52 && ehdr->phentsize == 32 )
       {
+#ifdef DSNET_COMPILING_E
+        if ( !sload )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
         if ( ehdr->phnum )
+#endif /* DSNET_COMPILING_I */
         {
-          phdr = (DS_ELF_PHDR *)ds_fload(stream, 0, ehdr->phoff, 32, ehdr->phnum);
-          if ( phdr )
+#ifdef DSNET_COMPILING_E
+          if ( !ehdr->phnum )
           {
+            ds_printf("program header not found\n");
+            goto LABEL_85;
+          }
+#endif /* DSNET_COMPILING_E */
+          phdr = (DS_ELF_PHDR *)ds_fload(stream, 0, ehdr->phoff, 32, ehdr->phnum);
+#ifdef DSNET_COMPILING_E
+          if ( !phdr )
+            goto LABEL_85;
+          ph = phdr;
+          symndx = 0;
+          while ( symndx < ehdr->phnum )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+          if ( phdr )
+#endif /* DSNET_COMPILING_I */
+          {
+#ifdef DSNET_COMPILING_E
+            if ( ph->type == 1 || ph->filesz )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
             if ( ehdr->type == 2 )
+#endif /* DSNET_COMPILING_I */
             {
+#ifdef DSNET_COMPILING_E
+              ds_printf("Loading program (address=0x%W size=0x%W) ...\n", ph->vaddr, ph->filesz);
+              buf = (unsigned __int8 *)ds_fload(stream, 0, ph->offset, 1, ph->filesz);
+              if ( !buf || ds_store_mem(ph->vaddr, buf, ph->filesz) )
+                goto LABEL_85;
+              buf = (unsigned __int8 *)ds_free_mem_low(buf, "mem.c", "pload_cmd");
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
               if ( v4 )
               {
                 ds_printf("-b option for not relocatable ??\n");
                 goto LABEL_96;
               }
               v4 = -1;
+#endif /* DSNET_COMPILING_I */
             }
+#ifdef DSNET_COMPILING_E
+            ++symndx;
+            ++ph;
+          }
+        }
+        if ( ehdr->shnum )
+        {
+          shdr = (DS_ELF_SHDR *)ds_fload(stream, 0, ehdr->shoff, 40, ehdr->shnum);
+          if ( shdr )
+          {
+            sh = shdr;
+            symndx = 0;
+            while ( symndx < ehdr->shnum )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
             if ( sload )
+#endif /* DSNET_COMPILING_I */
             {
+#ifdef DSNET_COMPILING_E
+              ++symndx;
+              ++sh;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
               ph = phdr;
               symndx = 0;
               while ( symndx < ehdr->phnum )
@@ -1163,13 +1250,31 @@ LABEL_22:
                 ++symndx;
                 ++ph;
               }
+#endif /* DSNET_COMPILING_I */
             }
+#ifdef DSNET_COMPILING_E
+            sh = shdr;
+            symndx = 0;
+            while ( symndx < ehdr->shnum )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
             else
+#endif /* DSNET_COMPILING_I */
             {
+#ifdef DSNET_COMPILING_E
+              type = sh->type;
+              if ( type == 1879048197 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
               ph = phdr;
               symndx = 0;
               while ( symndx < ehdr->phnum )
+#endif /* DSNET_COMPILING_I */
               {
+#ifdef DSNET_COMPILING_E
+                load_mdebug(stream, ehdr, shdr, symndx, id, v4, path);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
                 if ( ph->type == 1 || ph->filesz )
                 {
                   ds_printf("Loading program (address=0x%W size=0x%W) ...\n", ph->vaddr, ph->filesz);
@@ -1180,17 +1285,33 @@ LABEL_22:
                 }
                 ++symndx;
                 ++ph;
+#endif /* DSNET_COMPILING_I */
               }
+#ifdef DSNET_COMPILING_E
+              else if ( type > 0x70000005 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
             }
             if ( ehdr->shnum )
             {
               shdr = (DS_ELF_SHDR *)ds_fload(stream, 0, ehdr->shoff, 40, ehdr->shnum);
               if ( shdr )
+#endif /* DSNET_COMPILING_I */
               {
+#ifdef DSNET_COMPILING_E
+                if ( type == 1879048198 && sh->size == 24 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
                 sh = shdr;
                 symndx = 0;
                 while ( symndx < ehdr->shnum )
+#endif /* DSNET_COMPILING_I */
                 {
+#ifdef DSNET_COMPILING_E
+                  ri = (DS_ELF_REGINFO *)ds_free_mem_low(ri, "mem.c", "pload_cmd");
+                  ri = (DS_ELF_REGINFO *)ds_fload(stream, 0, sh->offset, 24, 1);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
                   ++symndx;
                   ++sh;
                 }
@@ -1222,7 +1343,12 @@ LABEL_22:
                 }
                 if ( !sload )
                 {
+#endif /* DSNET_COMPILING_I */
                   if ( !ri )
+#ifdef DSNET_COMPILING_E
+                    goto LABEL_85;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
                   {
                     ds_printf("REGINFO not found\n");
                     goto LABEL_96;
@@ -1231,19 +1357,56 @@ LABEL_22:
                   ds_printf("GP value      = 0x%W\n", ri->gp_value);
                   current_entry_point = ehdr->entry;
                   current_gp_value = ri->gp_value;
+#endif /* DSNET_COMPILING_I */
                 }
+#ifdef DSNET_COMPILING_I
                 r = 0;
+#endif /* DSNET_COMPILING_I */
               }
+#ifdef DSNET_COMPILING_E
+              else if ( type == 2 && sh->link && sh->link < ehdr->shnum && sh->entsize == 16 )
+              {
+                load_symbol(stream, ehdr, shdr, symndx, sh->link, id, v4);
+              }
+              ++symndx;
+              ++sh;
+#endif /* DSNET_COMPILING_E */
             }
+#ifdef DSNET_COMPILING_E
+            if ( !sload )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
             else
+#endif /* DSNET_COMPILING_I */
             {
+#ifdef DSNET_COMPILING_E
+              if ( !ri )
+              {
+                ds_printf("REGINFO not found\n");
+                goto LABEL_85;
+              }
+              ds_printf("Entry address = 0x%W\n", ehdr->entry);
+              ds_printf("GP value      = 0x%W\n", ri->gp_value);
+              current_entry_point = ehdr->entry;
+              current_gp_value = ri->gp_value;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
               ds_printf("section header not found\n");
+#endif /* DSNET_COMPILING_I */
             }
+#ifdef DSNET_COMPILING_E
+            r = 0;
+#endif /* DSNET_COMPILING_E */
           }
         }
         else
         {
+#ifdef DSNET_COMPILING_E
+          ds_printf("section header not found\n");
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
           ds_printf("program header not found\n");
+#endif /* DSNET_COMPILING_I */
         }
       }
       else
@@ -1255,7 +1418,12 @@ LABEL_22:
     {
       ds_printf("arch error (type=0x%x, machine=0x%x)\n", ehdr->type, ehdr->machine);
     }
+#ifdef DSNET_COMPILING_E
+LABEL_85:
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
 LABEL_96:
+#endif /* DSNET_COMPILING_I */
     ds_free_mem_low(buf, "mem.c", "pload_cmd");
     ds_free_mem_low(ri, "mem.c", "pload_cmd");
     ds_free_mem_low(shdr, "mem.c", "pload_cmd");
@@ -1265,7 +1433,15 @@ LABEL_96:
     return r;
   }
   if ( aca > 0 )
+#ifdef DSNET_COMPILING_E
+  {
+    set_runarg(aca, ava);
+    goto LABEL_23;
+  }
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     goto LABEL_22;
+#endif /* DSNET_COMPILING_I */
 LABEL_11:
   if ( sload )
     return ds_error("Usage: sload [-id <id>] [-b <base>] [<fname>]");

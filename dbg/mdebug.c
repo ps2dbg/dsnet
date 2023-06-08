@@ -1,4 +1,5 @@
-#include "dsidb_prototypes.h"
+
+#include "dsxdb_prototypes.h"
 
 static struct {MDEBUG *head;MDEBUG *tail;} mdebug_list = { NULL, NULL };
 static char *cur_fname = NULL;
@@ -442,7 +443,12 @@ int __cdecl load_mdebug(
   unsigned offset; // [esp+48h] [ebp-4h]
   int ida; // [esp+64h] [ebp+18h]
 
+#ifdef DSNET_COMPILING_E
+  ida = look_eemod(stream, elf_header, section_header, id, base, clear_mdebug_with_id);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   ida = look_iopmod(stream, elf_header, section_header, id, base, clear_mdebug_with_id);
+#endif /* DSNET_COMPILING_I */
   if ( ida < 0 )
     return -1;
 
@@ -702,9 +708,20 @@ unsigned int __cdecl file_and_line_to_address(int line, char *path)
       {
         for ( sym = &md->lsyms[fdt->isymBase]; &md->lsyms[fdt->isymBase + fdt->csym] > sym; ++sym )
         {
+#ifdef DSNET_COMPILING_E
+         if ( (sym->st_sc_index & 0x3F) == 5
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
           if ( (sym->st_sc_index & 0x3F) == 5
+#endif /* DSNET_COMPILING_I */
             && ((sym->st_sc_index >> 6) & 0x1F) == 1
+#ifdef DSNET_COMPILING_E
+            && ((sym->st_sc_index >> 12) & 0x80000) == 0
+            && line == sym->st_sc_index >> 12 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
             && line == (unsigned __int16)HIWORD(sym->st_sc_index) >> 4 )
+#endif /* DSNET_COMPILING_I */
           {
             return sym->value + base;
           }

@@ -320,11 +320,12 @@ struct xrecv_comport_dat_struct {unsigned int zero; unsigned __int8 str[256];};
 
 struct dscons_send_char_struct {unsigned int zero; unsigned char str[1];};
 
-#ifdef TARGET_EE
+#ifdef DSNET_COMPILING_E
 typedef quad regtype;
 typedef struct {unsigned int cause; unsigned int epc; unsigned int status; unsigned int errorepc;} SCRS;
 struct imod {struct imod *forw; struct imod *back; int flags; unsigned int id; ILOADP_MODINFO_DATA info; unsigned int erx_stub_addr; unsigned int erx_stub_size; unsigned int erx_lib_addr; unsigned int erx_lib_size; char *name; unsigned char status; unsigned int retval; int arg_siz; char args[160]; unsigned int vaddr;};
-#else
+#endif
+#ifdef DSNET_COMPILING_I
 typedef unsigned int regtype;
 typedef struct {unsigned int cause; unsigned int epc;} SCRS;
 struct imod {struct imod *forw; struct imod *back; int flags; unsigned int id; ILOADP_MODINFO_DATA info; char *name; unsigned char status; unsigned int retval; int arg_siz; char args[160]; unsigned int vaddr;};

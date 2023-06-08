@@ -1,6 +1,10 @@
-#include "dsedb_prototypes.h"
+
+#include "dsxdb_prototypes.h"
 
 extern unsigned int dot; // defined in mem.c
+#ifdef DSNET_COMPILING_I
+static int last_cnt_16 = 20;
+#endif /* DSNET_COMPILING_I */
 static const char *gpr_name[] =
 {
   "zero",
@@ -38,6 +42,7 @@ static const char *gpr_name[] =
 };
 static const char *cpr_name[] =
 {
+#ifdef DSNET_COMPILING_E
   "index",
   "random",
   "entrylo0",
@@ -52,8 +57,26 @@ static const char *cpr_name[] =
   "compare",
   "status",
   "cause",
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  "0",
+  "1",
+  "2",
+  "bpc",
+  "4",
+  "bda",
+  "tar",
+  "dcic",
+  "bada",
+  "bdam",
+  "10",
+  "bpcm",
+  "sr",
+  "cr",
+#endif /* DSNET_COMPILING_I */
   "epc",
   "prid",
+#ifdef DSNET_COMPILING_E
   "config",
   "rsvd17",
   "rsvd18",
@@ -70,9 +93,34 @@ static const char *cpr_name[] =
   "taghi",
   "errorepc",
   "rsvd31"
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "23",
+  "24",
+  "25",
+  "26",
+  "27",
+  "28",
+  "29",
+  "30",
+  "31"
+#endif /* DSNET_COMPILING_I */
 };
+#ifdef DSNET_COMPILING_E
 static const char *fpr_name[] =
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+static const char *fllt_name[] =
+#endif /* DSNET_COMPILING_I */
 {
+#ifdef DSNET_COMPILING_E
   "fpr0",
   "fpr1",
   "fpr2",
@@ -105,7 +153,43 @@ static const char *fpr_name[] =
   "fpr29",
   "fpr30",
   "fpr31"
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "23",
+  "24",
+  "25",
+  "26",
+  "27",
+  "28",
+  "29",
+  "30",
+  "31"
+#endif /* DSNET_COMPILING_I */
 };
+#ifdef DSNET_COMPILING_E
 static const char *vf_name[] =
 {
   "vf00",
@@ -141,6 +225,7 @@ static const char *vf_name[] =
   "vf30",
   "vf31"
 };
+#endif /* DSNET_COMPILING_E */
 static const char *ccr_name[] =
 {
   "0",
@@ -176,6 +261,7 @@ static const char *ccr_name[] =
   "30",
   "31"
 };
+#ifdef DSNET_COMPILING_E
 static const char *vi_name[] =
 {
   "vi00",
@@ -233,6 +319,7 @@ static const char *dest_name[] =
 static const char *xyzw_name[] =
 { "x", "y", "z", "w" };
 static int last_cnt_16 = 20;
+#endif /* DSNET_COMPILING_E */
 static struct {BT *head;BT *tail;} bts = { NULL, NULL };
 static int bt_no = 0;
 OPCODE opcodes[] =
@@ -240,8 +327,14 @@ OPCODE opcodes[] =
   { "NOP", 4294967295u, 0u, 1u },
   { "LI      rt,simm", 4292870144u, 603979776u, 4097u },
   { "LI      rt,imm", 4292870144u, 872415232u, 4097u },
+#ifdef DSNET_COMPILING_E
   { "MOVE    rd,rt", 4292872191u, 45u, 4100u },
   { "MOVE    rd,rs", 4229892095u, 45u, 4100u },
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  { "MOVE    rd,rt", 4292872191u, 33u, 4097u },
+  { "MOVE    rd,rs", 4229892095u, 33u, 4097u },
+#endif /* DSNET_COMPILING_I */
   { "MOVE    rd,rt", 4292872191u, 37u, 4097u },
   { "MOVE    rd,rs", 4229892095u, 37u, 4097u },
   { "B       off", 4294901760u, 268435456u, 4097u },
@@ -253,29 +346,57 @@ OPCODE opcodes[] =
   { "ADDU    rd,rs,rt", 4227860479u, 33u, 1u },
   { "AND     rd,rs,rt", 4227860479u, 36u, 1u },
   { "ANDI    rt,rs,imm", 4227858432u, 805306368u, 1u },
+#ifdef DSNET_COMPILING_I
+  { "BC0F    off", 4294901760u, 1090519040u, 1u },
+  { "BC1F    off", 4294901760u, 1157627904u, 1u },
+  { "BC2F    off", 4294901760u, 1224736768u, 1u },
+  { "BC3F    off", 4294901760u, 1291845632u, 1u },
+  { "BC0T    off", 4294901760u, 1090584576u, 1u },
+  { "BC1T    off", 4294901760u, 1157693440u, 1u },
+  { "BC2T    off", 4294901760u, 1224802304u, 1u },
+  { "BC3T    off", 4294901760u, 1291911168u, 1u },
+#endif /* DSNET_COMPILING_I */
   { "BEQ     rs,rt,off", 4227858432u, 268435456u, 1u },
+#ifdef DSNET_COMPILING_E
   { "BEQL    rs,rt,off", 4227858432u, 1342177280u, 130u },
+#endif /* DSNET_COMPILING_E */
   { "BGEZ    rs,off", 4229890048u, 67174400u, 1u },
   { "BGEZAL  rs,off", 4229890048u, 68222976u, 1u },
+#ifdef DSNET_COMPILING_E
   { "BGEZALL rs,off", 4229890048u, 68354048u, 130u },
   { "BGEZL   rs,off", 4229890048u, 67305472u, 130u },
+#endif /* DSNET_COMPILING_E */
   { "BGTZ    rs,off", 4229890048u, 469762048u, 1u },
+#ifdef DSNET_COMPILING_E
   { "BGTZL   rs,off", 4229890048u, 1543503872u, 130u },
+#endif /* DSNET_COMPILING_E */
   { "BLEZ    rs,off", 4229890048u, 402653184u, 1u },
+#ifdef DSNET_COMPILING_E
   { "BLEZL   rs,off", 4229890048u, 1476395008u, 130u },
+#endif /* DSNET_COMPILING_E */
   { "BLTZ    rs,off", 4229890048u, 67108864u, 1u },
   { "BLTZAL  rs,off", 4229890048u, 68157440u, 1u },
+#ifdef DSNET_COMPILING_E
   { "BLTZALL rs,off", 4229890048u, 68288512u, 130u },
   { "BLTZL   rs,off", 4229890048u, 67239936u, 130u },
+#endif /* DSNET_COMPILING_E */
   { "BNE     rs,rt,off", 4227858432u, 335544320u, 1u },
+#ifdef DSNET_COMPILING_E
   { "BNEL    rs,rt,off", 4227858432u, 1409286144u, 130u },
+#endif /* DSNET_COMPILING_E */
   { "BREAK   code", 4227858495u, 13u, 1u },
+#ifdef DSNET_COMPILING_E
   { "DADD    rd,rs,rt", 4227860479u, 44u, 4u },
   { "DADDI   rt,rs,simm", 4227858432u, 1610612736u, 4u },
   { "DADDIU  rt,rs,simm", 4227858432u, 1677721600u, 4u },
   { "DADDU   rd,rs,rt", 4227860479u, 45u, 4u },
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  { "RFE", 4294967295u, 1107296272u, 129u },
+#endif /* DSNET_COMPILING_I */
   { "DIV     rs,rt", 4227923967u, 26u, 1u },
   { "DIVU    rs,rt", 4227923967u, 27u, 1u },
+#ifdef DSNET_COMPILING_E
   { "DSLL    rd,rt,shamt", 4292870207u, 56u, 4u },
   { "DSLL32  rd,rt,shamt", 4292870207u, 60u, 4u },
   { "DSLLV   rd,rt,rs", 4227860479u, 20u, 4u },
@@ -287,26 +408,33 @@ OPCODE opcodes[] =
   { "DSRLV   rd,rt,rs", 4227860479u, 22u, 4u },
   { "DSUB    rd,rs,rt", 4227860479u, 46u, 4u },
   { "DSUBU   rd,rs,rt", 4227860479u, 47u, 4u },
+#endif /* DSNET_COMPILING_E */
   { "J       target", 4227858432u, 134217728u, 1u },
   { "JAL     target", 4227858432u, 201326592u, 1u },
   { "JALR    rd,rs", 4229892095u, 9u, 1u },
   { "JR      rs", 4229955583u, 8u, 1u },
   { "LB      rt,simm(rs)", 4227858432u, 2147483648u, 1u },
   { "LBU     rt,simm(rs)", 4227858432u, 2415919104u, 1u },
+#ifdef DSNET_COMPILING_E
   { "LD      rt,simm(rs)", 4227858432u, 3690987520u, 4u },
   { "LDL     rt,simm(rs)", 4227858432u, 1744830464u, 4u },
   { "LDR     rt,simm(rs)", 4227858432u, 1811939328u, 4u },
+#endif /* DSNET_COMPILING_E */
   { "LH      rt,simm(rs)", 4227858432u, 2214592512u, 1u },
   { "LHU     rt,simm(rs)", 4227858432u, 2483027968u, 1u },
   { "LUI     rt,imm", 4227858432u, 1006632960u, 1u },
   { "LW      rt,simm(rs)", 4227858432u, 2348810240u, 1u },
   { "LWL     rt,simm(rs)", 4227858432u, 2281701376u, 1u },
   { "LWR     rt,simm(rs)", 4227858432u, 2550136832u, 1u },
+#ifdef DSNET_COMPILING_E
   { "LWU     rt,simm(rs)", 4227858432u, 2617245696u, 4u },
+#endif /* DSNET_COMPILING_E */
   { "MFHI    rd", 4294903807u, 16u, 1u },
   { "MFLO    rd", 4294903807u, 18u, 1u },
+#ifdef DSNET_COMPILING_E
   { "MOVN    rd,rs,rt", 4227860479u, 11u, 8u },
   { "MOVZ    rd,rs,rt", 4227860479u, 10u, 8u },
+#endif /* DSNET_COMPILING_E */
   { "MTHI    rs", 4229955583u, 17u, 1u },
   { "MTLO    rs", 4229955583u, 19u, 1u },
   { "MULT    rs,rt", 4227923967u, 24u, 1u },
@@ -314,11 +442,15 @@ OPCODE opcodes[] =
   { "NOR     rd,rs,rt", 4227860479u, 39u, 1u },
   { "OR      rd,rs,rt", 4227860479u, 37u, 1u },
   { "ORI     rt,rs,imm", 4227858432u, 872415232u, 1u },
+#ifdef DSNET_COMPILING_E
   { "PREF    hint,simm(rs)", 4227858432u, 3422552064u, 8u },
+#endif /* DSNET_COMPILING_E */
   { "SB      rt,simm(rs)", 4227858432u, 2684354560u, 1u },
+#ifdef DSNET_COMPILING_E
   { "SD      rt,simm(rs)", 4227858432u, 4227858432u, 4u },
   { "SDL     rt,simm(rs)", 4227858432u, 2952790016u, 4u },
   { "SDR     rt,simm(rs)", 4227858432u, 3019898880u, 4u },
+#endif /* DSNET_COMPILING_E */
   { "SH      rt,simm(rs)", 4227858432u, 2751463424u, 1u },
   { "SLL     rd,rt,shamt", 4292870207u, 0u, 1u },
   { "SLLV    rd,rt,rs", 4227860479u, 4u, 1u },
@@ -335,10 +467,13 @@ OPCODE opcodes[] =
   { "SW      rt,simm(rs)", 4227858432u, 2885681152u, 1u },
   { "SWL     rt,simm(rs)", 4227858432u, 2818572288u, 1u },
   { "SWR     rt,simm(rs)", 4227858432u, 3087007744u, 1u },
+#ifdef DSNET_COMPILING_E
   { "SYNC", 4294967295u, 15u, 386u },
   { "SYNC.L", 4294967295u, 15u, 2u },
   { "SYNC.P", 4294967295u, 1039u, 2u },
+#endif /* DSNET_COMPILING_E */
   { "SYSCALL code", 4227858495u, 12u, 1u },
+#ifdef DSNET_COMPILING_E
   { "TEQ     rs,rt", 4227923967u, 52u, 2u },
   { "TEQI    rs,simm", 4229890048u, 67895296u, 2u },
   { "TGE     rs,rt", 4227923967u, 48u, 2u },
@@ -351,8 +486,10 @@ OPCODE opcodes[] =
   { "TLTU    rs,rt", 4227923967u, 51u, 2u },
   { "TNE     rs,rt", 4227923967u, 54u, 2u },
   { "TNEI    rs,simm", 4229890048u, 68026368u, 2u },
+#endif /* DSNET_COMPILING_E */
   { "XOR     rd,rs,rt", 4227860479u, 38u, 1u },
   { "XORI    rt,rs,imm", 4227858432u, 939524096u, 1u },
+#ifdef DSNET_COMPILING_E
   { "DIV1    rs,rt", 4227923967u, 1879048218u, 256u },
   { "DIVU1   rs,rt", 4227923967u, 1879048219u, 256u },
   { "LQ      rt,simm(rs)", 4227858432u, 2013265920u, 256u },
@@ -624,6 +761,7 @@ OPCODE opcodes[] =
   { "VSUBAQ&dest  ACC,vfs,Q", 4263446527u, 1241514620u, 256u },
   { "VSUBA*&dest  ACC,vfs,vft", 4261414908u, 1241514108u, 256u },
   { "VWAITQ", 4294967295u, 1241514943u, 256u },
+#endif /* DSNET_COMPILING_E */
   { "CFC0    rt,cd", 4292872191u, 1077936128u, 1u },
   { "CFC1    rt,cd", 4292872191u, 1145044992u, 1u },
   { "CFC2    rt,cd", 4292872191u, 1212153856u, 1u },
@@ -920,6 +1058,7 @@ static char *__cdecl disasm(
   int v46; // eax
   int v47; // eax
   int v48; // eax
+#ifdef DSNET_COMPILING_E
   int v49; // eax
   int v50; // eax
   int v51; // eax
@@ -933,11 +1072,19 @@ static char *__cdecl disasm(
   int v59; // eax
   int v60; // eax
   int v61; // eax
+#endif /* DSNET_COMPILING_E */
   int si; // [esp+24h] [ebp-420h]
   int cm; // [esp+28h] [ebp-41Ch]
+#ifdef DSNET_COMPILING_E
   signed int v64; // [esp+2Ch] [ebp-418h]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  signed int v51; // [esp+2Ch] [ebp-418h]
+#endif /* DSNET_COMPILING_I */
   int v; // [esp+2Ch] [ebp-418h]
+#ifdef DSNET_COMPILING_E
   unsigned int v66; // [esp+2Ch] [ebp-418h]
+#endif /* DSNET_COMPILING_E */
   char ch; // [esp+33h] [ebp-411h]
   char *dp; // [esp+34h] [ebp-410h]
   char *dp_1; // [esp+34h] [ebp-410h]
@@ -1062,17 +1209,37 @@ static char *__cdecl disasm(
           v26 = (unsigned __int16)inst;
         else
           v26 = inst | 0xFFFF0000;
+#ifdef DSNET_COMPILING_E
         v64 = v26;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+        v51 = v26;
+#endif /* DSNET_COMPILING_I */
         if ( v26 < 0 )
         {
           *bp++ = 45;
+#ifdef DSNET_COMPILING_E
           v64 = -v26;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+          v51 = -v26;
+#endif /* DSNET_COMPILING_I */
         }
+#ifdef DSNET_COMPILING_E
         if ( v64 < 0 || v64 > 9 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+        if ( v51 < 0 || v51 > 9 )
+#endif /* DSNET_COMPILING_I */
           v27 = "0x";
         else
           v27 = "";
+#ifdef DSNET_COMPILING_E
         v28 = ds_sprintf(bp, "%s%x", v27, v64);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+        v28 = ds_sprintf(bp, "%s%x", v27, v51);
+#endif /* DSNET_COMPILING_I */
         bp += v28;
         ++si;
       }
@@ -1165,19 +1332,43 @@ LABEL_84:
         }
         else if ( !strcmp("ft", opr) )
         {
+#ifdef DSNET_COMPILING_E
           v45 = ds_sprintf(bp, "$%s", fpr_name[BYTE2(inst) & 0x1F]);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+          v45 = ds_sprintf(bp, "$%s", fllt_name[BYTE2(inst) & 0x1F]);
+#endif /* DSNET_COMPILING_I */
           bp += v45;
         }
         else if ( !strcmp("fs", opr) )
         {
+#ifdef DSNET_COMPILING_E
           v46 = ds_sprintf(bp, "$%s", fpr_name[(unsigned __int16)inst >> 11]);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+          v46 = ds_sprintf(bp, "$%s", fllt_name[(unsigned __int16)inst >> 11]);
+#endif /* DSNET_COMPILING_I */
           bp += v46;
         }
+#ifdef DSNET_COMPILING_E
         else if ( !strcmp("fd", opr) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+        else
+#endif /* DSNET_COMPILING_I */
         {
+#ifdef DSNET_COMPILING_E
           v47 = ds_sprintf(bp, "$%s", fpr_name[(inst >> 6) & 0x1F]);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+          if ( !strcmp("fd", opr) )
+            v47 = ds_sprintf(bp, "$%s", fllt_name[(inst >> 6) & 0x1F]);
+          else
+            v47 = ds_sprintf(bp, "??%s??", opr);
+#endif /* DSNET_COMPILING_I */
           bp += v47;
         }
+#ifdef DSNET_COMPILING_E
         else if ( !strcmp("&dest", opr) )
         {
           v48 = ds_sprintf(bp, ".%s", dest_name[(inst >> 21) & 0xF]);
@@ -1246,6 +1437,7 @@ LABEL_84:
           v60 = ds_sprintf(bp, "??%s??", opr);
           bp += v60;
         }
+#endif /* DSNET_COMPILING_E */
       }
     }
     else
@@ -1264,8 +1456,14 @@ LABEL_84:
   dp_1 = bp;
   if ( !cm )
   {
+#ifdef DSNET_COMPILING_E
     v61 = tabs(buf, bp);
     bp += v61;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    v48 = tabs(buf, bp);
+    bp += v48;
+#endif /* DSNET_COMPILING_I */
     *bp++ = 35;
     sp_1 = bp;
     *bp = 0;
@@ -1634,10 +1832,16 @@ static int __cdecl assemble(char *buf, unsigned int *ovals, int olen, int f_ma)
   int v20; // eax
   int v21; // eax
   int v22; // eax
+#ifdef DSNET_COMPILING_E
   int v23; // eax
   int v24; // eax
   char v25; // al
   char *v26; // eax
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  char v23; // al
+  char *v24; // eax
+#endif /* DSNET_COMPILING_I */
   char _c_5; // [esp+6h] [ebp-82Ah]
   char _c_6; // [esp+6h] [ebp-82Ah]
   char _c_7; // [esp+6h] [ebp-82Ah]
@@ -1825,7 +2029,12 @@ LABEL_105:
       if ( opr[0] )
         break;
       if ( !*fmt || *bp != *fmt )
+#ifdef DSNET_COMPILING_E
         goto LABEL_350;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+        goto LABEL_274;
+#endif /* DSNET_COMPILING_I */
       ++fmt;
       ++bp;
     }
@@ -2016,12 +2225,22 @@ LABEL_163:
         return ds_error("invalid fs - %s", tok);
       inst |= (v & 0x1F) << 11;
     }
+#ifdef DSNET_COMPILING_E
     else if ( !strcmp("fd", opr) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    else
+#endif /* DSNET_COMPILING_I */
     {
+#ifdef DSNET_COMPILING_I
+      if ( strcmp("fd", opr) )
+        return ds_error("as: internal error - ??%s??", opr);
+#endif /* DSNET_COMPILING_I */
       if ( name_regno(2, 1, tok, &v) )
         return ds_error("invalid fd - %s", tok);
       inst |= (v & 0x1F) << 6;
     }
+#ifdef DSNET_COMPILING_E
     else if ( !strcmp("I", opr) )
     {
       if ( strcmp("i", tok) )
@@ -2145,18 +2364,35 @@ LABEL_163:
         inst |= (v & 0x1F) << 6;
       }
     }
+#endif /* DSNET_COMPILING_E */
   }
   while ( *fmt );
   while ( 1 )
   {
+#ifdef DSNET_COMPILING_E
 LABEL_350:
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+LABEL_274:
+#endif /* DSNET_COMPILING_I */
     while ( *bp )
     {
       _c_7 = *bp;
+#ifdef DSNET_COMPILING_E
       v24 = 0;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+      v22 = 0;
+#endif /* DSNET_COMPILING_I */
       if ( *bp == 32 || _c_7 == 12 || _c_7 == 10 || _c_7 == 13 || _c_7 == 9 || _c_7 == 11 )
+#ifdef DSNET_COMPILING_E
         v24 = 1;
       if ( !v24 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+        v22 = 1;
+      if ( !v22 )
+#endif /* DSNET_COMPILING_I */
         break;
       ++bp;
     }
@@ -2165,22 +2401,48 @@ LABEL_350:
       break;
     if ( ch == 91 )
     {
+#ifdef DSNET_COMPILING_E
       v25 = 93;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+      v23 = 93;
+#endif /* DSNET_COMPILING_I */
     }
     else if ( ch == 60 )
     {
+#ifdef DSNET_COMPILING_E
       v25 = 62;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+      v23 = 62;
+#endif /* DSNET_COMPILING_I */
     }
     else
     {
+#ifdef DSNET_COMPILING_E
       v25 = 125;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+      v23 = 125;
+#endif /* DSNET_COMPILING_I */
     }
+#ifdef DSNET_COMPILING_E
     ch = v25;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    ch = v23;
+#endif /* DSNET_COMPILING_I */
     ++bp;
     while ( *bp && ch != *bp )
       ++bp;
+#ifdef DSNET_COMPILING_E
     v26 = bp++;
     if ( ch != *v26 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    v24 = bp++;
+    if ( ch != *v24 )
+#endif /* DSNET_COMPILING_I */
       return ds_error("unblanced - '%c'", ch);
   }
   if ( *bp && *bp != 59 && *bp != 35 )

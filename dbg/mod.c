@@ -1,4 +1,5 @@
-#include "dsidb_prototypes.h"
+
+#include "dsxdb_prototypes.h"
 
 static struct {IMOD *head;IMOD *tail;} imod_list = { NULL, NULL };
 static IMOD *last_imod = NULL;
@@ -23,6 +24,10 @@ static void __cdecl print_gp(char *str, IMOD *p);
 static void __cdecl print_tsize(char *str, IMOD *p);
 static void __cdecl print_dsize(char *str, IMOD *p);
 static void __cdecl print_bsize(char *str, IMOD *p);
+#ifdef DSNET_COMPILING_E
+static void __cdecl print_erxstub(char *str, IMOD *p);
+static void __cdecl print_erxlib(char *str, IMOD *p);
+#endif /* DSNET_COMPILING_E */
 static void __cdecl print_args(IMOD *p);
 static void __cdecl print_status(char *fmt, IMOD *p);
 static void __cdecl print_retval(char *fmt, IMOD *p);
@@ -168,7 +173,12 @@ static IMOD *__cdecl alloc_imod(int id, int ac, char **av)
     bp_1 = p->args;
     if ( !f_dev )
     {
+#ifdef DSNET_COMPILING_E
+      strcpy(bp_1, "host0:");
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
       strcpy(bp_1, "host1:");
+#endif /* DSNET_COMPILING_I */
       bp_1 = &p->args[6];
     }
     for ( i = 0; ac > i; ++i )
@@ -183,7 +193,12 @@ static IMOD *__cdecl alloc_imod(int id, int ac, char **av)
       bp_1 += strlen(av[i]) + 1;
     }
     ds_free_mem_low(buf, "mod.c", "alloc_imod");
+#ifdef DSNET_COMPILING_E
+    p->arg_siz = bp_1 - 80 - (char *)p;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     p->arg_siz = bp_1 - 64 - (char *)p;
+#endif /* DSNET_COMPILING_I */
     p->flags |= 8u;
   }
   if ( !id )
@@ -271,7 +286,12 @@ static void __cdecl load_mod_symbols(IMOD *p)
   char path[1024]; // [esp+Ch] [ebp-800h] BYREF
   char buf[1024]; // [esp+40Ch] [ebp-400h] BYREF
 
+#ifdef DSNET_COMPILING_E
+  if ( !ds_strncmp("host0:", p->args, 6) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   if ( !ds_strncmp("host1:", p->args, 6) )
+#endif /* DSNET_COMPILING_I */
   {
     dp = path;
     for ( sp = &p->args[6]; *sp && *sp != 32; ++sp )
@@ -336,6 +356,15 @@ LABEL_5:
           if ( (unsigned int)len > 0x20 )
           {
             memcpy(&p->info, ptr, sizeof(p->info));
+#ifdef DSNET_COMPILING_E
+            if ( *((_BYTE *)ptr + 29) == 1 && *((_BYTE *)ptr + 28) > 4u )
+            {
+              p->erx_stub_addr = *((_DWORD *)ptr + 8);
+              p->erx_stub_size = *((_DWORD *)ptr + 9);
+              p->erx_lib_addr = *((_DWORD *)ptr + 10);
+              p->erx_lib_size = *((_DWORD *)ptr + 11);
+            }
+#endif /* DSNET_COMPILING_E */
             set_modname(p, (char *)ptr + 4 * *((unsigned __int8 *)ptr + 28) + 32);
             p->flags |= 2u;
             if ( SLOBYTE(p->flags) >= 0 )
@@ -594,7 +623,12 @@ static void __cdecl print_id(char *str, IMOD *p)
 static void __cdecl print_addr(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
+#ifdef DSNET_COMPILING_E
+    ds_printf("%s%7x", str, p->info.mod_addr);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     ds_printf("%s%6x", str, p->info.mod_addr);
+#endif /* DSNET_COMPILING_I */
   else
     ds_printf("%s------", str);
 }
@@ -610,7 +644,12 @@ static void __cdecl print_size_0(char *str, IMOD *p)
 static void __cdecl print_last_addr(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
+#ifdef DSNET_COMPILING_E
+    ds_printf("%s%7x", str, p->info.mod_addr + p->info.bss_size + p->info.data_size + p->info.text_size - 1);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     ds_printf("%s%6x", str, p->info.mod_addr + p->info.bss_size + p->info.data_size + p->info.text_size - 1);
+#endif /* DSNET_COMPILING_I */
   else
     ds_printf("%s------", str);
 }
@@ -731,6 +770,20 @@ static void __cdecl print_bsize(char *str, IMOD *p)
   else
     ds_printf("%s-----", str);
 }
+
+#ifdef DSNET_COMPILING_E
+static void __cdecl print_erxstub(char *str, IMOD *p)
+{
+  if ( (p->flags & 2) != 0 && p->erx_stub_addr != -1 )
+    ds_printf("%s%x-%x", str, p->erx_stub_addr, p->erx_stub_size + p->erx_stub_addr - 1);
+}
+
+static void __cdecl print_erxlib(char *str, IMOD *p)
+{
+  if ( (p->flags & 2) != 0 && p->erx_lib_addr != -1 )
+    ds_printf("%s%x-%x", str, p->erx_lib_addr, p->erx_lib_size + p->erx_lib_addr - 1);
+}
+#endif /* DSNET_COMPILING_E */
 
 static void __cdecl print_args(IMOD *p)
 {
@@ -862,7 +915,12 @@ int __cdecl mlist_cmd(int ac, char **av)
   if ( f_mem )
   {
     clear_module_symbol();
+#ifdef DSNET_COMPILING_E
+    ds_printf(" Id   Begin     End  Size (Text  Data   Bss) Ver  Name\n");
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     ds_printf(" Id  Begin    End  Size (Text  Data   Bss) Ver  Name\n");
+#endif /* DSNET_COMPILING_I */
     for ( p_2 = imod_list.head; p_2; p_2 = p_2->forw )
     {
       if ( (p_2->flags & 0x200) != 0 )
@@ -883,6 +941,10 @@ int __cdecl mlist_cmd(int ac, char **av)
           print_flags(" Status=", p_2);
           print_entry(" Entry=", p_2);
           print_gp(" GP=", p_2);
+#ifdef DSNET_COMPILING_E
+          print_erxstub(" ErxStub=", p_2);
+          print_erxlib(" ErxLib=", p_2);
+#endif /* DSNET_COMPILING_E */
           print_status(" ST=%s", p_2);
           print_retval(" RV=%W", p_2);
           print_args(p_2);
@@ -1051,7 +1113,12 @@ LABEL_35:
         v18 = v8 - 1;
         v9 = *i;
         LOBYTE(v9) = 0;
+#ifdef DSNET_COMPILING_E
+        ds_printf(" %07x-%07x %07x", v9, v18, v6 - v7);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
         ds_printf(" %06x-%06x %06x", v9, v18, v6 - v7);
+#endif /* DSNET_COMPILING_I */
         if ( (*i & 1) != 0 )
         {
           ds_printf(" <free>\n");
@@ -1123,8 +1190,14 @@ LABEL_76:
                   v13 = *i;
                   LOBYTE(v13) = 0;
                   ds_printf(
+#ifdef DSNET_COMPILING_E
+                    " %*s+%07x %07x",
+                    7,
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
                     " %*s+%06x %06x",
                     6,
+#endif /* DSNET_COMPILING_I */
                     "",
                     p->info.mod_addr - v13,
                     p->info.bss_size + p->info.data_size + p->info.text_size);

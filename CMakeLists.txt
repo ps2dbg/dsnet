@@ -91,89 +91,102 @@ add_executable(pacons src/pacons.c)
 target_link_libraries(pacons dsnet)
 
 
-add_executable(dsdcons src_d/dscons.c)
+add_executable(dsdcons src/dscons.c)
 
 target_link_libraries(dsdcons dsnet)
+target_compile_definitions(dsdcons PRIVATE DSNET_COMPILING_D)
 
 
-add_executable(dsmcons src_m/dscons.c)
+add_executable(dsmcons src/dscons.c)
 
 target_link_libraries(dsmcons dsnet)
+target_compile_definitions(dsmcons PRIVATE DSNET_COMPILING_M)
 
 
-add_executable(dsecons src_e/dscons.c)
+add_executable(dsecons src/dscons.c)
 
 target_link_libraries(dsecons dsnet)
+target_compile_definitions(dsecons PRIVATE DSNET_COMPILING_E)
 
 
-add_executable(dsicons src_i/dscons.c)
+add_executable(dsicons src/dscons.c)
 
 target_link_libraries(dsicons dsnet)
+target_compile_definitions(dsicons PRIVATE DSNET_COMPILING_I)
 
 
-add_executable(dsefilesv src_e/dsfilesv.c)
+add_executable(dsefilesv src/dsfilesv.c)
 
 target_link_libraries(dsefilesv dsnet)
+target_compile_definitions(dsefilesv PRIVATE DSNET_COMPILING_E)
 
 
-add_executable(dsifilesv src_i/dsfilesv.c)
+add_executable(dsifilesv src/dsfilesv.c)
 
 target_link_libraries(dsifilesv dsnet)
+target_compile_definitions(dsifilesv PRIVATE DSNET_COMPILING_I)
 
 
-add_executable(dseping src_e/dsping.c)
+add_executable(dseping src/dsping.c)
 
 target_link_libraries(dseping dsnet)
+target_compile_definitions(dseping PRIVATE DSNET_COMPILING_E)
 
 
-add_executable(dsiping src_i/dsping.c)
+add_executable(dsiping src/dsping.c)
 
 target_link_libraries(dsiping dsnet)
+target_compile_definitions(dsiping PRIVATE DSNET_COMPILING_I)
 
 
-add_executable(dsestart src_e/dsstart.c)
+add_executable(dsestart src/dsstart.c)
 
 target_link_libraries(dsestart dsnet)
+target_compile_definitions(dsestart PRIVATE DSNET_COMPILING_E)
 
 
-add_executable(dsistart src_i/dsstart.c)
+add_executable(dsistart src/dsstart.c)
 
 target_link_libraries(dsistart dsnet)
+target_compile_definitions(dsistart PRIVATE DSNET_COMPILING_I)
 
 
-add_executable(dselist src_e/dslist.c)
+add_executable(dselist src/dslist.c)
 
 target_link_libraries(dselist dsnet)
+target_compile_definitions(dselist PRIVATE DSNET_COMPILING_E)
 
 
 add_executable(dsidb
-	dbg_i/dbg.c
-	dbg_i/exe.c
-	dbg_i/help.c
-	dbg_i/ireg.c
-	dbg_i/mdebug.c
-	dbg_i/mem.c
-	dbg_i/mod.c
-	dbg_i/opc.c
-	dbg_i/sym.c
+	dbg/dbg.c
+	dbg/exe.c
+	dbg/help.c
+	dbg/ireg.c
+	dbg/mdebug.c
+	dbg/mem.c
+	dbg/mod.c
+	dbg/opc.c
+	dbg/sym.c
 )
 
 target_link_libraries(dsidb dsnet)
+target_compile_definitions(dsidb PRIVATE DSNET_COMPILING_I)
 
 
 add_executable(dsedb
-	dbg_e/dbg.c
-	dbg_e/ereg.c
-	dbg_e/ethread.c
-	dbg_e/exe.c
-	dbg_e/help.c
-	dbg_e/mdebug.c
-	dbg_e/mem.c
-	dbg_e/mod.c
-	dbg_e/opc.c
-	dbg_e/sym.c
-	dbg_e/vopc.c
+	dbg/dbg.c
+	dbg/ereg.c
+	dbg/ethread.c
+	dbg/exe.c
+	dbg/help.c
+	dbg/mdebug.c
+	dbg/mem.c
+	dbg/mod.c
+	dbg/opc.c
+	dbg/sym.c
+	dbg/vopc.c
 )
 
 target_link_libraries(dsedb dsnet)
+target_compile_definitions(dsedb PRIVATE DSNET_COMPILING_E)
 

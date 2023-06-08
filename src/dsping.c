@@ -12,7 +12,12 @@ static int pkt_timeout = 0;
 static int send_count = 0;
 static int recv_count = 0;
 static int loss_count = 0;
+#ifdef DSNET_COMPILING_E
+static int64_t rt_min = 2147483647;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
 static int64_t rt_min = INT64_MAX;
+#endif /* DSNET_COMPILING_I */
 static int64_t rt_max = -1;
 static int64_t rt_avg = 0;
 static int rt_cnt = 0;
@@ -57,13 +62,23 @@ static void __cdecl send_echo()
     if ( !v1 )
       ds_exit(135);
     v1->seq = seq_4++;
+#ifdef DSNET_COMPILING_E
+    db = ds_alloc_buf(1, 69, 0, pkt_size + 8);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     db = ds_alloc_buf(1, 73, 0, pkt_size + 8);
+#endif /* DSNET_COMPILING_I */
     if ( !db )
       ds_exit(135);
     db->buf[8] = 1;
     db->buf[9] = 0;
     *(_WORD *)&db->buf[10] = 0;
+#ifdef DSNET_COMPILING_E
+    *(_WORD *)&db->buf[12] = 69;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
     *(_WORD *)&db->buf[12] = 73;
+#endif /* DSNET_COMPILING_I */
     *(_WORD *)&db->buf[14] = v1->seq;
     memcpy(&db->buf[16], data_buf, pkt_size);
     ds_send_desc(target_desc, db);
@@ -108,7 +123,12 @@ static void __cdecl statics()
 
 static void __cdecl check_timeout()
 {
+#ifdef DSNET_COMPILING_E
+  int v0; // [esp+4h] [ebp-14h]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   int64_t v0; // [esp+4h] [ebp-14h]
+#endif /* DSNET_COMPILING_I */
   int64_t cu; // [esp+8h] [ebp-10h] BYREF
   int64_t psec; // [esp+Ch] [ebp-Ch] BYREF
   SEQ_TIME *q; // [esp+10h] [ebp-8h]

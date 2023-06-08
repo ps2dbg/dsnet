@@ -195,9 +195,19 @@ int __cdecl main(int ac, char **av)
     ds_exit(132);
   if ( !ds_add_recv_func(target_desc, 1024, -1, -1, recv_netmp) )
     ds_exit(135);
+#ifdef DSNET_COMPILING_E
+  if ( !ds_add_recv_func(target_desc, 288, -1, -1, ds_recv_drfp) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   if ( !ds_add_recv_func(target_desc, 289, -1, -1, ds_recv_drfp) )
+#endif /* DSNET_COMPILING_I */
     ds_exit(135);
+#ifdef DSNET_COMPILING_E
+  if ( ds_send_netmp1(target_desc, 0, 0, 240, 288) < 0 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
   if ( ds_send_netmp1(target_desc, 0, 0, 240, 289) < 0 )
+#endif /* DSNET_COMPILING_I */
     ds_exit(135);
   dsm_waiting = 1;
   ds_drfp_err_func = (void (__cdecl *)())drfp_error;

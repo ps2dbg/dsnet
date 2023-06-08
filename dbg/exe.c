@@ -1,8 +1,12 @@
-#include "dsedb_prototypes.h"
+
+#include "dsxdb_prototypes.h"
 
 extern DBGP_CONF_DATA dbconf; // defined in dbg.c
+#ifdef DSNET_COMPILING_E
 extern unsigned int current_entry_point; // defined in mem.c
 extern unsigned int current_gp_value; // defined in mem.c
+#endif /* DSNET_COMPILING_E */
+
 static int brkpt_no = 1;
 static int last_cnt_44 = 1;
 static int last_cnt_47 = 1;
@@ -14,9 +18,11 @@ static int last_cnt_80 = 1;
 static int last_cnt_83 = 1;
 static int last_cnt_86 = 1;
 static int last_cnt_89 = 1;
+#ifdef DSNET_COMPILING_E
 static int run_argc = 0;
 static char *run_args = NULL;
 static int run_args_len = 0;
+#endif /* DSNET_COMPILING_E */
 
 static struct {BRKPT *head;BRKPT *tail;} bps;
 
@@ -1057,6 +1063,7 @@ static unsigned int __cdecl get_pc(SCRS *scrs)
 {
   unsigned int result; // eax
 
+#ifdef DSNET_COMPILING_E
   if ( (scrs->status & 4) != 0 )
   {
     result = scrs->errorepc;
@@ -1069,6 +1076,12 @@ static unsigned int __cdecl get_pc(SCRS *scrs)
     if ( (scrs->cause & 0x80000000) != 0 )
       result += 4;
   }
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  result = scrs->epc;
+  if ( (scrs->cause & 0x80000000) != 0 )
+    result += 4;
+#endif /* DSNET_COMPILING_I */
   return result;
 }
 
@@ -1088,17 +1101,34 @@ static int __cdecl is_breakpoint(int flag, SCRS *scrs)
 
 static int __cdecl load_scrs(SCRS *scrs)
 {
+#ifdef DSNET_COMPILING_E
   quad pv[4]; // [esp+0h] [ebp-6Ch] BYREF
   unsigned int masks[11]; // [esp+40h] [ebp-2Ch] BYREF
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  unsigned int vals[2]; // [esp+0h] [ebp-30h] BYREF
+  unsigned int masks[10]; // [esp+8h] [ebp-28h] BYREF
+#endif /* DSNET_COMPILING_I */
 
   ds_bzero(masks, sizeof(masks));
+#ifdef DSNET_COMPILING_E
   masks[2] = 1073770496;
   if ( load_quad_registers(masks, pv, 4) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  masks[3] = 24576;
+  if ( load_word_registers(masks, vals, 2) )
+#endif /* DSNET_COMPILING_I */
     return -1;
+#ifdef DSNET_COMPILING_E
   scrs->status = ds_cqw(pv[0]);
   scrs->cause = ds_cqw(pv[1]);
   scrs->epc = ds_cqw(pv[2]);
   scrs->errorepc = ds_cqw(pv[3]);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  *scrs = *(SCRS *)vals;
+#endif /* DSNET_COMPILING_I */
   return 0;
 }
 
@@ -1123,28 +1153,56 @@ static int __cdecl do_cont(int flag, SCRS *scrs)
 
 static int __cdecl host_do_step(int f_next, SCRS *scrs)
 {
+#ifdef DSNET_COMPILING_E
   unsigned int errorepc; // eax
   signed int cause; // ebx
   int v5; // eax
   unsigned int rpc; // [esp+4h] [ebp-Ch]
   unsigned int tadr; // [esp+8h] [ebp-8h] BYREF
   unsigned int ins; // [esp+Ch] [ebp-4h] BYREF
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  int v3; // eax
+  unsigned int rpc; // [esp+0h] [ebp-Ch]
+  unsigned int tadr; // [esp+4h] [ebp-8h] BYREF
+  unsigned int ins; // [esp+8h] [ebp-4h] BYREF
+#endif /* DSNET_COMPILING_I */
 
+#ifdef DSNET_COMPILING_E
   if ( (scrs->status & 4) != 0 )
     errorepc = scrs->errorepc;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  rpc = scrs->epc;
+  if ( (scrs->cause & 0x80000000) == 0 )
+  {
+    if ( add_brkpt(4, rpc + 4, 1u) < 0 )
+      return -1;
+  }
+#endif /* DSNET_COMPILING_I */
   else
+#ifdef DSNET_COMPILING_E
     errorepc = scrs->epc;
   rpc = errorepc;
   if ( ds_load_mem(errorepc, &ins, 4) )
     return -1;
   cause = scrs->cause;
   if ( (scrs->status & 4) == 0 )
+#endif /* DSNET_COMPILING_E */
   {
+#ifdef DSNET_COMPILING_E
     if ( cause >= 0 )
       goto LABEL_32;
 LABEL_10:
     v5 = is_branch_instruction(rpc, ins, &tadr);
     if ( v5 == 1 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    if ( ds_load_mem(rpc, &ins, 4) )
+      return -1;
+    v3 = is_branch_instruction(rpc, ins, &tadr);
+    if ( v3 == 1 )
+#endif /* DSNET_COMPILING_I */
     {
       if ( f_next && ((ins & 0xFC1FFFFF) == 63497 || (ins & 0xFC000000) == 201326592) )
       {
@@ -1156,9 +1214,19 @@ LABEL_10:
         return -1;
       }
     }
+#ifdef DSNET_COMPILING_E
     else if ( v5 > 1 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    else if ( v3 > 1 )
+#endif /* DSNET_COMPILING_I */
     {
+#ifdef DSNET_COMPILING_E
       if ( v5 == 2 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+      if ( v3 == 2 )
+#endif /* DSNET_COMPILING_I */
       {
         if ( tadr != rpc && add_brkpt(4, tadr, 1u) < 0 )
           return -1;
@@ -1166,12 +1234,20 @@ LABEL_10:
           return -1;
       }
     }
+#ifdef DSNET_COMPILING_E
     else if ( !v5 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    else if ( !v3 )
+#endif /* DSNET_COMPILING_I */
     {
       return ds_error("host_do_step: BD=1 and branch=0");
     }
+#ifdef DSNET_COMPILING_E
     return do_cont(4, scrs);
+#endif /* DSNET_COMPILING_E */
   }
+#ifdef DSNET_COMPILING_E
   if ( (cause & 0x40000000) != 0 )
     goto LABEL_10;
 LABEL_32:
@@ -1184,6 +1260,7 @@ LABEL_32:
   {
     goto LABEL_10;
   }
+#endif /* DSNET_COMPILING_E */
   return do_cont(4, scrs);
 }
 
@@ -1255,10 +1332,18 @@ LABEL_6:
 static int __cdecl host_cont_cmd(int ac, char **av)
 {
   int v2; // eax
+#ifdef DSNET_COMPILING_E
   int r; // [esp+4h] [ebp-20h]
   SCRS scrs_area; // [esp+Ch] [ebp-18h] BYREF
   int i; // [esp+1Ch] [ebp-8h]
   int cnt; // [esp+20h] [ebp-4h] BYREF
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  int r; // [esp+0h] [ebp-18h]
+  SCRS scrs_area; // [esp+8h] [ebp-10h] BYREF
+  int i; // [esp+10h] [ebp-8h]
+  int cnt; // [esp+14h] [ebp-4h] BYREF
+#endif /* DSNET_COMPILING_I */
 
   cnt = 1;
   r = 0;
@@ -1276,6 +1361,7 @@ static int __cdecl host_cont_cmd(int ac, char **av)
   }
   if ( ac > 1 )
     return ds_error("Usage: cont [<cnt>]");
+#ifdef DSNET_COMPILING_E
   if ( ac > 0 )
   {
     if ( ds_eval_word(*av, (unsigned int *)&cnt) )
@@ -1283,15 +1369,36 @@ static int __cdecl host_cont_cmd(int ac, char **av)
     if ( cnt <= 0 )
       return 0;
   }
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  if ( ac <= 0 )
+    goto LABEL_15;
+  if ( ds_eval_word(*av, (unsigned int *)&cnt) )
+    return -1;
+  if ( cnt <= 0 )
+    return 0;
+LABEL_15:
+#endif /* DSNET_COMPILING_I */
   last_cnt_72 = cnt;
   if ( load_scrs(&scrs_area) < 0 )
     return -1;
+#ifdef DSNET_COMPILING_E
   i = 0;
 LABEL_18:
   if ( cnt > i )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  for ( i = 0; cnt > i; ++i )
+#endif /* DSNET_COMPILING_I */
   {
+#ifdef DSNET_COMPILING_E
     do
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    while ( (scrs_area.cause & 0x80000000) != 0 || is_breakpoint(8, &scrs_area) )
+#endif /* DSNET_COMPILING_I */
     {
+#ifdef DSNET_COMPILING_E
       if ( (scrs_area.status & 4) != 0 )
       {
         if ( (scrs_area.cause & 0x40000000) != 0 )
@@ -1310,16 +1417,32 @@ LABEL_18:
         goto LABEL_18;
       }
 LABEL_24:
+#endif /* DSNET_COMPILING_E */
       r = host_do_step(0, &scrs_area);
+#ifdef DSNET_COMPILING_I
+      if ( r != 36 || is_breakpoint(8, &scrs_area) )
+        goto LABEL_26;
+#endif /* DSNET_COMPILING_I */
     }
+#ifdef DSNET_COMPILING_E
     while ( r == 36 && !is_breakpoint(8, &scrs_area) );
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    r = do_cont(8, &scrs_area);
+    if ( r != 36 )
+      break;
+#endif /* DSNET_COMPILING_I */
   }
+#ifdef DSNET_COMPILING_I
+LABEL_26:
+#endif /* DSNET_COMPILING_I */
   display_current_informations(r);
   return exitc(r);
 }
 
 static int __cdecl host_until_cmd(int ac, char **av)
 {
+#ifdef DSNET_COMPILING_E
   signed int cause; // ebx
   int i; // [esp+8h] [ebp-1ACh]
   int i_1; // [esp+8h] [ebp-1ACh]
@@ -1329,6 +1452,17 @@ static int __cdecl host_until_cmd(int ac, char **av)
   SCRS scrs_area; // [esp+1A4h] [ebp-10h] BYREF
   int aca; // [esp+1BCh] [ebp+8h]
   char **ava; // [esp+1C0h] [ebp+Ch]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  int i; // [esp+4h] [ebp-1A4h]
+  int i_1; // [esp+4h] [ebp-1A4h]
+  int r; // [esp+8h] [ebp-1A0h]
+  unsigned int adrs[100]; // [esp+Ch] [ebp-19Ch] BYREF
+  SCRS *scrs; // [esp+19Ch] [ebp-Ch]
+  SCRS scrs_area; // [esp+1A0h] [ebp-8h] BYREF
+  int aca; // [esp+1B0h] [ebp+8h]
+  char **ava; // [esp+1B4h] [ebp+Ch]
+#endif /* DSNET_COMPILING_I */
 
   scrs = &scrs_area;
   r = 0;
@@ -1349,17 +1483,52 @@ static int __cdecl host_until_cmd(int ac, char **av)
   }
   for ( i_1 = 0; aca > i_1; ++i_1 )
   {
+#ifdef DSNET_COMPILING_E
     if ( adrs[i_1] == get_pc(scrs) )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    if ( adrs[i_1] != get_pc(scrs) )
+      goto LABEL_36;
+    if ( aca == 1 || i_1 < aca - 1 )
+#endif /* DSNET_COMPILING_I */
     {
+#ifdef DSNET_COMPILING_E
       if ( aca == 1 || i_1 < aca - 1 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+      r = host_do_step(0, scrs);
+      if ( r != 36 )
+        break;
+    }
+    if ( aca == 1 )
+    {
+LABEL_36:
+      if ( (scrs->cause & 0x80000000) == 0 )
+        goto LABEL_37;
+      r = host_do_step(0, scrs);
+      if ( r != 36 )
+        break;
+      if ( adrs[i_1] != get_pc(scrs) )
+#endif /* DSNET_COMPILING_I */
       {
+#ifdef DSNET_COMPILING_E
         r = host_do_step(0, scrs);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+LABEL_37:
+        if ( add_brkpt(16, adrs[i_1], 1u) < 0 )
+          return -1;
+        r = do_cont(16, scrs);
+#endif /* DSNET_COMPILING_I */
         if ( r != 36 )
           break;
       }
+#ifdef DSNET_COMPILING_E
       if ( aca != 1 )
         continue;
+#endif /* DSNET_COMPILING_E */
     }
+#ifdef DSNET_COMPILING_E
     cause = scrs->cause;
     if ( (scrs->status & 4) != 0 )
     {
@@ -1380,6 +1549,7 @@ LABEL_30:
     r = do_cont(16, scrs);
     if ( r != 36 )
       break;
+#endif /* DSNET_COMPILING_E */
   }
   display_current_informations(r);
   return exitc(r);
@@ -1388,11 +1558,20 @@ LABEL_30:
 static int __cdecl host_step_cmd(int ac, char **av)
 {
   int v2; // eax
+#ifdef DSNET_COMPILING_E
   int r; // [esp+0h] [ebp-24h]
   SCRS scrs_area; // [esp+8h] [ebp-1Ch] BYREF
   int i; // [esp+18h] [ebp-Ch]
   int cnt; // [esp+1Ch] [ebp-8h] BYREF
   int f_next; // [esp+20h] [ebp-4h]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  int r; // [esp+0h] [ebp-1Ch]
+  SCRS scrs_area; // [esp+8h] [ebp-14h] BYREF
+  int i; // [esp+10h] [ebp-Ch]
+  int cnt; // [esp+14h] [ebp-8h] BYREF
+  int f_next; // [esp+18h] [ebp-4h]
+#endif /* DSNET_COMPILING_I */
 
   f_next = 0;
   cnt = 1;
@@ -1434,11 +1613,20 @@ LABEL_15:
 static int __cdecl host_next_cmd(int ac, char **av)
 {
   int v2; // eax
+#ifdef DSNET_COMPILING_E
   int r; // [esp+0h] [ebp-24h]
   SCRS scrs_area; // [esp+8h] [ebp-1Ch] BYREF
   int i; // [esp+18h] [ebp-Ch]
   int cnt; // [esp+1Ch] [ebp-8h] BYREF
   int f_next; // [esp+20h] [ebp-4h]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  int r; // [esp+0h] [ebp-1Ch]
+  SCRS scrs_area; // [esp+8h] [ebp-14h] BYREF
+  int i; // [esp+10h] [ebp-Ch]
+  int cnt; // [esp+14h] [ebp-8h] BYREF
+  int f_next; // [esp+18h] [ebp-4h]
+#endif /* DSNET_COMPILING_I */
 
   f_next = 1;
   cnt = 1;
@@ -1480,11 +1668,20 @@ LABEL_15:
 static int __cdecl host_lstep_cmd(int ac, char **av)
 {
   int v2; // eax
+#ifdef DSNET_COMPILING_E
   int r; // [esp+0h] [ebp-24h]
   SCRS scrs_area; // [esp+8h] [ebp-1Ch] BYREF
   int i; // [esp+18h] [ebp-Ch]
   int cnt; // [esp+1Ch] [ebp-8h] BYREF
   int f_next; // [esp+20h] [ebp-4h]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  int r; // [esp+0h] [ebp-1Ch]
+  SCRS scrs_area; // [esp+8h] [ebp-14h] BYREF
+  int i; // [esp+10h] [ebp-Ch]
+  int cnt; // [esp+14h] [ebp-8h] BYREF
+  int f_next; // [esp+18h] [ebp-4h]
+#endif /* DSNET_COMPILING_I */
 
   f_next = 0;
   cnt = 1;
@@ -1529,11 +1726,20 @@ LABEL_15:
 static int __cdecl host_lnext_cmd(int ac, char **av)
 {
   int v2; // eax
+#ifdef DSNET_COMPILING_E
   int r; // [esp+0h] [ebp-24h]
   SCRS scrs_area; // [esp+8h] [ebp-1Ch] BYREF
   int i; // [esp+18h] [ebp-Ch]
   int cnt; // [esp+1Ch] [ebp-8h] BYREF
   int f_next; // [esp+20h] [ebp-4h]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  int r; // [esp+0h] [ebp-1Ch]
+  SCRS scrs_area; // [esp+8h] [ebp-14h] BYREF
+  int i; // [esp+10h] [ebp-Ch]
+  int cnt; // [esp+14h] [ebp-8h] BYREF
+  int f_next; // [esp+18h] [ebp-4h]
+#endif /* DSNET_COMPILING_I */
 
   f_next = 1;
   cnt = 1;
@@ -1580,6 +1786,7 @@ static int __cdecl host_luntil_cmd(int ac, char **av)
   int v2; // eax
   unsigned int pc; // eax
   unsigned int v5; // eax
+#ifdef DSNET_COMPILING_E
   int r; // [esp+4h] [ebp-34h]
   char *file0; // [esp+8h] [ebp-30h]
   SCRS v8; // [esp+10h] [ebp-28h] BYREF
@@ -1589,9 +1796,26 @@ static int __cdecl host_luntil_cmd(int ac, char **av)
   unsigned int addr; // [esp+2Ch] [ebp-Ch]
   int i; // [esp+30h] [ebp-8h]
   int cnt; // [esp+34h] [ebp-4h]
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  int v6; // [esp+0h] [ebp-2Ch]
+  char *s2; // [esp+4h] [ebp-28h]
+  SCRS v8; // [esp+Ch] [ebp-20h] BYREF
+  unsigned int delta0; // [esp+14h] [ebp-18h] BYREF
+  unsigned int line0; // [esp+18h] [ebp-14h] BYREF
+  unsigned int line; // [esp+1Ch] [ebp-10h] BYREF
+  unsigned int addr; // [esp+20h] [ebp-Ch]
+  int i; // [esp+24h] [ebp-8h]
+  int cnt; // [esp+28h] [ebp-4h]
+#endif /* DSNET_COMPILING_I */
 
   cnt = 1;
+#ifdef DSNET_COMPILING_E
   r = 0;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  v6 = 0;
+#endif /* DSNET_COMPILING_I */
   if ( ac > 0 )
     v2 = 1;
   else
@@ -1612,26 +1836,64 @@ static int __cdecl host_luntil_cmd(int ac, char **av)
   addr = get_pc(&v8);
   if ( ds_scan_digit_word(*av, &line) )
     return ds_error("Usage: luntil <line>");
+#ifdef DSNET_COMPILING_E
   file0 = address_to_file_and_line(addr, (int *)&line0, 0, (int *)&delta0, 0);
   if ( !file0 || !line0 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  s2 = address_to_file_and_line(addr, (int *)&line0, 0, (int *)&delta0, 0);
+  if ( !s2 || !line0 )
+#endif /* DSNET_COMPILING_I */
     return ds_error("*** No line for 0x%W", addr);
+#ifdef DSNET_COMPILING_E
   addr = file_and_line_to_address(line, file0);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  addr = file_and_line_to_address(line, s2);
+#endif /* DSNET_COMPILING_I */
   if ( !addr )
+#ifdef DSNET_COMPILING_E
     return ds_error("*** No address for line %d in %s", line, file0);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    return ds_error("*** No address for line %d in %s", line, s2);
+#endif /* DSNET_COMPILING_I */
   for ( i = 0; i < 1; ++i )
   {
     pc = get_pc(&v8);
     if ( addr == pc )
     {
+#ifdef DSNET_COMPILING_E
       r = host_do_step(0, &v8);
       if ( r != 36 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+      v6 = host_do_step(0, &v8);
+      if ( v6 != 36 )
+#endif /* DSNET_COMPILING_I */
         break;
     }
+#ifdef DSNET_COMPILING_E
     if ( (v8.status & 4) != 0 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    if ( (v8.cause & 0x80000000) != 0 )
+#endif /* DSNET_COMPILING_I */
     {
+#ifdef DSNET_COMPILING_E
       if ( (v8.cause & 0x40000000) == 0 )
         goto LABEL_28;
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+      v6 = host_do_step(0, &v8);
+      if ( v6 != 36 )
+        break;
+      v5 = get_pc(&v8);
+      if ( addr == v5 )
+        break;
+#endif /* DSNET_COMPILING_I */
     }
+#ifdef DSNET_COMPILING_E
     else if ( (v8.cause & 0x80000000) == 0 )
     {
       goto LABEL_28;
@@ -1643,19 +1905,38 @@ static int __cdecl host_luntil_cmd(int ac, char **av)
     if ( addr == v5 )
       break;
 LABEL_28:
+#endif /* DSNET_COMPILING_E */
     if ( add_brkpt(16, addr, 1u) < 0 )
       return -1;
+#ifdef DSNET_COMPILING_E
     r = do_cont(16, &v8);
     if ( r != 36 )
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+    v6 = do_cont(16, &v8);
+    if ( v6 != 36 )
+#endif /* DSNET_COMPILING_I */
       break;
   }
+#ifdef DSNET_COMPILING_E
   if ( r )
     display_current_informations(r);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  if ( v6 )
+    display_current_informations(v6);
+#endif /* DSNET_COMPILING_I */
   else
     lstep_default_list();
+#ifdef DSNET_COMPILING_E
   return exitc(r);
+#endif /* DSNET_COMPILING_E */
+#ifdef DSNET_COMPILING_I
+  return exitc(v6);
+#endif /* DSNET_COMPILING_I */
 }
 
+#ifdef DSNET_COMPILING_E
 int __cdecl set_runarg(int ac, char **av)
 {
   int v3; // ebx
@@ -1742,6 +2023,7 @@ int __cdecl run_cmd(int ac, char **av)
   }
   return r;
 }
+#endif /* DSNET_COMPILING_E */
 
 int __cdecl cont_cmd(int ac, char **av)
 {
