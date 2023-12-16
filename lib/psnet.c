@@ -12,9 +12,9 @@ static int __cdecl set_deci1_hdr(DS_PSNETD_PRIV *priv, DS_DECI1 *p, unsigned int
   unsigned int *wp; // [esp+8h] [ebp-8h]
   unsigned int sum; // [esp+Ch] [ebp-4h]
 
-  ds_bzero(p, 0x20u);
+  ds_bzero(p, sizeof(DS_DECI1));
   p->mag = -24244;
-  p->len = len + 32;
+  p->len = len + sizeof(DS_DECI1);
   p->cid = priv->cid;
   p->req = req;
   if ( HIBYTE(req) == 71 )
@@ -38,7 +38,7 @@ static int __cdecl set_deci1_hdr(DS_PSNETD_PRIV *priv, DS_DECI1 *p, unsigned int
   for ( i = 0; i <= 6; ++i )
     sum += *wp++;
   p->sum = sum;
-  return 32;
+  return sizeof(DS_DECI1);
 }
 
 static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
@@ -60,7 +60,7 @@ static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
   p = (DS_PSNETD_PRIV *)ds_alloc_mem_low("psnet.c", "init_psnet", sizeof(DS_PSNETD_PRIV));
   if ( !p )
     return 0;
-  ds_bzero(p, 0x50u);
+  ds_bzero(p, sizeof(DS_PSNETD_PRIV));
   v2 = getpid();
   p->cid = time(0) ^ v2;
   p->cid ^= p->cid >> 16;
@@ -74,7 +74,7 @@ static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
     return 0;
   cp = p->snd_buf;
   ds_bzero(cp, p->snd_len);
-  cp_1 = &cp[set_deci1_hdr(p, (DS_DECI1 *)cp, 0x54080101u, 80)];
+  cp_1 = &cp[set_deci1_hdr(p, (DS_DECI1 *)cp, 0x54080101u, sizeof(DS_PSNETD_PRIV))];
   *(_DWORD *)cp_1 = 18;
   cp_1 += 4;
   *(_DWORD *)cp_1 = 113;

@@ -87,7 +87,7 @@ static int __cdecl getaddr_net(char *name, struct sockaddr_in *sin)
   }
   if ( !*hostp )
     hostp = "127.0.0.1";
-  ds_bzero(sin, 0x10u);
+  ds_bzero(sin, sizeof(struct sockaddr_in));
   temp = inet_addr(hostp);
   if ( temp == -1 )
   {

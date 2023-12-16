@@ -375,8 +375,8 @@ char *__cdecl ds_subst(char *dst, int dst_siz, char *src)
   RERP *rerp; // [esp+424h] [ebp-4h]
 
   de = &dst[dst_siz];
-  ds_bzero(tags, 0x24u);
-  ds_bzero(tage, 0x24u);
+  ds_bzero(tags, sizeof(tags));
+  ds_bzero(tage, sizeof(tage));
   for ( rerp = rerps.head; rerp; rerp = rerp->forw )
   {
     sp = src;
@@ -426,8 +426,8 @@ char *__cdecl ds_subst(char *dst, int dst_siz, char *src)
           *dp++ = *i;
         }
       }
-      ds_bzero(tags, 0x24u);
-      ds_bzero(tage, 0x24u);
+      ds_bzero(tags, sizeof(tags));
+      ds_bzero(tage, sizeof(tage));
       sp = me;
     }
     while ( dp < de - 1 && *sp )
@@ -510,7 +510,7 @@ int __cdecl ds_subst_cmd(int ac, char **av)
             rerp_3 = (RERP *)ds_alloc_mem_low("subst.c", "ds_subst_cmd", 20);
             if ( rerp_3 )
             {
-              ds_bzero(rerp_3, 0x14u);
+              ds_bzero(rerp_3, sizeof(RERP));
               rerp_3->re_str = s1;
               s1 = 0;
               rerp_3->re = re;

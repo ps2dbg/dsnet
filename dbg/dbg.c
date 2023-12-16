@@ -1262,11 +1262,11 @@ static int __cdecl get_conf(DBGP_CONF_DATA *conf)
   DSP_BUF *db; // [esp+8h] [ebp-4h]
 
 LABEL_1:
-  db = alloc_dbgp(0, 0, 0, 0, 0, 0, &p, 68);
+  db = alloc_dbgp(0, 0, 0, 0, 0, 0, &p, sizeof(DBGP_CONF_DATA));
   if ( !db )
     return -1;
-  ds_bzero(p, 68);
-  r = send_and_wait(db, 0, conf, 68, 0);
+  ds_bzero(p, sizeof(DBGP_CONF_DATA));
+  r = send_and_wait(db, 0, conf, sizeof(DBGP_CONF_DATA), 0);
   if ( !r )
     return 0;
   if ( (cur_state & 0xFF0) == 2048 && dcmp_waiting_status )
@@ -1291,10 +1291,10 @@ static void __cdecl send_dbconf()
   DBGP_CONF_DATA *p; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
 
-  db = alloc_dbgp(0, 0, 0, 0, 0, 0, &p, 68);
+  db = alloc_dbgp(0, 0, 0, 0, 0, 0, &p, sizeof(DBGP_CONF_DATA));
   if ( db )
   {
-    ds_bzero(p, 68);
+    ds_bzero(p, sizeof(DBGP_CONF_DATA));
     ds_send_desc(target_desc, db);
   }
 }
@@ -1810,10 +1810,10 @@ int __cdecl run_and_wait_halt(unsigned int entry_point, unsigned int gp_value, i
   DBGP_EERUN *er; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
 
-  db = alloc_dbgp(0, 0, 24, 0, 0, 0, &er, args_len + 20);
+  db = alloc_dbgp(0, 0, 24, 0, 0, 0, &er, args_len + sizeof(DBGP_EERUN));
   if ( !db )
     return -1;
-  ds_bzero(er, 20);
+  ds_bzero(er, sizeof(DBGP_EERUN));
   er->entry = entry_point;
   er->gp = gp_value;
   er->argc = argc;

@@ -504,8 +504,8 @@ static int __cdecl ds_scan_num_quad(char *s, quad *pv, int base)
 
   us = 0;
   ds_cwq(&qbase, base);
-  ds_bzero(&qv, 0x10u);
-  ds_bzero(&cv, 0x10u);
+  ds_bzero(&qv, sizeof(quad));
+  ds_bzero(&cv, sizeof(quad));
   while ( *s )
   {
     if ( *s == 95 )
@@ -516,7 +516,7 @@ static int __cdecl ds_scan_num_quad(char *s, quad *pv, int base)
       ds_cwq(&v7, 0x20u);
       ds_qshl(&v8, qv, v7);
       ds_qor(&qv, v8, v4);
-      ds_bzero(&cv, 0x10u);
+      ds_bzero(&cv, sizeof(quad));
     }
     else
     {
