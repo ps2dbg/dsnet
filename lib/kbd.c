@@ -9,8 +9,6 @@ static struct termios *oterm = NULL;
 int __cdecl ds_raw_kbd()
 {
 #ifndef _WIN32
-  unsigned int c_oflag; // ecx
-  unsigned int c_lflag; // ecx
   struct termios new_area; // [esp+4h] [ebp-44h] BYREF
   struct termios *old; // [esp+40h] [ebp-8h]
 #endif
@@ -24,15 +22,11 @@ int __cdecl ds_raw_kbd()
   if ( tcgetattr(fd, old) < 0 )
     return ds_error("!tcgetattr()");
   memcpy(&new_area, old, sizeof(new_area));
-  new_area.c_iflag &= 0xFFFFFEDF;
-  c_oflag = new_area.c_oflag;
-  LOBYTE(c_oflag) = LOBYTE(new_area.c_oflag) | 5;
-  new_area.c_oflag = c_oflag;
-  c_lflag = new_area.c_lflag;
-  LOBYTE(c_lflag) = new_area.c_lflag & 0xF4;
-  new_area.c_lflag = c_lflag;
-  ds_bzero(new_area.c_cc, 0x20u);
-  new_area.c_cc[6] = 1;
+  new_area.c_iflag &= ~(ISTRIP | ICRNL);
+  new_area.c_oflag |= OPOST | OXTABS;
+  new_area.c_lflag &= ~(ECHOKE | ECHOE | ECHO);
+  ds_bzero(new_area.c_cc, sizeof(new_area.c_cc));
+  new_area.c_cc[VMIN] = 1;
   if ( tcsetattr(fd, 0, &new_area) < 0 )
     return ds_error("!tcsetattr()");
   oterm = old;
