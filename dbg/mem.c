@@ -1149,6 +1149,16 @@ LABEL_22:
     }
     for ( symndx = 0; (unsigned int)symndx <= 0xF; ++symndx )
     {
+#ifdef DSNET_COMPILING_E
+      if ( symndx == 8 /* EI_ABIVERSION */ )
+      {
+        if ( ehdr->ident[symndx] != '\x00' && ehdr->ident[symndx] != '\x01' )
+        {
+          ds_printf("EI_ABIVERSION identification error: it is neither 0 nor 1\n");
+          goto LABEL_85;
+        }
+      }
+#endif /* DSNET_COMPILING_E */
       if ( ehdr->ident[symndx] != TARG_IDENT[symndx] )
       {
         ds_printf("ident error\n");
