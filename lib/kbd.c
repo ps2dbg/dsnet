@@ -23,7 +23,7 @@ int __cdecl ds_raw_kbd()
     return ds_error("!tcgetattr()");
   memcpy(&new_area, old, sizeof(new_area));
   new_area.c_iflag &= ~(ISTRIP | ICRNL);
-  new_area.c_oflag |= OPOST | OXTABS;
+  new_area.c_oflag |= OPOST | TAB3;
   new_area.c_lflag &= ~(ECHOKE | ECHOE | ECHO);
   ds_bzero(new_area.c_cc, sizeof(new_area.c_cc));
   new_area.c_cc[VMIN] = 1;
