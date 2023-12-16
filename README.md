@@ -25,10 +25,12 @@ The following binaries are available:
 * [Ubuntu 20.04](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-ubuntu.zip)  
 
 The following binaries are also available, but functionality may be limited compared to the above binaries:  
-* [Win32 (Intel 32-bit)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-i686.zip)  
-* [Win32 (Intel 64-bit)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-amd64.zip)  
-* [Win32 (ARM 32-bit)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-arm.zip)  
-* [Win32 (ARM 64-bit)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-arm64.zip)  
+* [Win32 (Intel 32-bit GCC)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-i686-gcc.zip)  
+* [Win32 (Intel 64-bit GCC)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-amd64-gcc.zip)  
+* [Win32 (Intel 32-bit Clang)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-i686-clang.zip)  
+* [Win32 (Intel 64-bit Clang)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-amd64-clang.zip)  
+* [Win32 (ARM 32-bit Clang)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-arm-clang.zip)  
+* [Win32 (ARM 64-bit Clang)](https://github.com/ps2dbg/dsnet/releases/download/latest/dsnet-win32-arm64-clang.zip)  
 
 ## License
 

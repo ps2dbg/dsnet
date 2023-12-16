@@ -174,8 +174,8 @@
         {
           "uses" : "actions/upload-artifact@master",
           "with" : {
-            "name" : "dsnet-win32-${{ matrix.platform.cmake-system-compiler }}",
-            "path" : "dsnet-win32-${{ matrix.platform.cmake-system-compiler }}.zip"
+            "name" : "dsnet-win32-${{ matrix.platform.cmake-system-compiler }}-${{ matrix.platform.compiler }}",
+            "path" : "dsnet-win32-${{ matrix.platform.cmake-system-compiler }}-${{ matrix.platform.compiler }}.zip"
           }
         }
       ]
