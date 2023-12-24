@@ -270,10 +270,12 @@ static DSP_BUF *__cdecl recv_kbd(DS_DESC *desc, DSP_BUF *db)
   int v3; // eax
   unsigned __int8 *bp; // [esp+0h] [ebp-Ch]
   int len; // [esp+4h] [ebp-8h]
+  DECI2_HDR *dh;
 
   if ( !db )
     return 0;
-  len = *(unsigned __int16 *)db->buf - 12;
+  dh = (DECI2_HDR *)db->buf;
+  len = dh->length - 12;
   if ( len < 0 )
     return db;
   for ( bp = (unsigned __int8 *)&db->buf[12]; ; ++bp )

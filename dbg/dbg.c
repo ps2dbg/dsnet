@@ -420,13 +420,13 @@ static DSP_BUF *__cdecl recv_kbd(DS_DESC *desc, DSP_BUF *db)
   unsigned __int8 buf[1024]; // [esp+Ch] [ebp-404h] BYREF
   DECI2_HDR *dh; // [esp+40Ch] [ebp-4h]
 
-  dh = (DECI2_HDR *)db->buf;
   if ( !db )
     return 0;
+  dh = (DECI2_HDR *)db->buf;
   len = dh->length - 12;
   if ( len < 0 )
     return db;
-  bp = (unsigned __int8 *)&dh[1].protocol;
+  bp = (unsigned __int8 *)&db->buf[12];
   if ( (cur_state & 1) != 0 )
   {
     while ( 1 )

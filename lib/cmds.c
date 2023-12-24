@@ -2268,11 +2268,13 @@ DSP_BUF *__cdecl ds_cmd_input(DS_DESC *desc, DSP_BUF *db)
   int len; // [esp+40Ch] [ebp-8h]
   DECI2_HDR *dh; // [esp+410h] [ebp-4h]
 
+  if ( !db )
+    return 0;
   dh = (DECI2_HDR *)db->buf;
-  len = *(unsigned __int16 *)db->buf - 12;
+  len = dh->length - 12;
   if ( len < 0 )
     return db;
-  for ( bp = (unsigned __int8 *)&dh[1].protocol; ; ++bp )
+  for ( bp = (unsigned __int8 *)&db->buf[12]; ; ++bp )
   {
     v3 = len--;
     if ( v3 <= 0 )
