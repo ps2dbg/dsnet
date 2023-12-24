@@ -27,7 +27,7 @@ int __cdecl ds_raw_kbd()
   new_area.c_lflag &= ~(ECHOKE | ECHOE | ECHO);
   ds_bzero(new_area.c_cc, sizeof(new_area.c_cc));
   new_area.c_cc[VMIN] = 1;
-  if ( tcsetattr(fd, 0, &new_area) < 0 )
+  if ( tcsetattr(fd, TCSANOW, &new_area) < 0 )
     return ds_error("!tcsetattr()");
   oterm = old;
 #endif
@@ -42,10 +42,10 @@ int __cdecl ds_resume_kbd()
 #ifndef _WIN32
   if ( oterm )
   {
-    tcsetattr(0, 0, oterm);
+    tcsetattr(0, TCSANOW, oterm);
     r = 1;
   }
-  oterm = 0;
+  oterm = NULL;
 #endif
   return r;
 }

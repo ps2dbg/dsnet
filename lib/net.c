@@ -191,13 +191,13 @@ DS_DESC *__cdecl ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
       ds_error("ds_connect - too many refused");
       return 0;
     }
-    fd = socket(2, 1, 0);
+    fd = socket(PF_INET, SOCK_STREAM, 0);
     if ( fd < 0 )
     {
       ds_error("!socket");
       return 0;
     }
-    if ( !connect(fd, (const struct sockaddr *)&sin, 0x10u) )
+    if ( !connect(fd, (const struct sockaddr *)&sin, sizeof(sin)) )
       break;
     close(fd);
     if ( errno != 111 )
