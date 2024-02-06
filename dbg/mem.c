@@ -1158,6 +1158,7 @@ LABEL_22:
           goto LABEL_85;
         }
       }
+      else
 #endif /* DSNET_COMPILING_E */
       if ( ehdr->ident[symndx] != TARG_IDENT[symndx] )
       {
