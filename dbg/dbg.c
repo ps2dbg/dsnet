@@ -1383,28 +1383,10 @@ static int __cdecl store_mem(unsigned int adr, void *ptr, int len)
   return rdwr_mem(10, adr, ptr, len);
 }
 
-#ifdef DSNET_COMPILING_E
 int __cdecl get_handlerlist(DBGP_HDR *phdr)
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-int __cdecl load_word_registers(unsigned int *masks, unsigned int *pv, int n)
-#endif /* DSNET_COMPILING_I */
 {
-#ifdef DSNET_COMPILING_E
   DSP_BUF *db; // [esp+0h] [ebp-8h]
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  int nr; // [esp+Ch] [ebp-20h]
-  int k; // [esp+10h] [ebp-1Ch]
-  int j; // [esp+14h] [ebp-18h]
-  int i; // [esp+18h] [ebp-14h]
-  unsigned int *dp; // [esp+1Ch] [ebp-10h]
-  DBGP_REG *rh; // [esp+20h] [ebp-Ch] BYREF
-  DSP_BUF *db; // [esp+24h] [ebp-8h]
-  int id; // [esp+28h] [ebp-4h]
-#endif /* DSNET_COMPILING_I */
 
-#ifdef DSNET_COMPILING_E
   db = alloc_dbgp(0, 1, 54, phdr->code, 0, 0, 0, 0);
   if ( !db )
     return -1;
@@ -1418,10 +1400,8 @@ int __cdecl get_tcb(DBGP_HDR *phdr, int tid)
   int *ptid; // [esp+0h] [ebp-Ch] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-8h]
   int id; // [esp+8h] [ebp-4h]
-#endif /* DSNET_COMPILING_E */
 
   id = 0;
-#ifdef DSNET_COMPILING_E
   db = alloc_dbgp(0, 1, 50, phdr->code, 0, 0, &ptid, 4);
   if ( !db )
     return -1;
@@ -1461,17 +1441,18 @@ int __cdecl get_semablock(DBGP_HDR *phdr, int sid)
     return 0;
 }
 
-static int __cdecl load_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
+int __cdecl load_word_registers(unsigned int *masks, unsigned int *pv, int n)
 {
-  int nr; // [esp+Ch] [ebp-1Ch]
-  int k; // [esp+10h] [ebp-18h]
-  int j; // [esp+14h] [ebp-14h]
-  int i; // [esp+18h] [ebp-10h]
-  quad *dp; // [esp+1Ch] [ebp-Ch]
-  DBGP_REG *rh; // [esp+20h] [ebp-8h] BYREF
-  DSP_BUF *db; // [esp+24h] [ebp-4h]
-#endif /* DSNET_COMPILING_E */
+  int nr; // [esp+Ch] [ebp-20h]
+  int k; // [esp+10h] [ebp-1Ch]
+  int j; // [esp+14h] [ebp-18h]
+  int i; // [esp+18h] [ebp-14h]
+  unsigned int *dp; // [esp+1Ch] [ebp-10h]
+  DBGP_REG *rh; // [esp+20h] [ebp-Ch] BYREF
+  DSP_BUF *db; // [esp+24h] [ebp-8h]
+  int id; // [esp+28h] [ebp-4h]
 
+  id = 0;
   j = 0;
   i = 0;
   while ( 1 )
@@ -1481,66 +1462,34 @@ static int __cdecl load_quad_registers_id(int id, unsigned int *masks, quad *pv,
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-#ifdef DSNET_COMPILING_E
-    db = alloc_dbgp(id, 0, 4, 0, 0, (unsigned __int8)nr, &rh, 20 * nr);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
     db = alloc_dbgp(id, 0, 4, 0, 0, (unsigned __int8)nr, &rh, 8 * nr);
-#endif /* DSNET_COMPILING_I */
     if ( !db )
       return -1;
-#ifdef DSNET_COMPILING_E
-    if ( i > 10 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
     if ( i > 9 )
-#endif /* DSNET_COMPILING_I */
       break;
     for ( k = 0; nr > k; ++k )
     {
       while ( !masks[i] )
       {
         j = 0;
-#ifdef DSNET_COMPILING_E
-        if ( ++i > 10 )
-          return ds_error("internal error %s:%s", "dbg.c", "load_quad_registers_id");
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
         if ( ++i > 9 )
           return ds_error("internal error %s:%s", "dbg.c", "load_word_registers");
-#endif /* DSNET_COMPILING_I */
       }
       while ( (masks[i] & (1 << j)) == 0 )
       {
         if ( ++j > 31 )
         {
           j = 0;
-#ifdef DSNET_COMPILING_E
-          if ( ++i > 10 )
-            return ds_error("internal error %s:%s", "dbg.c", "load_quad_registers_id");
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
           if ( ++i > 9 )
             return ds_error("internal error %s:%s", "dbg.c", "load_word_registers");
-#endif /* DSNET_COMPILING_I */
         }
       }
       rh->kind = i;
       rh->number = j;
       rh->reserved = 0;
-#ifdef DSNET_COMPILING_E
-      dp = (quad *)++rh;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
       dp = (unsigned int *)++rh;
-#endif /* DSNET_COMPILING_I */
       ds_bzero(rh, sizeof(DBGP_REG));
-#ifdef DSNET_COMPILING_E
-      rh = (DBGP_REG *)&dp[1];
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
       rh = (DBGP_REG *)(dp + 1);
-#endif /* DSNET_COMPILING_I */
       if ( ++j > 31 )
       {
         j = 0;
@@ -1552,32 +1501,12 @@ static int __cdecl load_quad_registers_id(int id, unsigned int *masks, quad *pv,
     pv += nr;
     n -= nr;
   }
-#ifdef DSNET_COMPILING_E
-  return ds_error("internal error %s:%s", "dbg.c", "load_quad_registers_id");
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
   return ds_error("internal error %s:%s", "dbg.c", "load_word_registers");
-#endif /* DSNET_COMPILING_I */
 }
 
-#ifdef DSNET_COMPILING_E
-static int __cdecl store_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
+
 int __cdecl store_word_registers(unsigned int *masks, unsigned int *pv, int n)
-#endif /* DSNET_COMPILING_I */
 {
-#ifdef DSNET_COMPILING_E
-  DBGP_REG *v5; // eax
-  int nr; // [esp+Ch] [ebp-1Ch]
-  int k; // [esp+10h] [ebp-18h]
-  int j; // [esp+14h] [ebp-14h]
-  int i; // [esp+18h] [ebp-10h]
-  quad *dp; // [esp+1Ch] [ebp-Ch]
-  DBGP_REG *rh; // [esp+20h] [ebp-8h] BYREF
-  DSP_BUF *db; // [esp+24h] [ebp-4h]
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
   int nr; // [esp+Ch] [ebp-20h]
   int k; // [esp+10h] [ebp-1Ch]
   int j; // [esp+14h] [ebp-18h]
@@ -1588,7 +1517,6 @@ int __cdecl store_word_registers(unsigned int *masks, unsigned int *pv, int n)
   int id; // [esp+28h] [ebp-4h]
 
   id = 0;
-#endif /* DSNET_COMPILING_I */
   j = 0;
   i = 0;
   while ( 1 )
@@ -1598,68 +1526,34 @@ int __cdecl store_word_registers(unsigned int *masks, unsigned int *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-#ifdef DSNET_COMPILING_E
-    db = alloc_dbgp(id, 0, 6, 0, 0, (unsigned __int8)nr, &rh, 20 * nr);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
     db = alloc_dbgp(id, 0, 6, 0, 0, (unsigned __int8)nr, &rh, 8 * nr);
-#endif /* DSNET_COMPILING_I */
     if ( !db )
       return -1;
-#ifdef DSNET_COMPILING_E
-    if ( i > 10 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
     if ( i > 9 )
-#endif /* DSNET_COMPILING_I */
       break;
     for ( k = 0; nr > k; ++k )
     {
       while ( !masks[i] )
       {
         j = 0;
-#ifdef DSNET_COMPILING_E
-        if ( ++i > 10 )
-          return ds_error("internal error %s:%s", "dbg.c", "store_quad_registers_id");
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
         if ( ++i > 9 )
           return ds_error("internal error %s:%s", "dbg.c", "store_word_registers");
-#endif /* DSNET_COMPILING_I */
       }
       while ( (masks[i] & (1 << j)) == 0 )
       {
         if ( ++j > 31 )
         {
           j = 0;
-#ifdef DSNET_COMPILING_E
-          if ( ++i > 10 )
-            return ds_error("internal error %s:%s", "dbg.c", "store_quad_registers_id");
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
           if ( ++i > 9 )
             return ds_error("internal error %s:%s", "dbg.c", "store_word_registers");
-#endif /* DSNET_COMPILING_I */
         }
       }
       rh->kind = i;
       rh->number = j;
       rh->reserved = 0;
-#ifdef DSNET_COMPILING_E
-      dp = (quad *)&rh[1];
-      v5 = rh + 1;
-      ((unsigned int *)(&rh[1]))[0] = pv->xa[0];
-      ((unsigned int *)(&v5[1]))[0] = pv->xa[1];
-      ((unsigned int *)(&v5[2]))[0] = pv->xa[2];
-      ((unsigned int *)(&v5[3]))[0] = pv->xa[3];
-      ++pv;
-      rh = (DBGP_REG *)&dp[1];
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
       dp = (unsigned int *)&rh[1];
       *dp = *pv++;
       rh = (DBGP_REG *)(dp + 1);
-#endif /* DSNET_COMPILING_I */
       if ( ++j > 31 )
       {
         j = 0;
@@ -1670,15 +1564,136 @@ int __cdecl store_word_registers(unsigned int *masks, unsigned int *pv, int n)
       return -1;
     n -= nr;
   }
-#ifdef DSNET_COMPILING_E
-  return ds_error("internal error %s:%s", "dbg.c", "store_quad_registers_id");
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
   return ds_error("internal error %s:%s", "dbg.c", "store_word_registers");
-#endif /* DSNET_COMPILING_I */
 }
 
-#ifdef DSNET_COMPILING_E
+static int __cdecl load_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
+{
+  int nr; // [esp+Ch] [ebp-1Ch]
+  int k; // [esp+10h] [ebp-18h]
+  int j; // [esp+14h] [ebp-14h]
+  int i; // [esp+18h] [ebp-10h]
+  quad *dp; // [esp+1Ch] [ebp-Ch]
+  DBGP_REG *rh; // [esp+20h] [ebp-8h] BYREF
+  DSP_BUF *db; // [esp+24h] [ebp-4h]
+
+  j = 0;
+  i = 0;
+  while ( 1 )
+  {
+    if ( n <= 0 )
+      return 0;
+    nr = n;
+    if ( dbconf.nreg < n )
+      nr = dbconf.nreg;
+    db = alloc_dbgp(id, 0, 4, 0, 0, (unsigned __int8)nr, &rh, 20 * nr);
+    if ( !db )
+      return -1;
+    if ( i > 10 )
+      break;
+    for ( k = 0; nr > k; ++k )
+    {
+      while ( !masks[i] )
+      {
+        j = 0;
+        if ( ++i > 10 )
+          return ds_error("internal error %s:%s", "dbg.c", "load_quad_registers_id");
+      }
+      while ( (masks[i] & (1 << j)) == 0 )
+      {
+        if ( ++j > 31 )
+        {
+          j = 0;
+          if ( ++i > 10 )
+            return ds_error("internal error %s:%s", "dbg.c", "load_quad_registers_id");
+        }
+      }
+      rh->kind = i;
+      rh->number = j;
+      rh->reserved = 0;
+      dp = (quad *)++rh;
+      ds_bzero(rh, sizeof(DBGP_REG));
+      rh = (DBGP_REG *)&dp[1];
+      if ( ++j > 31 )
+      {
+        j = 0;
+        ++i;
+      }
+    }
+    if ( send_and_wait(db, 4, pv, nr, 0) )
+      return -1;
+    pv += nr;
+    n -= nr;
+  }
+  return ds_error("internal error %s:%s", "dbg.c", "load_quad_registers_id");
+}
+
+static int __cdecl store_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
+{
+  DBGP_REG *v5; // eax
+  int nr; // [esp+Ch] [ebp-1Ch]
+  int k; // [esp+10h] [ebp-18h]
+  int j; // [esp+14h] [ebp-14h]
+  int i; // [esp+18h] [ebp-10h]
+  quad *dp; // [esp+1Ch] [ebp-Ch]
+  DBGP_REG *rh; // [esp+20h] [ebp-8h] BYREF
+  DSP_BUF *db; // [esp+24h] [ebp-4h]
+
+  j = 0;
+  i = 0;
+  while ( 1 )
+  {
+    if ( n <= 0 )
+      return 0;
+    nr = n;
+    if ( dbconf.nreg < n )
+      nr = dbconf.nreg;
+    db = alloc_dbgp(id, 0, 6, 0, 0, (unsigned __int8)nr, &rh, 20 * nr);
+    if ( !db )
+      return -1;
+    if ( i > 10 )
+      break;
+    for ( k = 0; nr > k; ++k )
+    {
+      while ( !masks[i] )
+      {
+        j = 0;
+        if ( ++i > 10 )
+          return ds_error("internal error %s:%s", "dbg.c", "store_quad_registers_id");
+      }
+      while ( (masks[i] & (1 << j)) == 0 )
+      {
+        if ( ++j > 31 )
+        {
+          j = 0;
+          if ( ++i > 10 )
+            return ds_error("internal error %s:%s", "dbg.c", "store_quad_registers_id");
+        }
+      }
+      rh->kind = i;
+      rh->number = j;
+      rh->reserved = 0;
+      dp = (quad *)&rh[1];
+      v5 = rh + 1;
+      ((unsigned int *)(&rh[1]))[0] = pv->xa[0];
+      ((unsigned int *)(&v5[1]))[0] = pv->xa[1];
+      ((unsigned int *)(&v5[2]))[0] = pv->xa[2];
+      ((unsigned int *)(&v5[3]))[0] = pv->xa[3];
+      ++pv;
+      rh = (DBGP_REG *)&dp[1];
+      if ( ++j > 31 )
+      {
+        j = 0;
+        ++i;
+      }
+    }
+    if ( send_and_wait(db, 6, 0, nr, 0) )
+      return -1;
+    n -= nr;
+  }
+  return ds_error("internal error %s:%s", "dbg.c", "store_quad_registers_id");
+}
+
 static int __cdecl access_quad_registers(int (__cdecl *func)(), unsigned int *masks, quad *pv, int n)
 {
   int nvu1; // [esp+Ch] [ebp-40h]
@@ -1755,7 +1770,6 @@ int __cdecl store_quad_registers(unsigned int *masks, quad *pv, int n)
 {
   return access_quad_registers((int (__cdecl *)())store_quad_registers_id, masks, pv, n);
 }
-#endif /* DSNET_COMPILING_E */
 
 int __cdecl cont_and_wait_halt(int code, int cnt)
 {
