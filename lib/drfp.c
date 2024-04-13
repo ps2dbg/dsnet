@@ -1357,9 +1357,9 @@ DSP_BUF *__cdecl ds_recv_drfp(DS_DESC *desc, DSP_BUF *db)
   int len; // [esp+4h] [ebp-8h]
   DECI2_HDR *dh; // [esp+8h] [ebp-4h]
 
-  dh = (DECI2_HDR *)db->buf;
   if ( db )
   {
+    dh = (DECI2_HDR *)db->buf;
     len = dh->length - 12;
     if ( len >= 0 )
     {

@@ -3937,12 +3937,8 @@ static int __cdecl valid_delim(int lang, char *p)
 {
   if ( *p != 45 )
     return 0;
-#ifdef DSNET_COMPILING_E
-  return p[1] == 45 || p[1] == 69;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  return p[1] == 45 || p[1] == 73;
-#endif /* DSNET_COMPILING_I */
+
+  return p[1] == 45 || p[1] == TARGET_DID;
 }
 
 static int __cdecl valid_lang(int lang, HELP_MAP *hm)

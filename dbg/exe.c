@@ -7,17 +7,6 @@ extern unsigned int current_entry_point; // defined in mem.c
 extern unsigned int current_gp_value; // defined in mem.c
 #endif /* DSNET_COMPILING_E */
 
-static int brkpt_no = 1;
-static int last_cnt_44 = 1;
-static int last_cnt_47 = 1;
-static int last_cnt_50 = 1;
-static int last_cnt_53 = 1;
-static int last_cnt_72 = 1;
-static int last_cnt_77 = 1;
-static int last_cnt_80 = 1;
-static int last_cnt_83 = 1;
-static int last_cnt_86 = 1;
-static int last_cnt_89 = 1;
 #ifdef DSNET_COMPILING_E
 static int run_argc = 0;
 static char *run_args = NULL;
@@ -304,6 +293,7 @@ static int __cdecl add_brkpt(int flag, unsigned int adr, unsigned int cnt)
   int v12; // [esp+Ch] [ebp-8h]
   BRKPT *bp; // [esp+10h] [ebp-4h]
   BRKPT *bp_1; // [esp+10h] [ebp-4h]
+  static int brkpt_no = 1;
 
   for ( bp = bps.head; bp; bp = bp->forw )
   {
@@ -743,12 +733,13 @@ static int __cdecl targ_step_cmd(int ac, char **av)
   int r; // [esp+0h] [ebp-Ch]
   int n; // [esp+4h] [ebp-8h]
   int cnt; // [esp+8h] [ebp-4h] BYREF
+  static int last_cnt = 1;
 
   r = 0;
   if ( ac > 0 )
     v2 = 1;
   else
-    v2 = last_cnt_44;
+    v2 = last_cnt;
   cnt = v2;
   if ( ac > 0 )
   {
@@ -761,7 +752,7 @@ static int __cdecl targ_step_cmd(int ac, char **av)
     return ds_error("Usage: step [<cnt>]");
   if ( ac > 0 && ds_eval_word(*av, (unsigned int *)&cnt) )
     return -1;
-  last_cnt_44 = cnt;
+  last_cnt = cnt;
   while ( cnt > 0 )
   {
     n = cnt;
@@ -790,12 +781,13 @@ static int __cdecl targ_next_cmd(int ac, char **av)
   int r; // [esp+0h] [ebp-Ch]
   int n; // [esp+4h] [ebp-8h]
   int cnt; // [esp+8h] [ebp-4h] BYREF
+  static int last_cnt = 1;
 
   r = 0;
   if ( ac > 0 )
     v2 = 1;
   else
-    v2 = last_cnt_47;
+    v2 = last_cnt;
   cnt = v2;
   if ( ac > 0 )
   {
@@ -808,7 +800,7 @@ static int __cdecl targ_next_cmd(int ac, char **av)
     return ds_error("Usage: next [<cnt>]");
   if ( ac > 0 && ds_eval_word(*av, (unsigned int *)&cnt) )
     return -1;
-  last_cnt_47 = cnt;
+  last_cnt = cnt;
   while ( cnt > 0 )
   {
     n = cnt;
@@ -844,6 +836,7 @@ static int __cdecl targ_lstep_cmd(int ac, char **av)
   int line0; // [esp+1Ch] [ebp-Ch] BYREF
   int r; // [esp+20h] [ebp-8h]
   int cnt; // [esp+24h] [ebp-4h] BYREF
+  static int last_cnt = 1;
 
   r = 0;
   if ( !dbconf.nstep )
@@ -851,7 +844,7 @@ static int __cdecl targ_lstep_cmd(int ac, char **av)
   if ( ac > 0 )
     v3 = 1;
   else
-    v3 = last_cnt_50;
+    v3 = last_cnt;
   cnt = v3;
   if ( ac > 0 )
   {
@@ -874,7 +867,7 @@ static int __cdecl targ_lstep_cmd(int ac, char **av)
     file0 = "";
     line0 = 0;
   }
-  last_cnt_50 = cnt;
+  last_cnt = cnt;
   while ( cnt > 0 )
   {
     do
@@ -936,6 +929,7 @@ static int __cdecl targ_lnext_cmd(int ac, char **av)
   int line0; // [esp+1Ch] [ebp-Ch] BYREF
   int r; // [esp+20h] [ebp-8h]
   int cnt; // [esp+24h] [ebp-4h] BYREF
+  static int last_cnt = 1;
 
   r = 0;
   if ( !dbconf.nnext )
@@ -943,7 +937,7 @@ static int __cdecl targ_lnext_cmd(int ac, char **av)
   if ( ac > 0 )
     v3 = 1;
   else
-    v3 = last_cnt_53;
+    v3 = last_cnt;
   cnt = v3;
   if ( ac > 0 )
   {
@@ -966,7 +960,7 @@ static int __cdecl targ_lnext_cmd(int ac, char **av)
     file0 = "";
     line0 = 0;
   }
-  last_cnt_53 = cnt;
+  last_cnt = cnt;
   while ( cnt > 0 )
   {
     do
@@ -1344,13 +1338,14 @@ static int __cdecl host_cont_cmd(int ac, char **av)
   int i; // [esp+10h] [ebp-8h]
   int cnt; // [esp+14h] [ebp-4h] BYREF
 #endif /* DSNET_COMPILING_I */
+  static int last_cnt = 1;
 
   cnt = 1;
   r = 0;
   if ( ac > 0 )
     v2 = 1;
   else
-    v2 = last_cnt_72;
+    v2 = last_cnt;
   cnt = v2;
   if ( ac > 0 )
   {
@@ -1379,7 +1374,7 @@ static int __cdecl host_cont_cmd(int ac, char **av)
     return 0;
 LABEL_15:
 #endif /* DSNET_COMPILING_I */
-  last_cnt_72 = cnt;
+  last_cnt = cnt;
   if ( load_scrs(&scrs_area) < 0 )
     return -1;
 #ifdef DSNET_COMPILING_E
@@ -1572,6 +1567,7 @@ static int __cdecl host_step_cmd(int ac, char **av)
   int cnt; // [esp+14h] [ebp-8h] BYREF
   int f_next; // [esp+18h] [ebp-4h]
 #endif /* DSNET_COMPILING_I */
+  static int last_cnt = 1;
 
   f_next = 0;
   cnt = 1;
@@ -1579,7 +1575,7 @@ static int __cdecl host_step_cmd(int ac, char **av)
   if ( ac > 0 )
     v2 = 1;
   else
-    v2 = last_cnt_77;
+    v2 = last_cnt;
   cnt = v2;
   if ( ac > 0 )
   {
@@ -1597,7 +1593,7 @@ static int __cdecl host_step_cmd(int ac, char **av)
   if ( cnt <= 0 )
     return 0;
 LABEL_15:
-  last_cnt_77 = cnt;
+  last_cnt = cnt;
   if ( load_scrs(&scrs_area) < 0 )
     return -1;
   for ( i = 0; cnt > i; ++i )
@@ -1627,6 +1623,7 @@ static int __cdecl host_next_cmd(int ac, char **av)
   int cnt; // [esp+14h] [ebp-8h] BYREF
   int f_next; // [esp+18h] [ebp-4h]
 #endif /* DSNET_COMPILING_I */
+  static int last_cnt = 1;
 
   f_next = 1;
   cnt = 1;
@@ -1634,7 +1631,7 @@ static int __cdecl host_next_cmd(int ac, char **av)
   if ( ac > 0 )
     v2 = 1;
   else
-    v2 = last_cnt_80;
+    v2 = last_cnt;
   cnt = v2;
   if ( ac > 0 )
   {
@@ -1652,7 +1649,7 @@ static int __cdecl host_next_cmd(int ac, char **av)
   if ( cnt <= 0 )
     return 0;
 LABEL_15:
-  last_cnt_80 = cnt;
+  last_cnt = cnt;
   if ( load_scrs(&scrs_area) < 0 )
     return -1;
   for ( i = 0; cnt > i; ++i )
@@ -1682,6 +1679,7 @@ static int __cdecl host_lstep_cmd(int ac, char **av)
   int cnt; // [esp+14h] [ebp-8h] BYREF
   int f_next; // [esp+18h] [ebp-4h]
 #endif /* DSNET_COMPILING_I */
+  static int last_cnt = 1;
 
   f_next = 0;
   cnt = 1;
@@ -1689,7 +1687,7 @@ static int __cdecl host_lstep_cmd(int ac, char **av)
   if ( ac > 0 )
     v2 = 1;
   else
-    v2 = last_cnt_83;
+    v2 = last_cnt;
   cnt = v2;
   if ( ac > 0 )
   {
@@ -1707,7 +1705,7 @@ static int __cdecl host_lstep_cmd(int ac, char **av)
   if ( cnt <= 0 )
     return 0;
 LABEL_15:
-  last_cnt_83 = cnt;
+  last_cnt = cnt;
   if ( load_scrs(&scrs_area) < 0 )
     return -1;
   for ( i = 0; cnt > i; ++i )
@@ -1740,6 +1738,7 @@ static int __cdecl host_lnext_cmd(int ac, char **av)
   int cnt; // [esp+14h] [ebp-8h] BYREF
   int f_next; // [esp+18h] [ebp-4h]
 #endif /* DSNET_COMPILING_I */
+  static int last_cnt = 1;
 
   f_next = 1;
   cnt = 1;
@@ -1747,7 +1746,7 @@ static int __cdecl host_lnext_cmd(int ac, char **av)
   if ( ac > 0 )
     v2 = 1;
   else
-    v2 = last_cnt_86;
+    v2 = last_cnt;
   cnt = v2;
   if ( ac > 0 )
   {
@@ -1765,7 +1764,7 @@ static int __cdecl host_lnext_cmd(int ac, char **av)
   if ( cnt <= 0 )
     return 0;
 LABEL_15:
-  last_cnt_86 = cnt;
+  last_cnt = cnt;
   if ( load_scrs(&scrs_area) < 0 )
     return -1;
   for ( i = 0; cnt > i; ++i )
@@ -1808,6 +1807,7 @@ static int __cdecl host_luntil_cmd(int ac, char **av)
   int i; // [esp+24h] [ebp-8h]
   int cnt; // [esp+28h] [ebp-4h]
 #endif /* DSNET_COMPILING_I */
+  static int last_cnt = 1;
 
   cnt = 1;
 #ifdef DSNET_COMPILING_E
@@ -1819,7 +1819,7 @@ static int __cdecl host_luntil_cmd(int ac, char **av)
   if ( ac > 0 )
     v2 = 1;
   else
-    v2 = last_cnt_89;
+    v2 = last_cnt;
   cnt = v2;
   if ( ac > 0 )
   {
@@ -1830,7 +1830,7 @@ static int __cdecl host_luntil_cmd(int ac, char **av)
   }
   if ( ac != 1 )
     return ds_error("Usage: luntil <line>");
-  last_cnt_89 = cnt;
+  last_cnt = cnt;
   if ( load_scrs(&v8) < 0 )
     return -1;
   addr = get_pc(&v8);
