@@ -50,17 +50,21 @@ static int cur_padding = 0;
 static int *cur_count_pointer = NULL;
 static int cur_result = 0;
 static int cur_stamp = 0;
+
 #ifdef DSNET_COMPILING_E
 static int cur_cpuid = 0;
 #endif /* DSNET_COMPILING_E */
+
 static int dcmp_waiting_status = 0;
 TTYQ ttyq = { 0, 0, 0, "" };
 static int prompt_len = 0;
 static int input_line_erased = 0;
+
 #ifdef DSNET_COMPILING_E
 static void *xgkt_stream = NULL;
 static void *rdimg_stream = NULL;
 #endif /* DSNET_COMPILING_E */
+
 static int dsip_stamp = 128;
 static int argc = 0;
 static char **argv = NULL;
@@ -104,6 +108,7 @@ static DS_OPTION *opt_iopconf;
 static DS_OPTION *opt_iopmodules;
 static DS_DESC *target_desc;
 static DS_DESC *kbd_desc;
+
 #ifdef DSNET_COMPILING_E
 static int xgkt_off;
 static int xgkt_eoff;
@@ -191,12 +196,8 @@ static DSP_BUF *__cdecl alloc_dbgp(int id, int group, int type, int code, int re
 {
   DSP_BUF *db; // [esp+1Ch] [ebp-Ch]
 
-#ifdef DSNET_COMPILING_E
-  db = ds_alloc_buf(560, 69, 0, len + 8);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  db = ds_alloc_buf(304, 73, 0, len + 8);
-#endif /* DSNET_COMPILING_I */
+  db = ds_alloc_buf(TARGET_SDBGP, TARGET_DID, 0, len + 8);
+
   if ( !db )
     return 0;
   db->buf[8] = id;
@@ -297,12 +298,8 @@ static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db)
 
   if ( !db )
     return 0;
-#ifdef DSNET_COMPILING_E
-  if ( (cur_state & 2) == 0 || cur_proto != 560 || cur_stype != 20 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  if ( (cur_state & 2) == 0 || cur_proto != 304 || cur_stype != 20 )
-#endif /* DSNET_COMPILING_I */
+
+  if ( (cur_state & 2) == 0 || cur_proto != TARGET_SDBGP || cur_stype != 20 )
   {
     n = *(unsigned __int16 *)db->buf - 12;
     if ( !*(_DWORD *)&db->buf[8] )
@@ -333,12 +330,7 @@ static void __cdecl flush_tty_buf()
   ttyq.get = 0;
   ttyq.put = 0;
   wv = 1;
-#ifdef DSNET_COMPILING_E
-  db = ds_alloc_buf(528, 72, &wv, 4);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  db = ds_alloc_buf(272, 72, &wv, 4);
-#endif /* DSNET_COMPILING_I */
+  db = ds_alloc_buf(TARGET_TTYP, 72, &wv, 4);
   if ( db )
     ds_send_desc(target_desc, db);
 }
@@ -354,12 +346,7 @@ static void __cdecl abort_input(int code)
   if ( (cur_state & 2) != 0 && (db = alloc_dbgp(0, 0, 20, 0, 0, 0, 0, 0)) != 0 )
   {
     ds_send_desc(target_desc, db);
-#ifdef DSNET_COMPILING_E
-    cur_proto = 560;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    cur_proto = 304;
-#endif /* DSNET_COMPILING_I */
+    cur_proto = TARGET_SDBGP;
     cur_stype = 20;
     ds_printf("*** Sending Break ...\n");
     LOBYTE(cur_state) = cur_state | 0x40;
@@ -374,31 +361,19 @@ LABEL_7:
 
 static void __cdecl normal_input(int code)
 {
-#ifdef DSNET_COMPILING_E
-  struct {unsigned int zero;unsigned __int8 code;} dat; // [esp+4h] [ebp-10h] BYREF
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  struct {unsigned int zero; unsigned char code;} dat; // [esp+4h] [ebp-10h] BYREF
-#endif /* DSNET_COMPILING_I */
+  struct {
+    unsigned int zero;
+    unsigned char code;
+  } dat; // [esp+4h] [ebp-10h] BYREF
   DSP_BUF *p; // [esp+Ch] [ebp-8h]
   unsigned __int8 v3; // [esp+13h] [ebp-1h]
 
   v3 = code;
-#ifdef DSNET_COMPILING_E
-  if ( (cur_state & 2) != 0 && (cur_proto != 560 || cur_stype != 20) )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  if ( (cur_state & 2) != 0 && (cur_proto != 304 || cur_stype != 20) )
-#endif /* DSNET_COMPILING_I */
+  if ( (cur_state & 2) != 0 && (cur_proto != TARGET_SDBGP|| cur_stype != 20) )
   {
     dat.zero = 0;
     dat.code = v3;
-#ifdef DSNET_COMPILING_E
-    p = ds_alloc_buf(528, 69, &dat, 5);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    p = ds_alloc_buf(272, 73, &dat, 5);
-#endif /* DSNET_COMPILING_I */
+    p = ds_alloc_buf(TARGET_TTYP, TARGET_DID, &dat, 5);
     if ( p )
       ds_send_desc(target_desc, p);
   }
@@ -1154,12 +1129,7 @@ static int __cdecl send_and_wait(DSP_BUF *db, int stype, void *ptr, int len, int
 
   sec = 120;
   cur_state = 1;
-#ifdef DSNET_COMPILING_E
-  cur_proto = 560;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  cur_proto = 304;
-#endif /* DSNET_COMPILING_I */
+  cur_proto = TARGET_SDBGP;
   if ( !db )
   {
     cur_stype = -1;
@@ -1909,12 +1879,7 @@ static DSP_BUF *__cdecl recv_loadp(DS_DESC *desc, DSP_BUF *db)
           vals[0] = ip->result;
           vals[1] = *(_DWORD *)&ip[1].cmd;
           r = iload_callback(id, ip->cmd, vals, 8);
-#ifdef DSNET_COMPILING_E
-          if ( r && (cur_state & 1) != 0 && cur_proto == 560 && cur_wtype == 21 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          if ( r && (cur_state & 1) != 0 && cur_proto == 304 && cur_wtype == 21 )
-#endif /* DSNET_COMPILING_I */
+          if ( r && (cur_state & 1) != 0 && cur_proto == TARGET_SDBGP && cur_wtype == 21 )
           {
             cur_result = r;
             cur_state &= 0xFFFFFFFC;
@@ -1929,12 +1894,7 @@ static DSP_BUF *__cdecl recv_loadp(DS_DESC *desc, DSP_BUF *db)
       }
       else if ( (cur_state & 1) != 0 )
       {
-#ifdef DSNET_COMPILING_E
-        if ( cur_proto == 592 && cur_wtype == ip->cmd )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        if ( cur_proto == 336 && cur_wtype == ip->cmd )
-#endif /* DSNET_COMPILING_I */
+        if ( cur_proto == TARGET_LOADP && cur_wtype == ip->cmd )
         {
           if ( cur_stamp == ip->stamp )
           {
@@ -2051,25 +2011,14 @@ int __cdecl send_iload_and_wait(int cmd, int action, unsigned int id, void *ptr,
   if ( is_target_is_running() )
     goto LABEL_10;
 LABEL_8:
-#ifdef DSNET_COMPILING_E
-  if ( !IsSupported(3, 20) )
-    return ds_error("LOADP extension is required DBGP version %d.%d or later.", 3, 20);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  if ( !IsSupported(3, 1) )
-    return ds_error("LOADP extension is required DBGP version %d.%d or later.", 3, 1);
-#endif /* DSNET_COMPILING_I */
+  if ( !IsSupported(TARGET_VERSION_MAJOR, TARGET_VERSION_MINOR) )
+    return ds_error("LOADP extension is required DBGP version %d.%d or later.", TARGET_VERSION_MAJOR, TARGET_VERSION_MINOR);
 LABEL_10:
   if ( is_target_is_running() )
   {
     if ( !v15 )
       ds_bzero(regbuf_mask, sizeof(regbuf_mask));
-#ifdef DSNET_COMPILING_E
-    db = ds_alloc_buf(592, 69, 0, len + 8);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    db = ds_alloc_buf(336, 73, 0, len + 8);
-#endif /* DSNET_COMPILING_I */
+    db = ds_alloc_buf(TARGET_LOADP, TARGET_DID, 0, len + 8);
     if ( db )
     {
       dh = (DECI2_HDR *)db->buf;
@@ -2087,12 +2036,7 @@ LABEL_10:
       while ( 1 )
       {
         cur_state = 1;
-#ifdef DSNET_COMPILING_E
-        cur_proto = 592;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        cur_proto = 336;
-#endif /* DSNET_COMPILING_I */
+        cur_proto = TARGET_LOADP;
         cur_stype = v15;
         cur_wtype = v15 + 1;
         dsc_proto = 0;
@@ -2187,24 +2131,14 @@ static int __cdecl get_and_check_config()
     ds_printf("can not get GETCONF - may be reset is needed\n");
     return -1;
   }
-#ifdef DSNET_COMPILING_E
-  else if ( dbconf.target_id == 560 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  else if ( dbconf.target_id == 304 )
-#endif /* DSNET_COMPILING_I */
+  else if ( dbconf.target_id == TARGET_SDBGP)
   {
     if ( (dbconf.mem_align & 1) != 0 )
     {
       for ( n = 10; n >= 0 && (dbconf.mem_align & (1 << n)) == 0; --n )
         ;
       dbconf_max_mem_align = n;
-#ifdef DSNET_COMPILING_E
-      if ( dbconf.reg_size == 7 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      if ( dbconf.reg_size == 5 )
-#endif /* DSNET_COMPILING_I */
+      if ( dbconf.reg_size == TARGET_REG_SIZE )
       {
         if ( dbconf.nbrkpt <= 0xFF )
         {
@@ -2720,12 +2654,8 @@ static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
       if ( db->buf[9] == 1 && cur_proto == ed->orig_hdr.length )
         ++dsc_proto;
     }
-#ifdef DSNET_COMPILING_E
-    else if ( ed->orig_hdr.length == 69 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    else if ( ed->orig_hdr.length == 73 )
-#endif /* DSNET_COMPILING_I */
+    // clearly wrong struct access
+    else if ( ed->orig_hdr.length == TARGET_DID )
     {
       ++dsc_connected;
       if ( need_getconf )
@@ -2759,22 +2689,12 @@ static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
     }
     if ( (cur_state & 1) != 0 && cur_proto == *(unsigned __int16 *)&db->buf[16] )
     {
-#ifdef DSNET_COMPILING_E
-      if ( cur_proto == 560 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      if ( cur_proto == 304 )
-#endif /* DSNET_COMPILING_I */
+      if ( cur_proto == TARGET_SDBGP)
       {
         if ( cur_stype != (unsigned __int8)db->buf[22] )
           return ds_free_buf(db);
       }
-#ifdef DSNET_COMPILING_E
-      else if ( cur_proto == 592 && cur_stype != (unsigned __int8)db->buf[20] )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      else if ( cur_proto == 336 && cur_stype != (unsigned __int8)db->buf[20] )
-#endif /* DSNET_COMPILING_I */
+      else if ( cur_proto == TARGET_LOADP && cur_stype != (unsigned __int8)db->buf[20] )
       {
         return ds_free_buf(db);
       }
@@ -2945,101 +2865,63 @@ static int __cdecl send_netmp_connect_request()
 
   ds_bzero(protos, sizeof(protos));
   p = &protos[1];
-#ifdef DSNET_COMPILING_E
-  protos[0].pri = -48;
-  protos[0].proto = 560;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  protos[0].pri = -64;
-  protos[0].proto = 304;
-#endif /* DSNET_COMPILING_I */
+
+  protos[0].pri = TARGET_PRI ;
+  protos[0].proto = TARGET_SDBGP;
   for ( i = 0; i <= 9; ++i )
   {
     if ( ((opt_tty_mask->val >> i) & 1) != 0 )
     {
       _p = p++;
-#ifdef DSNET_COMPILING_E
-      _p->pri = -48;
-      _p->proto = i + 528;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      _p->pri = -64;
-      _p->proto = i + 272;
-#endif /* DSNET_COMPILING_I */
+      _p->pri = TARGET_PRI;
+      _p->proto = TARGET_TTYP + i;
     }
   }
   if ( SLOWORD(opt_tty_mask->val) < 0 )
   {
     _p_3 = p++;
-#ifdef DSNET_COMPILING_E
-    _p_3->pri = -48;
-    _p_3->proto = 543;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    _p_3->pri = -64;
-    _p_3->proto = 287;
-#endif /* DSNET_COMPILING_I */
+    _p_3->pri = TARGET_PRI;
+    _p_3->proto = TARGET_KTTYP;
   }
   for ( i_1 = 0; i_1 <= 9; ++i_1 )
   {
     if ( ((opt_atty_mask->val >> i_1) & 1) != 0 )
     {
       _p_4 = p++;
-#ifdef DSNET_COMPILING_E
-      _p_4->pri = -48;
-      _p_4->proto = i_1 + 272;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      _p_4->pri = -64;
-      _p_4->proto = i_1 + 528;
-#endif /* DSNET_COMPILING_I */
+      // optionally register other CPU tty
+      _p_4->pri = TARGET_PRI;
+      _p_4->proto = TARGET_OTHER_TTYP + i_1;
     }
   }
   if ( SLOWORD(opt_atty_mask->val) < 0 )
   {
     _p_5 = p++;
+    _p_5->pri = TARGET_PRI;
 #ifdef DSNET_COMPILING_E
-    _p_5->pri = -48;
-    _p_5->proto = 287;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    _p_5->pri = -64;
-    _p_5->proto = 543;
+    _p_5->proto = PROTO_IKTTYP;
+#elif DSNET_COMPILING_I
+    _p_5->proto = PROTO_EKTTYP;
 #endif /* DSNET_COMPILING_I */
   }
   if ( (opt_tty_mask->val & 0x10000) != 0 )
   {
     _p_6 = p++;
-#ifdef DSNET_COMPILING_E
-    _p_6->pri = -48;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    _p_6->pri = -64;
-#endif /* DSNET_COMPILING_I */
-    _p_6->proto = 1043;
+    _p_6->pri = TARGET_PRI;
+    _p_6->proto = PROTO_STTYP;
   }
   pri = opt_file_priority->val;
   if ( pri >= 0 )
   {
     _p_7 = p++;
     _p_7->pri = pri;
-#ifdef DSNET_COMPILING_E
-    _p_7->proto = 288;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    _p_7->proto = 289;
-#endif /* DSNET_COMPILING_I */
+    _p_7->proto = TARGET_DRFP;
   }
-#ifdef DSNET_COMPILING_E
-  p->pri = -48;
-  p->proto = 592;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  p->pri = -64;
-  p->proto = 336;
-#endif /* DSNET_COMPILING_I */
+  p->pri = TARGET_PRI;
+  p->proto = TARGET_LOADP;
+
   if ( ds_send_netmp(target_desc, 0, 0, protos, (char *)&p[1] - (char *)protos) < 0 )
     ds_exit(135);
+
   return 0;
 }
 
@@ -3190,8 +3072,7 @@ static void __cdecl set_options_to_default()
   opt_atty_mask = ds_set_option("atty_mask", 2, 0, 0, 1);
 #ifdef DSNET_COMPILING_E
   opt_file_priority = ds_set_option("file_priority", 2, 0, 208, 1);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
+#elif DSNET_COMPILING_I
   opt_file_priority = ds_set_option("file_priority", 2, 0, 192, 1);
 #endif /* DSNET_COMPILING_I */
   opt_reset_on_start = ds_set_option("reset_on_start", 1, 0, 1, 1);
@@ -3359,49 +3240,25 @@ int __cdecl main(int ac, char **av)
     ds_exit(135);
   if ( !ds_add_recv_func(target_desc, 1024, -1, -1, recv_netmp) )
     ds_exit(135);
-#ifdef DSNET_COMPILING_E
-  if ( !ds_add_recv_func(target_desc, 560, -1, -1, recv_dbgp) )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  if ( !ds_add_recv_func(target_desc, 304, -1, -1, recv_dbgp) )
-#endif /* DSNET_COMPILING_I */
+  if ( !ds_add_recv_func(target_desc, TARGET_SDBGP, -1, -1, recv_dbgp) )
     ds_exit(135);
   for ( i = 0; i <= 15; ++i )
   {
     if ( i <= 9 || i > 14 )
     {
-#ifdef DSNET_COMPILING_E
-      if ( ((opt_tty_mask->val >> i) & 1) != 0 && !ds_add_recv_func(target_desc, i + 528, -1, -1, recv_ttyp) )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      if ( ((opt_tty_mask->val >> i) & 1) != 0 && !ds_add_recv_func(target_desc, i + 272, -1, -1, recv_ttyp) )
-#endif /* DSNET_COMPILING_I */
+      if ( ((opt_tty_mask->val >> i) & 1) != 0 && !ds_add_recv_func(target_desc, TARGET_TTYP + i, -1, -1, recv_ttyp) )
         ds_exit(135);
-#ifdef DSNET_COMPILING_E
-      if ( ((opt_atty_mask->val >> i) & 1) != 0 && !ds_add_recv_func(target_desc, i + 272, -1, -1, recv_ttyp) )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      if ( ((opt_atty_mask->val >> i) & 1) != 0 && !ds_add_recv_func(target_desc, i + 528, -1, -1, recv_ttyp) )
-#endif /* DSNET_COMPILING_I */
+      if ( ((opt_atty_mask->val >> i) & 1) != 0 && !ds_add_recv_func(target_desc, TARGET_OTHER_TTYP +  i, -1, -1, recv_ttyp) )
         ds_exit(135);
     }
   }
   if ( (opt_tty_mask->val & 0x10000) != 0 && !ds_add_recv_func(target_desc, 1043, -1, -1, recv_ttyp) )
     ds_exit(135);
-#ifdef DSNET_COMPILING_E
-  if ( opt_file_priority->val >= 0 && !ds_add_recv_func(target_desc, 288, -1, -1, ds_recv_drfp) )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  if ( opt_file_priority->val >= 0 && !ds_add_recv_func(target_desc, 289, -1, -1, ds_recv_drfp) )
-#endif /* DSNET_COMPILING_I */
+  if ( opt_file_priority->val >= 0 && !ds_add_recv_func(target_desc, TARGET_DRFP, -1, -1, ds_recv_drfp) )
     ds_exit(135);
-#ifdef DSNET_COMPILING_E
-  if ( !ds_add_recv_func(target_desc, 592, -1, -1, recv_loadp) )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  if ( !ds_add_recv_func(target_desc, 336, -1, -1, recv_loadp) )
-#endif /* DSNET_COMPILING_I */
+  if ( !ds_add_recv_func(target_desc, TARGET_LOADP, -1, -1, recv_loadp) )
     ds_exit(135);
+
 #ifdef DSNET_COMPILING_E
   ds_cmd_install("dt", "[-[acdefhrqsuvw]*] [<tid>]", "display thread", dt_cmd);
   ds_cmd_install("ds", "[-v] [<sid>]", "display semaphore", ds_cmd);
@@ -3433,8 +3290,7 @@ int __cdecl main(int ac, char **av)
   ds_cmd_install("bsave", "<fname> <adr> <cnt>", "binary save", bsave_cmd);
 #ifdef DSNET_COMPILING_E
   ds_cmd_install("dr", "[-<cpuid>] [-[hfxw]*] [<reg>]...", "display register(s)", dreg_cmd);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
+#elif DSNET_COMPILING_I
   ds_cmd_install("dr", "[<reg>]...", "display register(s)", dreg_cmd);
 #endif /* DSNET_COMPILING_I */
   ds_cmd_install("sr", "[-f] [<reg> <val>]...", "set register(s)", sreg_cmd);
@@ -3462,8 +3318,7 @@ int __cdecl main(int ac, char **av)
   ds_cmd_install("bd", "[<adr>]...", "disable breakpoint", bd_cmd);
 #ifdef DSNET_COMPILING_E
   ds_cmd_install("hbp", "[pc|da|dr|dw][uskx]*[:<adr>[,<msk>]]...", "set hardware breakpoint", hbp_cmd);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
+#elif DSNET_COMPILING_I
   ds_cmd_install("hbp", "[pc|da|dr|dw][ku]*[:<adr>[,<msk>]]...", "set hardware breakpoint", hbp_cmd);
 #endif /* DSNET_COMPILING_I */
   ds_cmd_install("hub", "[pc|da|dr|dw]...", "remove hardware breakpoint", hbp_cmd);
@@ -3543,4 +3398,3 @@ int __cdecl IsSupported(int MajorVersion, int MinorVersion)
 {
   return MajorVersion == dbconf.major_ver && MinorVersion <= dbconf.minor_ver || MajorVersion < dbconf.major_ver;
 }
-
