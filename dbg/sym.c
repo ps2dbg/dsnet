@@ -370,12 +370,7 @@ LABEL_33:
   return 0;
 }
 
-#ifdef DSNET_COMPILING_E
 int __cdecl look_eemod(
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-int __cdecl look_iopmod(
-#endif /* DSNET_COMPILING_I */
         void *stream,
         DS_ELF_EHDR *ehdr,
         DS_ELF_SHDR *shdr,
@@ -384,70 +379,32 @@ int __cdecl look_iopmod(
         void (__cdecl *clear_func)())
 {
   int i; // [esp+4h] [ebp-Ch]
-#ifdef DSNET_COMPILING_E
   EEMOD *eemod; // [esp+8h] [ebp-8h]
   DS_ELF_SHDR *sheemod; // [esp+Ch] [ebp-4h]
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  IOPMOD *iopmod; // [esp+8h] [ebp-8h]
-  DS_ELF_SHDR *shiopmod; // [esp+Ch] [ebp-4h]
-#endif /* DSNET_COMPILING_I */
 
-#ifdef DSNET_COMPILING_E
   sheemod = 0;
   eemod = 0;
   if ( ehdr->type != 0xFF91 )
     return id;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  shiopmod = 0;
-  iopmod = 0;
-#endif /* DSNET_COMPILING_I */
   if ( base )
     return id;
   for ( i = 0; i < ehdr->shnum; ++i )
   {
-#ifdef DSNET_COMPILING_E
     if ( shdr[i].type == 1879048336 )
       sheemod = &shdr[i];
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    if ( shdr[i].type == 1879048320 )
-      shiopmod = &shdr[i];
-#endif /* DSNET_COMPILING_I */
   }
-#ifdef DSNET_COMPILING_E
   if ( !sheemod || sheemod->size <= 0x2B )
     goto LABEL_16;
   eemod = (EEMOD *)ds_fload(stream, 0, sheemod->offset, sheemod->size, 1);
   if ( !eemod )
     goto LABEL_20;
   if ( eemod->moduleinfo == -1 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  if ( !shiopmod || shiopmod->size <= 0x1B )
-    goto LABEL_14;
-  iopmod = (IOPMOD *)ds_fload(stream, 0, shiopmod->offset, shiopmod->size, 1);
-  if ( !iopmod )
-    goto LABEL_18;
-  if ( iopmod->moduleinfo == -1 )
-#endif /* DSNET_COMPILING_I */
   {
-#ifdef DSNET_COMPILING_E
 LABEL_16:
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-LABEL_14:
-#endif /* DSNET_COMPILING_I */
     if ( id )
     {
       if ( mod_fetch_id(id) >= 0 )
-#ifdef DSNET_COMPILING_E
         goto LABEL_19;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        goto LABEL_17;
-#endif /* DSNET_COMPILING_I */
     }
     else
     {
@@ -456,34 +413,72 @@ LABEL_14:
   }
   else
   {
-#ifdef DSNET_COMPILING_E
     id = mod_id_by_name(id, eemod->modulename, eemod->moduleversion);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    id = mod_id_by_name(id, iopmod->modulename, iopmod->moduleversion);
-#endif /* DSNET_COMPILING_I */
     if ( id > 0 )
     {
       ((void (__cdecl *)(int))clear_func)(id);
-#ifdef DSNET_COMPILING_E
 LABEL_19:
       ds_free_mem_low(eemod, "sym.c", "look_eemod");
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-LABEL_17:
-      ds_free_mem_low(iopmod, "sym.c", "look_iopmod");
-#endif /* DSNET_COMPILING_I */
       return id;
     }
   }
-#ifdef DSNET_COMPILING_E
 LABEL_20:
   ds_free_mem_low(eemod, "sym.c", "look_eemod");
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
+  return -1;
+}
+
+int __cdecl look_iopmod(
+        void *stream,
+        DS_ELF_EHDR *ehdr,
+        DS_ELF_SHDR *shdr,
+        int id,
+        int base,
+        void (__cdecl *clear_func)())
+{
+  int i; // [esp+4h] [ebp-Ch]
+  IOPMOD *iopmod; // [esp+8h] [ebp-8h]
+  DS_ELF_SHDR *shiopmod; // [esp+Ch] [ebp-4h]
+
+  shiopmod = 0;
+  iopmod = 0;
+  if ( base )
+    return id;
+  for ( i = 0; i < ehdr->shnum; ++i )
+  {
+    if ( shdr[i].type == 1879048320 )
+      shiopmod = &shdr[i];
+  }
+  if ( !shiopmod || shiopmod->size <= 0x1B )
+    goto LABEL_14;
+  iopmod = (IOPMOD *)ds_fload(stream, 0, shiopmod->offset, shiopmod->size, 1);
+  if ( !iopmod )
+    goto LABEL_18;
+  if ( iopmod->moduleinfo == -1 )
+  {
+LABEL_14:
+    if ( id )
+    {
+      if ( mod_fetch_id(id) >= 0 )
+        goto LABEL_17;
+    }
+    else
+    {
+      ds_error("no module name, -b or -id option is needed");
+    }
+  }
+  else
+  {
+    id = mod_id_by_name(id, iopmod->modulename, iopmod->moduleversion);
+    if ( id > 0 )
+    {
+      ((void (__cdecl *)(int))clear_func)(id);
+LABEL_17:
+      ds_free_mem_low(iopmod, "sym.c", "look_iopmod");
+      return id;
+    }
+  }
 LABEL_18:
   ds_free_mem_low(iopmod, "sym.c", "look_iopmod");
-#endif /* DSNET_COMPILING_I */
   return -1;
 }
 
@@ -534,8 +529,7 @@ int __cdecl load_symbol(void *stream, DS_ELF_EHDR *ehdr, DS_ELF_SHDR *shdr, int 
     ++psym;
 #ifdef DSNET_COMPILING_E
   ida = look_eemod(stream, ehdr, shdr, id, base, (void (__cdecl *)())clear_symbol_with_id);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
+#elif DSNET_COMPILING_I
   ida = look_iopmod(stream, ehdr, shdr, id, base, (void (__cdecl *)())clear_symbol_with_id);
 #endif /* DSNET_COMPILING_I */
   syms = (SYMS *)ds_alloc_mem_low("sym.c", "load_symbol", sizeof(SYMS));
