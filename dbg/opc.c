@@ -474,7 +474,7 @@ OPCODE opcodes[] =
 #endif /* DSNET_COMPILING_E */
   { "SYSCALL code", 0xfc00003f, 0x0000000c, 0x1 },
 #ifdef DSNET_COMPILING_E
-  { "TEQ     rs,rt", 0xfc00ffff, 0x00000034, 0x2 },
+  { "TEQ     rs,rt", 0xfc00003f, 0x00000034, 0x2 },
   { "TEQI    rs,simm", 0xfc1f0000, 0x040c0000, 0x2 },
   { "TGE     rs,rt", 0xfc00ffff, 0x00000030, 0x2 },
   { "TGEI    rs,simm", 0xfc1f0000, 0x04080000, 0x2 },
