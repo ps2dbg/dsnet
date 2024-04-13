@@ -593,481 +593,230 @@ static DSP_BUF *__cdecl unexpected_reply(DSP_BUF *db, DBGP_HDR *ch)
 
 static DSP_BUF *__cdecl recv_dbgp(DS_DESC *desc, DSP_BUF *db)
 {
-  DSP_BUF *result; // eax
-  int v3; // eax
-  int v4; // eax
-#ifdef DSNET_COMPILING_E
-  quad *v5; // eax
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  int v5; // eax
-#endif /* DSNET_COMPILING_I */
-  int v6; // eax
-#ifdef DSNET_COMPILING_E
-  int v7; // eax
-  ILOADP_MODINFO_DATA *mi; // [esp+Ch] [ebp-3Ch]
-  int i_3; // [esp+10h] [ebp-38h]
-  int i_1; // [esp+10h] [ebp-38h]
-  int i_2; // [esp+10h] [ebp-38h]
-  int i; // [esp+10h] [ebp-38h]
-  int len; // [esp+14h] [ebp-34h]
-  int len_1; // [esp+14h] [ebp-34h]
-  unsigned int *wp; // [esp+1Ch] [ebp-2Ch]
-  unsigned int *wp_1; // [esp+1Ch] [ebp-2Ch]
-  unsigned int *wp_2; // [esp+1Ch] [ebp-2Ch]
-  quad v18; // [esp+20h] [ebp-28h]
-  DBGP_REG v19; // [esp+24h] [ebp-24h]
-  DBGP_REG v20; // [esp+28h] [ebp-20h]
-  DBGP_REG v21; // [esp+2Ch] [ebp-1Ch]
-  quad *dp; // [esp+30h] [ebp-18h]
-  DBGP_REG *rh; // [esp+38h] [ebp-10h]
-  DBGP_HDR *ch; // [esp+40h] [ebp-8h]
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  ILOADP_MODINFO_DATA *mi; // [esp+Ch] [ebp-30h]
-  int i_3; // [esp+10h] [ebp-2Ch]
-  int i_1; // [esp+10h] [ebp-2Ch]
-  int i_2; // [esp+10h] [ebp-2Ch]
-  int i; // [esp+10h] [ebp-2Ch]
-  int len; // [esp+14h] [ebp-28h]
-  int len_1; // [esp+14h] [ebp-28h]
-  unsigned int *wp; // [esp+1Ch] [ebp-20h]
-  unsigned int *wp_1; // [esp+1Ch] [ebp-20h]
-  unsigned int *wp_2; // [esp+1Ch] [ebp-20h]
-  unsigned int rv; // [esp+20h] [ebp-1Ch]
-  unsigned int *dp; // [esp+24h] [ebp-18h]
-  DBGP_REG *rh; // [esp+2Ch] [ebp-10h]
-  DBGP_HDR *ch; // [esp+34h] [ebp-8h]
-#endif /* DSNET_COMPILING_I */
+  DSP_BUF *result;
+  regtype* rp;
+  int len;
 
-  ch = (DBGP_HDR *)&db->buf[8];
-  rh = (DBGP_REG *)&db->buf[16];
+  /* For my sanity */
+  struct {
+    DECI2_HDR d2;
+    DBGP_HDR dbg;
+    char data[0];
+  } *d;
+
   if ( !db )
   {
-    cur_state &= 0xFFFFFFFC;
-    LOBYTE(cur_state) = cur_state | 0x80;
+    cur_state &= ~(1 | 2);
+    cur_state |= 0x80;
     return 0;
   }
-  len = *(unsigned __int16 *)db->buf - 16;
+
+  d = (void*)db->buf;
+
+  len = d->d2.length - (sizeof(DECI2_HDR) + sizeof(DBGP_HDR));
+
   if ( len < 0 )
     return db;
-  if ( db->buf[10] == 21 )
+
+  if ( d->dbg.type == DBGP_TYPE_BREAKR )
   {
     ds_bzero(regbuf_mask, sizeof(regbuf_mask));
     dbconf.run_stop_state = 2;
   }
-  else if ( db->buf[10] == 23 || db->buf[10] == 25 )
+  else if ( d->dbg.type == DBGP_TYPE_CONTINUER || d->dbg.type == DBGP_TYPE_RUNR )
   {
     dbconf.run_stop_state = 1;
   }
+
 #ifdef DSNET_COMPILING_E
-  if ( db->buf[10] == 35 )
+  if ( d->dbg.type == DBGP_TYPE_XGKTDATAR )
     return recv_xgkt(db);
 #endif /* DSNET_COMPILING_E */
+
   if ( (cur_state & 1) == 0
-#ifdef DSNET_COMPILING_E
-    || cur_proto != 560
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    || cur_proto != 304
-#endif /* DSNET_COMPILING_I */
-    || cur_wtype != (unsigned __int8)db->buf[10]
-    && (db->buf[10] != 23 || cur_stype != 22)
-    && (db->buf[10] != 25 || cur_stype != 24) )
+    || cur_proto != TARGET_SDBGP
+    || cur_wtype != d->dbg.type
+    && (d->dbg.type != DBGP_TYPE_CONTINUER || cur_stype != DBGP_TYPE_CONTINUE )
+    && (d->dbg.type != DBGP_TYPE_RUNR || cur_stype != DBGP_TYPE_RUN ) )
   {
-    return unexpected_reply(db, ch);
+    return unexpected_reply(db, &d->dbg);
   }
+
 #ifdef DSNET_COMPILING_E
-  cur_cpuid = ch->id;
+  cur_cpuid = d->dbg.id;
 #endif /* DSNET_COMPILING_E */
-  cur_result = (unsigned __int8)db->buf[12];
-  if ( cur_result )
-#ifdef DSNET_COMPILING_E
-    goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-  v3 = (unsigned __int8)db->buf[9];
-  if ( v3 == 1 )
-  {
-#ifdef DSNET_COMPILING_E
-    v6 = (unsigned __int8)db->buf[10];
-    if ( v6 != 51 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    v5 = (unsigned __int8)db->buf[10];
-    if ( v5 != 51 )
-#endif /* DSNET_COMPILING_I */
-    {
-      if ( (unsigned __int8)db->buf[10] > 0x33u )
-      {
-#ifdef DSNET_COMPILING_E
-        if ( v6 != 53 && v6 != 55 )
-          goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        if ( v5 != 53 && v5 != 55 )
-          goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-      }
-#ifdef DSNET_COMPILING_E
-      else if ( v6 != 49 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      else if ( v5 != 49 )
-#endif /* DSNET_COMPILING_I */
-      {
-#ifdef DSNET_COMPILING_E
-        goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-      }
-    }
-    memcpy(cur_pointer, ch, 8u);
-    ntoh_word_copy((unsigned int *)cur_pointer + 2, (unsigned int *)&db->buf[16], len);
-#ifdef DSNET_COMPILING_E
-LABEL_104:
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-LABEL_100:
-#endif /* DSNET_COMPILING_I */
-    cur_state &= 0xFFFFFFFC;
-    LOBYTE(cur_state) = cur_state | 0x10;
+
+  cur_result = d->dbg.result;
+  if (cur_result != DBGP_RESULT_GOOD) {
+    cur_state &= ~( 1 | 2 );
+    cur_state |= STATE_OK;
     return ds_free_buf(db);
   }
-  if ( (unsigned __int8)db->buf[9] > 1u )
-  {
-    if ( v3 != 2 )
-#ifdef DSNET_COMPILING_E
-      goto LABEL_104;
-    v7 = (unsigned __int8)db->buf[10];
-    if ( v7 != 67 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      goto LABEL_100;
-    v6 = (unsigned __int8)db->buf[10];
-    if ( v6 != 67 )
-#endif /* DSNET_COMPILING_I */
-    {
-      if ( (unsigned __int8)db->buf[10] > 0x43u )
-      {
-#ifdef DSNET_COMPILING_E
-        if ( v7 != 69 )
-          goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        if ( v6 != 69 )
-          goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-      }
-#ifdef DSNET_COMPILING_E
-      else if ( v7 != 65 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      else if ( v6 != 65 )
-#endif /* DSNET_COMPILING_I */
-      {
-#ifdef DSNET_COMPILING_E
-        goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-      }
-      for ( wp_2 = (unsigned int *)&db->buf[16]; &db->buf[4 * ((unsigned int)len >> 2) + 16] > (char *)wp_2; ++wp_2 )
-        *wp_2 = *wp_2;
-      iload_callback(0, (unsigned __int8)db->buf[10], &db->buf[16], len);
-#ifdef DSNET_COMPILING_E
-      goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-    }
-    if ( (unsigned int)len > 0x23 )
-    {
-      mi = (ILOADP_MODINFO_DATA *)&db->buf[20];
-      *(_DWORD *)&db->buf[20] = *(_DWORD *)&db->buf[20];
-      *(_QWORD *)&db->buf[24] = *(_QWORD *)&db->buf[24];
-      *(_QWORD *)&db->buf[32] = *(_QWORD *)&db->buf[32];
-      *(_QWORD *)&db->buf[40] = *(_QWORD *)&db->buf[40];
-      for ( i = 0; i < (unsigned __int8)db->buf[48]; ++i )
-        mi->extword[i] = mi->extword[i];
-      iload_callback(*(_DWORD *)&db->buf[16], (unsigned __int8)db->buf[10], mi, len - 4);
-#ifdef DSNET_COMPILING_E
-      goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-    }
-#ifdef DSNET_COMPILING_E
-LABEL_105:
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-LABEL_101:
-#endif /* DSNET_COMPILING_I */
-    cur_state &= 0xFFFFFFFC;
-    cur_state |= 0x200u;
-    return ds_free_buf(db);
-  }
-  else
-  {
-    if ( db->buf[9] )
-#ifdef DSNET_COMPILING_E
-      goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-    switch ( db->buf[10] )
-    {
-      case 1:
-        if ( len > cur_length )
-          len = cur_length;
-        memcpy(cur_pointer, &db->buf[16], len);
-        len_1 = (unsigned int)len >> 2;
-        for ( wp = (unsigned int *)cur_pointer; ; ++wp )
-        {
-          v4 = len_1--;
-          if ( v4 <= 0 )
+
+  switch (d->dbg.group) {
+    case DBGP_GROUP_THREAD:
+      switch(d->dbg.type) {
+        case DBGP_EE_THREAD_TYPE_THREADLISTR:
+        case DBGP_EE_THREAD_TYPE_SEMABLOCKR:
+        case DBGP_EE_THREAD_TYPE_HANDLERLISTR:
+        case DBGP_EE_THREAD_TYPE_TCBR:
+            memcpy(cur_pointer, &d->dbg, sizeof(DBGP_HDR));
+            ntoh_word_copy(cur_pointer + sizeof(DBGP_HDR), (unsigned int*)d->data, len);
             break;
-          *wp = *wp;
-        }
-#ifdef DSNET_COMPILING_E
-        goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-      case 5:
-#ifdef DSNET_COMPILING_E
-        if ( len != 20 * cur_length )
-          goto LABEL_105;
-        dp = (quad *)cur_pointer;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        if ( len != 8 * cur_length )
-          goto LABEL_101;
-        dp = (unsigned int *)cur_pointer;
-#endif /* DSNET_COMPILING_I */
-        for ( i_3 = 0; cur_length > i_3; ++i_3 )
-        {
-#ifdef DSNET_COMPILING_E
-          *(_QWORD *)v18.xa = *(_QWORD *)&rh[1].kind;
-          *(_QWORD *)&v18.xa[2] = *(_QWORD *)&rh[3].kind;
-          if ( rh->kind <= 0xAu && rh->number <= 0x1Fu )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          rv = ((unsigned int *)(&rh[1]))[0];
-          if ( rh->kind <= 9u && rh->number <= 0x1Fu )
-#endif /* DSNET_COMPILING_I */
-          {
-#ifdef DSNET_COMPILING_E
-            regbuf_vals[rh->kind][rh->number] = v18;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-            regbuf_vals[rh->kind][rh->number] = rv;
-#endif /* DSNET_COMPILING_I */
-            regbuf_mask[rh->kind] |= 1 << rh->number;
+        default:
+            break;
+      }
+      break;
+    case DBGP_GROUP_MODULE:
+      switch(d->dbg.type) {
+        case DBGP_MODULE_TYPE_LISTR:
+        case DBGP_MODULE_TYPE_MEMLISTR:
+          iload_callback(0, d->dbg.type, d->data, len);
+        case DBGP_MODULE_TYPE_INFOR:
+          if (len < 0x23) {
+            goto einval;
           }
-#ifdef DSNET_COMPILING_E
-          *dp++ = v18;
-          rh += 5;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          *dp++ = rv;
-          rh += 2;
-#endif /* DSNET_COMPILING_I */
-        }
-#ifdef DSNET_COMPILING_E
-        goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-      case 7:
-#ifdef DSNET_COMPILING_E
-        if ( len != 20 * cur_length )
-          goto LABEL_105;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        if ( len != 8 * cur_length )
-          goto LABEL_101;
-#endif /* DSNET_COMPILING_I */
-        for ( i_1 = 0; cur_length > i_1; ++i_1 )
-        {
-#ifdef DSNET_COMPILING_E
-          v19 = rh[2];
-          v20 = rh[3];
-          v21 = rh[4];
-          if ( rh->kind <= 0xAu && rh->number <= 0x1Fu )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          if ( rh->kind <= 9u && rh->number <= 0x1Fu )
-#endif /* DSNET_COMPILING_I */
-          {
-#ifdef DSNET_COMPILING_E
-            v5 = &regbuf_vals[rh->kind][rh->number];
-            v5->xa[0] = ((unsigned int *)(&rh[1]))[0];
-            v5->xa[1] = ((unsigned int *)(&v19))[0];
-            v5->xa[2] = ((unsigned int *)(&v20))[0];
-            v5->xa[3] = ((unsigned int *)(&v21))[0];
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-            regbuf_vals[rh->kind][rh->number] = ((unsigned int *)(&rh[1]))[0];
-#endif /* DSNET_COMPILING_I */
-            regbuf_mask[rh->kind] |= 1 << rh->number;
+          iload_callback(*(int*)&d->data[0], d->dbg.type, &d->data[4], len - 4);
+          break;
+        default:
+          break;
+      }
+      break;
+    case DBGP_GROUP_SYSTEM:
+      switch(d->dbg.type) {
+        case DBGP_TYPE_GETCONFR:
+          if (len > cur_length) {
+            len = cur_length;
           }
-#ifdef DSNET_COMPILING_E
-          rh += 5;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          rh += 2;
-#endif /* DSNET_COMPILING_I */
-        }
-#ifdef DSNET_COMPILING_E
-        goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-      case 9:
-        if ( len != cur_padding + cur_length + 12 )
-#ifdef DSNET_COMPILING_E
-          goto LABEL_105;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_101;
-#endif /* DSNET_COMPILING_I */
-        memcpy(cur_pointer, &db->buf[cur_padding + 28], cur_length);
-#ifdef DSNET_COMPILING_E
-        goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-      case 0xB:
-        if ( len == 12 )
-#ifdef DSNET_COMPILING_E
-          goto LABEL_104;
-        goto LABEL_105;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_100;
-        goto LABEL_101;
-#endif /* DSNET_COMPILING_I */
-      case 0x11:
-        if ( len > (unsigned int)(8 * cur_length) || len != 8 * (unsigned __int8)db->buf[13] )
-#ifdef DSNET_COMPILING_E
-          goto LABEL_105;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_101;
-#endif /* DSNET_COMPILING_I */
-        wp_1 = (unsigned int *)&db->buf[16];
-        for ( i_2 = 0; i_2 < (unsigned __int8)db->buf[13]; ++i_2 )
-        {
-          *((_DWORD *)cur_pointer + 2 * i_2) = *wp_1;
-          *((_DWORD *)cur_pointer + 2 * i_2 + 1) = wp_1[1];
-          wp_1 += 2;
-        }
-        if ( cur_count_pointer )
-          *cur_count_pointer = (unsigned __int8)db->buf[13];
-#ifdef DSNET_COMPILING_E
-        goto LABEL_104;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        goto LABEL_100;
-#endif /* DSNET_COMPILING_I */
-      case 0x13:
-        if ( !len )
-#ifdef DSNET_COMPILING_E
-          goto LABEL_104;
-        goto LABEL_105;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_100;
-        goto LABEL_101;
-#endif /* DSNET_COMPILING_I */
-      case 0x15:
-        if ( !len )
-#ifdef DSNET_COMPILING_E
-          goto LABEL_104;
-        goto LABEL_105;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_100;
-        goto LABEL_101;
-#endif /* DSNET_COMPILING_I */
-      case 0x17:
-        if ( len )
-#ifdef DSNET_COMPILING_E
-          goto LABEL_105;
-        goto LABEL_71;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_101;
-        goto LABEL_67;
-#endif /* DSNET_COMPILING_I */
-      case 0x19:
-        if ( len )
-#ifdef DSNET_COMPILING_E
-          goto LABEL_105;
-        goto LABEL_71;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_101;
-LABEL_67:
-        result = ds_free_buf(db);
+          memcpy(cur_pointer, d->data, len);
+          // weird leftover non-op loop was here. byte swap for big-endian systems?
+          break;
+        case DBGP_TYPE_GETREGR: {
+          regtype* dst;
+          struct {
+            DBGP_REG rhdr;
+            regtype rdata;
+          } *src;
+
+          if (len != (TARGET_REG_BYTES + sizeof(DBGP_REG)) * cur_length) {
+            goto einval;
+          }
+
+          src = (void *)d->data;
+          dst = (void *)cur_pointer;
+
+          for (int i = 0; i < cur_length; i++) {
+            if (src->rhdr.kind < TARGET_REG_NUM_KIND &&
+                src->rhdr.number < TARGET_REG_COUNT) {
+              regbuf_vals[src->rhdr.kind][src->rhdr.number] = src->rdata;
+              regbuf_mask[src->rhdr.kind] |= 1 << src->rhdr.number;
+
+            }
+
+            dst[i] = src[i].rdata;
+          }
+        } break;
+        case DBGP_TYPE_PUTREGR: {
+          struct {
+            DBGP_REG rhdr;
+            regtype rdata;
+          } *src;
+
+          if (len != (TARGET_REG_BYTES + sizeof(DBGP_REG)) * cur_length) {
+            goto einval;
+          }
+
+          src = (void *)d->data;
+          for (int i = 0; i < cur_length; i++) {
+            if (src->rhdr.kind < TARGET_REG_NUM_KIND &&
+                src->rhdr.number < TARGET_REG_COUNT) {
+              regbuf_vals[src->rhdr.kind][src->rhdr.number] = src->rdata;
+              regbuf_mask[src->rhdr.kind] |= 1 << src->rhdr.number;
+
+            }
+          }
+        } break;
+        case DBGP_TYPE_RDMEMR:
+            if (len != cur_padding + cur_length + sizeof(DBGP_MEM)) {
+              goto einval;
+            }
+            memcpy(cur_pointer, &d->data[sizeof(DBGP_MEM) + cur_padding], cur_length);
+            break;
+        case DBGP_TYPE_WRMEMR:
+            if (len != sizeof(DBGP_MEM)) {
+              goto einval;
+            }
+            break;
+        case DBGP_TYPE_GETBRKPTR: {
+            DBGP_BRKPT_DATA *src, *dst;
+            if (len > sizeof(DBGP_BRKPT_DATA) * cur_length ||
+                len != sizeof(DBGP_BRKPT_DATA) * d->dbg.count) {
+              goto einval;
+            }
+
+            src = (DBGP_BRKPT_DATA *)d->data;
+            dst = cur_pointer;
+            for (int i = 0; i < d->dbg.count; i++) {
+              dst[i] = src[i];
+            }
+
+            if (cur_count_pointer) {
+              *cur_count_pointer = d->dbg.count;
+            }
+        } break;
+        case DBGP_TYPE_PUTBRKPTR:
+        case DBGP_TYPE_BREAKR:
+            if (len != 0) {
+              goto einval;
+            }
+            break;
+        case DBGP_TYPE_CONTINUER:
+        case DBGP_TYPE_RUNR:
+            if (len != 0) {
+              goto einval;
+            }
+            return ds_free_buf(db);
         break;
-#endif /* DSNET_COMPILING_I */
-      case 0x21:
-        if ( len == 12 )
+        case DBGP_TYPE_XGKTCTLR:
+            if (len != sizeof(DBGP_XGKT_DATA)) {
+              goto einval;
+            }
+            break;
+        case DBGP_TYPE_DBGCTLR:
+            if (len != 4) {
+              goto einval;
+            }
+            break;
 #ifdef DSNET_COMPILING_E
-          goto LABEL_104;
-        goto LABEL_105;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_100;
-        goto LABEL_101;
-#endif /* DSNET_COMPILING_I */
-      case 0x25:
-        if ( len == 4 )
-#ifdef DSNET_COMPILING_E
-          goto LABEL_104;
-        goto LABEL_105;
-      case 0x29:
-        db = recv_rdimg(db);
-        if ( !rdimg_stream )
-          goto LABEL_104;
-LABEL_71:
-        result = ds_free_buf(db);
-        break;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_100;
-        goto LABEL_101;
-#endif /* DSNET_COMPILING_I */
-      case 0x2F:
-        if ( len == 4 )
-#ifdef DSNET_COMPILING_E
-          goto LABEL_104;
-        goto LABEL_105;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          goto LABEL_100;
-        goto LABEL_101;
-#endif /* DSNET_COMPILING_I */
-      default:
-        result = db;
-        break;
-    }
+        case DBGP_TYPE_RDIMGR:
+            db = recv_rdimg(db);
+            if (rdimg_stream) {
+              return ds_free_buf(db);
+            }
+            break;
+#endif
+        case DBGP_TYPE_SETBPFUNCR:
+            if (len != 4) {
+              goto einval;
+            }
+            break;
+        default:
+            return db;
+            break;
+      }
+      break;
+    default:
+      break;
   }
-  return result;
+
+  cur_state &= ~( 1 | 2 );
+  cur_state |= STATE_OK;
+  return ds_free_buf(db);
+
+  einval:
+  cur_state &= ~( 1 | 2 );
+  cur_state |= STATE_INVALID_REPLY;
+  return ds_free_buf(db);
 }
 
 static void __cdecl print_state_errors(char *fmt)
