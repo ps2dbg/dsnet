@@ -297,15 +297,15 @@ typedef struct {
     unsigned int ncont;
     unsigned int nstep;
     unsigned int nnext;
-    struct __anon_struct_19 {
+    struct {
         unsigned int mem_limit_align;
         unsigned int mem_limit_size;
-    } v1;
-    struct __anon_struct_20 {
+    };
+    struct {
         unsigned int run_stop_state;
         unsigned int hdbg_area_addr;
         unsigned int hdbg_area_size;
-    } v3;
+    };
 } DBGP_CONF_DATA;
 typedef struct {
     unsigned char space;

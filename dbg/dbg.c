@@ -20,30 +20,23 @@ static int to_usec = -1;
 static int need_getconf = 0;
 DBGP_CONF_DATA dbconf =
 {
-  3u,
-  0u,
-#ifdef DSNET_COMPILING_E
-  560u,
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  304u,
-#endif /* DSNET_COMPILING_I */
-  0u,
-  1u,
-  0u,
-#ifdef DSNET_COMPILING_E
-  7u,
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-  5u,
-#endif /* DSNET_COMPILING_I */
-  1u,
-  0u,
-  1u,
-  0u,
-  0u,
-  { 1u, 512u },
-  { 2u, 0u, 0u }
+  .major_ver = 3,
+  .minor_ver = 0,
+  .target_id = TARGET_SDBGP,
+  .reserved1 = 0,
+  .mem_align = 1,
+  .reserved2 = 0,
+  .reg_size = TARGET_REG_SIZE,
+  .nreg = 1,
+  .nbrkpt = 0,
+  .ncont = 1,
+  .nstep = 0,
+  .nnext = 0,
+  .mem_limit_align = 1,
+  .mem_limit_size = 512,
+  .run_stop_state = 2,
+  .hdbg_area_addr = 0,
+  .hdbg_area_size = 0,
 };
 static int dbconf_is_valid = 0;
 static int dbconf_max_mem_align = 0;
@@ -224,11 +217,11 @@ static void __cdecl print_prompt()
 
   if ( !f_batch || !no_kbd )
   {
-    if ( dbconf.v3.run_stop_state == 1 )
+    if ( dbconf.run_stop_state == 1 )
     {
       str = "R";
     }
-    else if ( dbconf.v3.run_stop_state == 2 )
+    else if ( dbconf.run_stop_state == 2 )
     {
       str = "S";
     }
@@ -686,11 +679,11 @@ static DSP_BUF *__cdecl recv_dbgp(DS_DESC *desc, DSP_BUF *db)
   if ( db->buf[10] == 21 )
   {
     ds_bzero(regbuf_mask, sizeof(regbuf_mask));
-    dbconf.v3.run_stop_state = 2;
+    dbconf.run_stop_state = 2;
   }
   else if ( db->buf[10] == 23 || db->buf[10] == 25 )
   {
-    dbconf.v3.run_stop_state = 1;
+    dbconf.run_stop_state = 1;
   }
 #ifdef DSNET_COMPILING_E
   if ( db->buf[10] == 35 )
@@ -1185,7 +1178,7 @@ LABEL_9:
     if ( (unsigned __int8)stype != 20 )
       goto LABEL_10;
 LABEL_8:
-    dbconf.v3.run_stop_state = -1;
+    dbconf.run_stop_state = -1;
     goto LABEL_9;
   }
   if ( (unsigned __int8)stype == 24 )
@@ -1332,10 +1325,10 @@ static int __cdecl rdwr_mem_align(int code, int align, int cpuid, int space, uns
     n_1 = ~amsk & (amsk + n - npad);
     if ( (unsigned int)(npad + n_1) > 0xFFE3 )
       n_1 -= asiz;
-    if ( (dbconf.v1.mem_limit_align & (1 << v19)) != 0
-      && dbconf.v1.mem_limit_size < n_1 + (~amsk & (unsigned int)(amsk + 28)) )
+    if ( (dbconf.mem_limit_align & (1 << v19)) != 0
+      && dbconf.mem_limit_size < n_1 + (~amsk & (unsigned int)(amsk + 28)) )
     {
-      n_1 = dbconf.v1.mem_limit_size - (~amsk & (amsk + 28));
+      n_1 = dbconf.mem_limit_size - (~amsk & (amsk + 28));
       if ( n_1 <= 0 )
         return ds_error("invalid mem_limit");
     }
@@ -1880,9 +1873,9 @@ int __cdecl put_brkpt(DBGP_BRKPT_DATA *bps, int n)
 
 int __cdecl is_target_is_running()
 {
-  if ( dbconf.v3.run_stop_state == 1 )
+  if ( dbconf.run_stop_state == 1 )
     return 1;
-  if ( dbconf.v3.run_stop_state == 2 )
+  if ( dbconf.run_stop_state == 2 )
     return 0;
   return -1;
 }
@@ -2358,12 +2351,12 @@ static int __cdecl show_dbconf(int ac, char **av)
   ds_printf("\nncont           = 0x%08x # %d", dbconf.ncont, dbconf.ncont);
   ds_printf("\nnstep           = 0x%08x # %d", dbconf.nstep, dbconf.nstep);
   ds_printf("\nnnext           = 0x%08x # %d", dbconf.nnext, dbconf.nnext);
-  ds_printf("\nmem_limit_align = 0x%08x # ", dbconf.v1.mem_limit_align);
+  ds_printf("\nmem_limit_align = 0x%08x # ", dbconf.mem_limit_align);
   print_align_list(dbconf.mem_align);
-  ds_printf("\nmem_limit_size  = 0x%08x # ", dbconf.v1.mem_limit_size);
-  print_size(dbconf.v1.mem_limit_size);
-  ds_printf("\nrun_stop_state  = 0x%08x # ", dbconf.v3.run_stop_state);
-  run_stop_state = dbconf.v3.run_stop_state;
+  ds_printf("\nmem_limit_size  = 0x%08x # ", dbconf.mem_limit_size);
+  print_size(dbconf.mem_limit_size);
+  ds_printf("\nrun_stop_state  = 0x%08x # ", dbconf.run_stop_state);
+  run_stop_state = dbconf.run_stop_state;
   if ( run_stop_state == 1 )
   {
     ds_printf("RUNNING");
@@ -2376,9 +2369,9 @@ static int __cdecl show_dbconf(int ac, char **av)
   {
     ds_printf("???????");
   }
-  ds_printf("\nhdbg_area_addr  = 0x%08x #", dbconf.v3.hdbg_area_addr);
-  ds_printf("\nhdbg_area_size  = 0x%08x # ", dbconf.v3.hdbg_area_size);
-  print_size(dbconf.v3.hdbg_area_size);
+  ds_printf("\nhdbg_area_addr  = 0x%08x #", dbconf.hdbg_area_addr);
+  ds_printf("\nhdbg_area_size  = 0x%08x # ", dbconf.hdbg_area_size);
+  print_size(dbconf.hdbg_area_size);
   ds_printf("\n");
   return 0;
 }
@@ -2842,7 +2835,7 @@ static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
     rdimg_stream = 0;
 #endif /* DSNET_COMPILING_E */
     ds_recv_drfp(desc, 0);
-    dbconf.v3.run_stop_state = 0;
+    dbconf.run_stop_state = 0;
     if ( (cur_state & 1) != 0 )
     {
       cur_state &= 0xFFFFFFFC;
