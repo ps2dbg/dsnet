@@ -10,11 +10,11 @@ static int to_usec = 0;
 
 static DS_DESC *target_desc;
 
-static void __cdecl show_status(NETMP_STATUS_DATA *status, int len);
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl usage(int f_true);
+static void show_status(NETMP_STATUS_DATA *status, int len);
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db);
+static int usage(int f_true);
 
-static void __cdecl show_status(NETMP_STATUS_DATA *status, int len)
+static void show_status(NETMP_STATUS_DATA *status, int len)
 {
   size_t v2; // eax
   signed int connect_time; // [esp+10h] [ebp-1010h]
@@ -51,7 +51,7 @@ static void __cdecl show_status(NETMP_STATUS_DATA *status, int len)
   }
 }
 
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   int n; // [esp+0h] [ebp-Ch]
@@ -107,7 +107,7 @@ LABEL_21:
   return ds_free_buf(db);
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -121,7 +121,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int r; // [esp+0h] [ebp-8h]
   char *target_name; // [esp+4h] [ebp-4h]

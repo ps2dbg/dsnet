@@ -117,30 +117,30 @@ static int m14_193;
 static int m15_194;
 static int m16_195;
 
-extern int __cdecl pa_getreg(unsigned int code, unsigned int *data);
-extern void __cdecl print_hex(char *bp, int offset, int cnt);
+extern int pa_getreg(unsigned int code, unsigned int *data);
+extern void print_hex(char *bp, int offset, int cnt);
 
-static int __cdecl pamp_error(unsigned int no);
-static void __cdecl batch(int ac, char **av);
-static DSP_BUF *__cdecl recv_pamp(DS_DESC *desc, DSP_BUF *db);
-static void __cdecl tty_flush_check(DSP_BUF *db);
-static DSP_BUF *__cdecl send_net(DS_DESC *desc, DSP_BUF *db, int proto);
-static DSP_BUF *__cdecl recv_target(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl usage(int f_true);
-static void __cdecl connect_dev(char *device_name, int f_first);
-static void __cdecl idle_func();
-static void __cdecl show_statics(int tb, int tst, int tut);
-static int __cdecl pa_puttrigpos(char **av);
-static int __cdecl pa_sr(int ac, char **av);
-static int __cdecl pa_getgif(unsigned int code, gifreg_t *gifreg);
-static int __cdecl pa_putgif(unsigned int code, gifreg_t *gifreg);
-static int __cdecl pa_putiopmem(unsigned int code, iopmem_t *pmem);
-static int __cdecl pa_putreg(unsigned int code, unsigned int value);
-static void __cdecl print_gifreg(gifreg_t *gifreg, unsigned int vblank);
-static void __cdecl print_trig_gif(unsigned int reg);
-static void __cdecl print_trig(unsigned int reg);
+static int pamp_error(unsigned int no);
+static void batch(int ac, char **av);
+static DSP_BUF *recv_pamp(DS_DESC *desc, DSP_BUF *db);
+static void tty_flush_check(DSP_BUF *db);
+static DSP_BUF *send_net(DS_DESC *desc, DSP_BUF *db, int proto);
+static DSP_BUF *recv_target(DS_DESC *desc, DSP_BUF *db);
+static int usage(int f_true);
+static void connect_dev(char *device_name, int f_first);
+static void idle_func();
+static void show_statics(int tb, int tst, int tut);
+static int pa_puttrigpos(char **av);
+static int pa_sr(int ac, char **av);
+static int pa_getgif(unsigned int code, gifreg_t *gifreg);
+static int pa_putgif(unsigned int code, gifreg_t *gifreg);
+static int pa_putiopmem(unsigned int code, iopmem_t *pmem);
+static int pa_putreg(unsigned int code, unsigned int value);
+static void print_gifreg(gifreg_t *gifreg, unsigned int vblank);
+static void print_trig_gif(unsigned int reg);
+static void print_trig(unsigned int reg);
 
-static int __cdecl pamp_error(unsigned int no)
+static int pamp_error(unsigned int no)
 {
   switch ( no )
   {
@@ -171,7 +171,7 @@ static int __cdecl pamp_error(unsigned int no)
   return 0;
 }
 
-static void __cdecl batch(int ac, char **av)
+static void batch(int ac, char **av)
 {
   int r; // [esp+4h] [ebp-40Ch]
   char *v3; // [esp+8h] [ebp-408h]
@@ -193,7 +193,7 @@ static void __cdecl batch(int ac, char **av)
   ds_exit(r);
 }
 
-static DSP_BUF *__cdecl recv_pamp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_pamp(DS_DESC *desc, DSP_BUF *db)
 {
   int len; // [esp+0h] [ebp-Ch]
   unsigned int *ph; // [esp+4h] [ebp-8h]
@@ -212,13 +212,13 @@ static DSP_BUF *__cdecl recv_pamp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static void __cdecl tty_flush_check(DSP_BUF *db)
+static void tty_flush_check(DSP_BUF *db)
 {
   if ( *(_WORD *)db->buf == 12 && (unsigned __int8)*(_DWORD *)&db->buf[8] == 1 )
     ds_flush_desc_by_proto(*(unsigned __int16 *)&db->buf[4]);
 }
 
-static DSP_BUF *__cdecl send_net(DS_DESC *desc, DSP_BUF *db, int proto)
+static DSP_BUF *send_net(DS_DESC *desc, DSP_BUF *db, int proto)
 {
   if ( proto > 527 && proto <= 543 || proto > 271 && proto <= 287 )
     tty_flush_check(db);
@@ -228,7 +228,7 @@ static DSP_BUF *__cdecl send_net(DS_DESC *desc, DSP_BUF *db, int proto)
     return ds_send_dcmp_error(desc, db, 1);
 }
 
-static DSP_BUF *__cdecl recv_target(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_target(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   DSP_BUF *result; // eax
@@ -279,7 +279,7 @@ LABEL_21:
   return result;
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -291,7 +291,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-static void __cdecl connect_dev(char *device_name, int f_first)
+static void connect_dev(char *device_name, int f_first)
 {
   if ( !argc && !no_kbd )
   {
@@ -310,18 +310,18 @@ static void __cdecl connect_dev(char *device_name, int f_first)
     ds_prompt();
 }
 
-static void __cdecl idle_func()
+static void idle_func()
 {
   if ( !target_desc )
     connect_dev(device_name, 0);
 }
 
-int __cdecl recv_pa_rdmem(int ac, char **av)
+int recv_pa_rdmem(int ac, char **av)
 {
   return 0;
 }
 
-int __cdecl pa_wait_cmd(int ac, char **av)
+int pa_wait_cmd(int ac, char **av)
 {
   unsigned int status; // [esp+0h] [ebp-4h] BYREF
 
@@ -336,7 +336,7 @@ int __cdecl pa_wait_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl pa_de(unsigned int *data, unsigned int offset, unsigned int size)
+int pa_de(unsigned int *data, unsigned int offset, unsigned int size)
 {
   int v4; // [esp+8h] [ebp-18h]
   int r; // [esp+Ch] [ebp-14h]
@@ -373,7 +373,7 @@ int __cdecl pa_de(unsigned int *data, unsigned int offset, unsigned int size)
   return v4;
 }
 
-int __cdecl pa_di(unsigned int *data, unsigned int offset, unsigned int size)
+int pa_di(unsigned int *data, unsigned int offset, unsigned int size)
 {
   int v4; // [esp+8h] [ebp-18h]
   int r; // [esp+Ch] [ebp-14h]
@@ -410,7 +410,7 @@ int __cdecl pa_di(unsigned int *data, unsigned int offset, unsigned int size)
   return v4;
 }
 
-int __cdecl pa_mem(unsigned int code, unsigned int *data, unsigned int offset, unsigned int count)
+int pa_mem(unsigned int code, unsigned int *data, unsigned int offset, unsigned int count)
 {
   int v5; // [esp+8h] [ebp-18h]
   int r; // [esp+Ch] [ebp-14h]
@@ -447,7 +447,7 @@ int __cdecl pa_mem(unsigned int code, unsigned int *data, unsigned int offset, u
   return v5;
 }
 
-int __cdecl pa_dg(unsigned int *data, unsigned int offset, unsigned int size)
+int pa_dg(unsigned int *data, unsigned int offset, unsigned int size)
 {
   int v4; // [esp+8h] [ebp-18h]
   int r; // [esp+Ch] [ebp-14h]
@@ -484,7 +484,7 @@ int __cdecl pa_dg(unsigned int *data, unsigned int offset, unsigned int size)
   return v4;
 }
 
-int __cdecl pa_dg_cmd(int ac, char **av)
+int pa_dg_cmd(int ac, char **av)
 {
   const char *v3; // eax
   const char *v4; // eax
@@ -564,7 +564,7 @@ LABEL_14:
   return 0;
 }
 
-int __cdecl pa_dgi_cmd(int ac, char **av)
+int pa_dgi_cmd(int ac, char **av)
 {
   unsigned int size; // [esp+0h] [ebp-8h] BYREF
   unsigned int offset; // [esp+4h] [ebp-4h] BYREF
@@ -604,7 +604,7 @@ LABEL_14:
   return 0;
 }
 
-int __cdecl pa_dii_cmd(int ac, char **av)
+int pa_dii_cmd(int ac, char **av)
 {
   unsigned int size; // [esp+0h] [ebp-8h] BYREF
   unsigned int offset; // [esp+4h] [ebp-4h] BYREF
@@ -644,7 +644,7 @@ LABEL_14:
   return 0;
 }
 
-void __cdecl print_hex(char *bp, int offset, int cnt)
+void print_hex(char *bp, int offset, int cnt)
 {
   const char *v3; // eax
   int v4; // eax
@@ -686,7 +686,7 @@ void __cdecl print_hex(char *bp, int offset, int cnt)
   }
 }
 
-int __cdecl pa_de_cmd(int ac, char **av)
+int pa_de_cmd(int ac, char **av)
 {
   unsigned int size; // [esp+0h] [ebp-8h] BYREF
   unsigned int offset; // [esp+4h] [ebp-4h] BYREF
@@ -715,7 +715,7 @@ int __cdecl pa_de_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl pa_dei_cmd(int ac, char **av)
+int pa_dei_cmd(int ac, char **av)
 {
   unsigned int size; // [esp+0h] [ebp-8h] BYREF
   unsigned int offset; // [esp+4h] [ebp-4h] BYREF
@@ -744,7 +744,7 @@ int __cdecl pa_dei_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl pa_di_cmd(int ac, char **av)
+int pa_di_cmd(int ac, char **av)
 {
   unsigned int size; // [esp+0h] [ebp-8h] BYREF
   unsigned int offset; // [esp+4h] [ebp-4h] BYREF
@@ -773,7 +773,7 @@ int __cdecl pa_di_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl pa_reset()
+int pa_reset()
 {
   int v1; // [esp+4h] [ebp-18h]
   int r; // [esp+8h] [ebp-14h]
@@ -813,7 +813,7 @@ int __cdecl pa_reset()
   }
 }
 
-int __cdecl pa_reset_cmd(int ac, char **av)
+int pa_reset_cmd(int ac, char **av)
 {
   if ( !ac )
     return 0;
@@ -823,7 +823,7 @@ int __cdecl pa_reset_cmd(int ac, char **av)
   return 0;
 }
 
-static void __cdecl show_statics(int tb, int tst, int tut)
+static void show_statics(int tb, int tst, int tut)
 {
   int v3; // [esp+Ch] [ebp-14h]
   int v4; // [esp+1Ch] [ebp-4h]
@@ -836,7 +836,7 @@ static void __cdecl show_statics(int tb, int tst, int tut)
   ds_printf("%d bytes %d.%03d sec %.1f kB/s\n", tb, v4 / 1000, v4 % 1000, (double)((long double)v3 / 1024.0));
 }
 
-int __cdecl pa_sg_cmd(int ac, char **av)
+int pa_sg_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-2Ch]
   int64_t u; // [esp+4h] [ebp-28h] BYREF
@@ -897,7 +897,7 @@ int __cdecl pa_sg_cmd(int ac, char **av)
   return v8;
 }
 
-int __cdecl pa_sgi_cmd(int ac, char **av)
+int pa_sgi_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
   int64_t tut; // [esp+4h] [ebp-24h] BYREF
@@ -956,7 +956,7 @@ int __cdecl pa_sgi_cmd(int ac, char **av)
   }
 }
 
-int __cdecl pa_sei_cmd(int ac, char **av)
+int pa_sei_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
   int64_t tut; // [esp+4h] [ebp-24h] BYREF
@@ -1015,7 +1015,7 @@ int __cdecl pa_sei_cmd(int ac, char **av)
   }
 }
 
-int __cdecl pa_sii_cmd(int ac, char **av)
+int pa_sii_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
   int64_t tut; // [esp+4h] [ebp-24h] BYREF
@@ -1074,7 +1074,7 @@ int __cdecl pa_sii_cmd(int ac, char **av)
   }
 }
 
-int __cdecl pa_si_cmd(int ac, char **av)
+int pa_si_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
   int64_t u; // [esp+4h] [ebp-24h] BYREF
@@ -1133,12 +1133,12 @@ int __cdecl pa_si_cmd(int ac, char **av)
   }
 }
 
-int __cdecl pa_save_cmd(int ac, char **av)
+int pa_save_cmd(int ac, char **av)
 {
   return 0;
 }
 
-int __cdecl pa_se_cmd(int ac, char **av)
+int pa_se_cmd(int ac, char **av)
 {
   char *ptr; // [esp+0h] [ebp-28h]
   int64_t u; // [esp+4h] [ebp-24h] BYREF
@@ -1197,7 +1197,7 @@ int __cdecl pa_se_cmd(int ac, char **av)
   }
 }
 
-int __cdecl pa_getreg(unsigned int code, unsigned int *data)
+int pa_getreg(unsigned int code, unsigned int *data)
 {
   int v3; // [esp+8h] [ebp-18h]
   int r; // [esp+Ch] [ebp-14h]
@@ -1242,7 +1242,7 @@ int __cdecl pa_getreg(unsigned int code, unsigned int *data)
   }
 }
 
-int __cdecl pa_dr(unsigned int addr, unsigned int *data)
+int pa_dr(unsigned int addr, unsigned int *data)
 {
   int v3; // [esp+8h] [ebp-18h]
   int r; // [esp+Ch] [ebp-14h]
@@ -1287,7 +1287,7 @@ int __cdecl pa_dr(unsigned int addr, unsigned int *data)
   }
 }
 
-int __cdecl pa_start()
+int pa_start()
 {
   int v1; // [esp+4h] [ebp-18h]
   int r; // [esp+8h] [ebp-14h]
@@ -1327,7 +1327,7 @@ int __cdecl pa_start()
   }
 }
 
-int __cdecl pa_stop()
+int pa_stop()
 {
   int v1; // [esp+4h] [ebp-18h]
   int r; // [esp+8h] [ebp-14h]
@@ -1367,7 +1367,7 @@ int __cdecl pa_stop()
   }
 }
 
-int __cdecl pa_ver(unsigned int *data)
+int pa_ver(unsigned int *data)
 {
   int v2; // [esp+4h] [ebp-18h]
   int r; // [esp+8h] [ebp-14h]
@@ -1398,7 +1398,7 @@ int __cdecl pa_ver(unsigned int *data)
   return v2;
 }
 
-int __cdecl pa_dr_default()
+int pa_dr_default()
 {
   unsigned int value; // [esp+0h] [ebp-4h] BYREF
 
@@ -1553,7 +1553,7 @@ int __cdecl pa_dr_default()
   return 0;
 }
 
-int __cdecl pa_ver_cmd(int ac, char **av)
+int pa_ver_cmd(int ac, char **av)
 {
   if ( ac && ac != 1 )
     return ds_error("Usage: ver ");
@@ -1571,7 +1571,7 @@ int __cdecl pa_ver_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl pa_start_cmd(int ac, char **av)
+int pa_start_cmd(int ac, char **av)
 {
   if ( ac == 1 || !ac )
     return pa_start();
@@ -1579,7 +1579,7 @@ int __cdecl pa_start_cmd(int ac, char **av)
     return ds_error("Usage: start");
 }
 
-int __cdecl pa_stop_cmd(int ac, char **av)
+int pa_stop_cmd(int ac, char **av)
 {
   if ( ac != 1 && ac )
     return ds_error("Usage: stop");
@@ -1587,7 +1587,7 @@ int __cdecl pa_stop_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl pa_dr_cmd(int ac, char **av)
+int pa_dr_cmd(int ac, char **av)
 {
   unsigned int data; // [esp+0h] [ebp-8h] BYREF
   unsigned int addr; // [esp+4h] [ebp-4h] BYREF
@@ -1610,7 +1610,7 @@ int __cdecl pa_dr_cmd(int ac, char **av)
   return 0;
 }
 
-static int __cdecl pa_puttrigpos(char **av)
+static int pa_puttrigpos(char **av)
 {
   int r; // [esp+4h] [ebp-18h]
   unsigned int pos; // [esp+8h] [ebp-14h] BYREF
@@ -1657,7 +1657,7 @@ static int __cdecl pa_puttrigpos(char **av)
   }
 }
 
-static int __cdecl pa_sr(int ac, char **av)
+static int pa_sr(int ac, char **av)
 {
   int v3; // [esp+4h] [ebp-1Ch]
   unsigned int data; // [esp+8h] [ebp-18h] BYREF
@@ -1706,7 +1706,7 @@ static int __cdecl pa_sr(int ac, char **av)
   }
 }
 
-int __cdecl Compare(trig_st *s, int count, char *str, unsigned int *val)
+int Compare(trig_st *s, int count, char *str, unsigned int *val)
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -1718,7 +1718,7 @@ int __cdecl Compare(trig_st *s, int count, char *str, unsigned int *val)
   return 1;
 }
 
-int __cdecl pa_gettrigpos(unsigned int *data)
+int pa_gettrigpos(unsigned int *data)
 {
   int v2; // [esp+8h] [ebp-18h]
   int r; // [esp+Ch] [ebp-14h]
@@ -1763,7 +1763,7 @@ int __cdecl pa_gettrigpos(unsigned int *data)
   }
 }
 
-static int __cdecl pa_getgif(unsigned int code, gifreg_t *gifreg)
+static int pa_getgif(unsigned int code, gifreg_t *gifreg)
 {
   int r; // [esp+10h] [ebp-14h]
   DSP_BUF *db; // [esp+18h] [ebp-Ch]
@@ -1801,7 +1801,7 @@ static int __cdecl pa_getgif(unsigned int code, gifreg_t *gifreg)
   }
 }
 
-static int __cdecl pa_putgif(unsigned int code, gifreg_t *gifreg)
+static int pa_putgif(unsigned int code, gifreg_t *gifreg)
 {
   int r; // [esp+10h] [ebp-14h]
   DSP_BUF *db; // [esp+18h] [ebp-Ch]
@@ -1838,7 +1838,7 @@ static int __cdecl pa_putgif(unsigned int code, gifreg_t *gifreg)
   }
 }
 
-static int __cdecl pa_putiopmem(unsigned int code, iopmem_t *pmem)
+static int pa_putiopmem(unsigned int code, iopmem_t *pmem)
 {
   int r; // [esp+Ch] [ebp-14h]
   DSP_BUF *db; // [esp+14h] [ebp-Ch]
@@ -1877,7 +1877,7 @@ static int __cdecl pa_putiopmem(unsigned int code, iopmem_t *pmem)
   }
 }
 
-static int __cdecl pa_putreg(unsigned int code, unsigned int value)
+static int pa_putreg(unsigned int code, unsigned int value)
 {
   int r; // [esp+4h] [ebp-18h]
   DSP_BUF *db; // [esp+10h] [ebp-Ch]
@@ -1914,7 +1914,7 @@ static int __cdecl pa_putreg(unsigned int code, unsigned int value)
   }
 }
 
-static void __cdecl print_gifreg(gifreg_t *gifreg, unsigned int vblank)
+static void print_gifreg(gifreg_t *gifreg, unsigned int vblank)
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -1949,7 +1949,7 @@ static void __cdecl print_gifreg(gifreg_t *gifreg, unsigned int vblank)
   ds_printf(" ]");
 }
 
-static void __cdecl print_trig_gif(unsigned int reg)
+static void print_trig_gif(unsigned int reg)
 {
   unsigned int vblank; // [esp+0h] [ebp-1Ch] BYREF
   gifreg_t gifreg; // [esp+4h] [ebp-18h] BYREF
@@ -1964,13 +1964,13 @@ static void __cdecl print_trig_gif(unsigned int reg)
     print_gifreg(&gifreg, vblank);
 }
 
-static void __cdecl print_trig(unsigned int reg)
+static void print_trig(unsigned int reg)
 {
   if ( reg != -2147483647 && reg > 0x80000001 && (reg == -2147483646 || reg == -2147483644) )
     print_trig_gif(reg);
 }
 
-int __cdecl pa_trig_get_cmd(int ac, char **av)
+int pa_trig_get_cmd(int ac, char **av)
 {
   unsigned int pos; // [esp+0h] [ebp-10h] BYREF
   unsigned int value; // [esp+4h] [ebp-Ch] BYREF
@@ -2003,7 +2003,7 @@ int __cdecl pa_trig_get_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl pa_trig_put_gif_cmd(int ac, char **av)
+int pa_trig_put_gif_cmd(int ac, char **av)
 {
   char *v2; // eax
   char *v3; // eax
@@ -2176,7 +2176,7 @@ LABEL_80:
 }
 
 // local variable allocation has failed, the output may be wrong!
-int __cdecl pa_trig_put_iop_cmd(int ac, char **av)
+int pa_trig_put_iop_cmd(int ac, char **av)
 {
   char *v2; // eax
   char *v3; // eax
@@ -2381,7 +2381,7 @@ LABEL_96:
     return 0;
 }
 
-int __cdecl pa_trig_put_cmd(int ac, char **av)
+int pa_trig_put_cmd(int ac, char **av)
 {
   int i; // [esp+0h] [ebp-Ch]
   int i_1; // [esp+0h] [ebp-Ch]
@@ -2415,7 +2415,7 @@ int __cdecl pa_trig_put_cmd(int ac, char **av)
   return pa_putreg(code, value);
 }
 
-int __cdecl pa_sr_cmd(int ac, char **av)
+int pa_sr_cmd(int ac, char **av)
 {
   if ( ac != 3 )
     return ds_error("Usage: sr <reg> <val>");
@@ -2423,7 +2423,7 @@ int __cdecl pa_sr_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl pa_trigpos_cmd(int ac, char **av)
+int pa_trigpos_cmd(int ac, char **av)
 {
   if ( ac != 2 )
     return ds_error("Usage: trigpos [<val>]");
@@ -2431,7 +2431,7 @@ int __cdecl pa_trigpos_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl pa_ce_cmd(int ac, char **av)
+int pa_ce_cmd(int ac, char **av)
 {
   char *p; // [esp+0h] [ebp-24h]
   int v4; // [esp+4h] [ebp-20h]
@@ -2480,7 +2480,7 @@ int __cdecl pa_ce_cmd(int ac, char **av)
   }
 }
 
-int __cdecl pa_cei_cmd(int ac, char **av)
+int pa_cei_cmd(int ac, char **av)
 {
   char *bp; // [esp+0h] [ebp-30h]
   int v4; // [esp+4h] [ebp-2Ch]
@@ -2534,7 +2534,7 @@ int __cdecl pa_cei_cmd(int ac, char **av)
   }
 }
 
-int __cdecl pa_cgi_cmd(int ac, char **av)
+int pa_cgi_cmd(int ac, char **av)
 {
   char *bp; // [esp+0h] [ebp-24h]
   int ret; // [esp+4h] [ebp-20h]
@@ -2607,7 +2607,7 @@ int __cdecl pa_cgi_cmd(int ac, char **av)
   return ret;
 }
 
-int __cdecl pa_cii_cmd(int ac, char **av)
+int pa_cii_cmd(int ac, char **av)
 {
   char *bp; // [esp+0h] [ebp-334h]
   int ret; // [esp+4h] [ebp-330h]
@@ -2658,7 +2658,7 @@ int __cdecl pa_cii_cmd(int ac, char **av)
   }
 }
 
-int __cdecl pa_cr_cmd(int ac, char **av)
+int pa_cr_cmd(int ac, char **av)
 {
   unsigned int data; // [esp+0h] [ebp-18h] BYREF
   unsigned int v4; // [esp+4h] [ebp-14h] BYREF
@@ -2695,7 +2695,7 @@ int __cdecl pa_cr_cmd(int ac, char **av)
   return m_result;
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int argc_; // [esp+Ch] [ebp+8h]
   char **argv_; // [esp+10h] [ebp+Ch]

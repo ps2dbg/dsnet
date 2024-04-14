@@ -1,11 +1,11 @@
 #include "dsnet_prototypes.h"
 
-static int __cdecl getport_net(char *portp);
-static int __cdecl getaddr_net(char *name, struct sockaddr_in *sin);
-static int __cdecl setup_net(int s);
-static DS_DESC *__cdecl ds_open_dev(char *name, DS_RECV_FUNC *recv_func);
+static int getport_net(char *portp);
+static int getaddr_net(char *name, struct sockaddr_in *sin);
+static int setup_net(int s);
+static DS_DESC *ds_open_dev(char *name, DS_RECV_FUNC *recv_func);
 
-static int __cdecl getport_net(char *portp)
+static int getport_net(char *portp)
 {
   int v1; // eax
   int f_rel; // [esp+0h] [ebp-10h]
@@ -59,7 +59,7 @@ static int __cdecl getport_net(char *portp)
   return htons(value);
 }
 
-static int __cdecl getaddr_net(char *name, struct sockaddr_in *sin)
+static int getaddr_net(char *name, struct sockaddr_in *sin)
 {
   unsigned __int16 v3; // ax
   int n; // [esp+0h] [ebp-54h]
@@ -110,7 +110,7 @@ static int __cdecl getaddr_net(char *name, struct sockaddr_in *sin)
     return -1;
 }
 
-static int __cdecl setup_net(int s)
+static int setup_net(int s)
 {
   char *v3; // eax
   int flag; // [esp+0h] [ebp-Ch]
@@ -145,7 +145,7 @@ static int __cdecl setup_net(int s)
   return 0;
 }
 
-static DS_DESC *__cdecl ds_open_dev(char *name, DS_RECV_FUNC *recv_func)
+static DS_DESC *ds_open_dev(char *name, DS_RECV_FUNC *recv_func)
 {
   int fd; // [esp+0h] [ebp-4h]
 
@@ -170,7 +170,7 @@ static DS_DESC *__cdecl ds_open_dev(char *name, DS_RECV_FUNC *recv_func)
   }
 }
 
-DS_DESC *__cdecl ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
+DS_DESC *ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
 {
   char *addr; // eax
   int port; // [esp-4h] [ebp-474h]
@@ -221,7 +221,7 @@ DS_DESC *__cdecl ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
   return ds_add_select_list(16, fd, name, 0, recv_func);
 }
 
-DS_DESC *__cdecl ds_listen_net(char *portp, int (__cdecl *accept_func)(DS_DESC *desc))
+DS_DESC *ds_listen_net(char *portp, int (*accept_func)(DS_DESC *desc))
 {
   char *addr; // eax
   int port; // [esp-4h] [ebp-41Ch]
@@ -275,7 +275,7 @@ DS_DESC *__cdecl ds_listen_net(char *portp, int (__cdecl *accept_func)(DS_DESC *
   return ds_add_select_list(4, fd, name, accept_func, 0);
 }
 
-DS_DESC *__cdecl ds_accept(int s, int (__cdecl *accept_func)(DS_DESC *desc))
+DS_DESC *ds_accept(int s, int (*accept_func)(DS_DESC *desc))
 {
   char *v3; // eax
   int v4; // [esp-4h] [ebp-41Ch]

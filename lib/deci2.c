@@ -2,7 +2,7 @@
 
 unsigned char ds_sid = 72u;
 
-DSP_BUF *__cdecl ds_alloc_buf(int proto, int did, void *ptr, int len)
+DSP_BUF *ds_alloc_buf(int proto, int did, void *ptr, int len)
 {
   DSP_BUF *db; // [esp+Ch] [ebp-8h]
 
@@ -35,12 +35,12 @@ DSP_BUF *__cdecl ds_alloc_buf(int proto, int did, void *ptr, int len)
   }
 }
 
-DSP_BUF *__cdecl ds_free_buf(DSP_BUF *db)
+DSP_BUF *ds_free_buf(DSP_BUF *db)
 {
   return (DSP_BUF *)ds_free(db);
 }
 
-DSP_BUF *__cdecl ds_dup_buf(DSP_BUF *db)
+DSP_BUF *ds_dup_buf(DSP_BUF *db)
 {
   int len; // [esp+0h] [ebp-Ch]
   DSP_BUF *r; // [esp+8h] [ebp-4h]

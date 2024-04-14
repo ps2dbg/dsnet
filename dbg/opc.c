@@ -793,11 +793,11 @@ OPCODE opcodes[] =
   { NULL, 0x00000000, 0x00000000, 0x0 },
 };
 
-static char *__cdecl detect_load_32bits(char *bp, unsigned int adr, unsigned int inst, unsigned int next);
-static int __cdecl tabs(char *buf, char *bp);
-static char *__cdecl func_and_line(char *bp, unsigned int adr, int kind);
-static char *__cdecl source_line(unsigned int adr, char **pfile, int *pline);
-static char *__cdecl disasm(
+static char *detect_load_32bits(char *bp, unsigned int adr, unsigned int inst, unsigned int next);
+static int tabs(char *buf, char *bp);
+static char *func_and_line(char *bp, unsigned int adr, int kind);
+static char *source_line(unsigned int adr, char **pfile, int *pline);
+static char *disasm(
         char *buf,
         unsigned int adr,
         unsigned int prev,
@@ -807,18 +807,18 @@ static char *__cdecl disasm(
         int f_iw,
         int f_ba,
         int f_ma);
-static void __cdecl display_symbol_once(char *old, unsigned int adr, int f_iw, int f_adr);
-static int __cdecl name_regno(int kind, int z, char *name, int *pval);
-static int __cdecl assemble_pseudo_instruction(char *name, char *bp, unsigned int *ovals, int olen);
-static int __cdecl assemble(char *buf, unsigned int *ovals, int olen, int f_ma);
-static void __cdecl clear_bts();
-static BT *__cdecl append_bt(unsigned int adr, unsigned int sp);
-static int __cdecl bt_fetch_word(unsigned int adr, unsigned int *pval);
-static int __cdecl backtrace_to_end_of_prologue(unsigned __int8 *ins_buf, unsigned int adr0, BT_REG *br);
-static int __cdecl backtrace_to_top_of_function(unsigned __int8 *ins_buf, unsigned int adr0, BT_REG *br, BT *bt);
-static int __cdecl backtrace_to_prev_function(BT_REG *br);
+static void display_symbol_once(char *old, unsigned int adr, int f_iw, int f_adr);
+static int name_regno(int kind, int z, char *name, int *pval);
+static int assemble_pseudo_instruction(char *name, char *bp, unsigned int *ovals, int olen);
+static int assemble(char *buf, unsigned int *ovals, int olen, int f_ma);
+static void clear_bts();
+static BT *append_bt(unsigned int adr, unsigned int sp);
+static int bt_fetch_word(unsigned int adr, unsigned int *pval);
+static int backtrace_to_end_of_prologue(unsigned __int8 *ins_buf, unsigned int adr0, BT_REG *br);
+static int backtrace_to_top_of_function(unsigned __int8 *ins_buf, unsigned int adr0, BT_REG *br, BT *bt);
+static int backtrace_to_prev_function(BT_REG *br);
 
-int __cdecl is_branch_instruction(unsigned int adr, unsigned int ins, unsigned int *ptadr)
+int is_branch_instruction(unsigned int adr, unsigned int ins, unsigned int *ptadr)
 {
   unsigned int v3; // edx
   quad pq; // [esp+Ch] [ebp-1Ch] BYREF
@@ -862,7 +862,7 @@ int __cdecl is_branch_instruction(unsigned int adr, unsigned int ins, unsigned i
   }
 }
 
-static char *__cdecl detect_load_32bits(char *bp, unsigned int adr, unsigned int inst, unsigned int next)
+static char *detect_load_32bits(char *bp, unsigned int adr, unsigned int inst, unsigned int next)
 {
   unsigned int v4; // eax
   char *result; // eax
@@ -956,12 +956,12 @@ LABEL_30:
   return result;
 }
 
-static int __cdecl tabs(char *buf, char *bp)
+static int tabs(char *buf, char *bp)
 {
   return ds_sprintf(bp, "%*s", 4 - (bp - buf) % 4, "");
 }
 
-static char *__cdecl func_and_line(char *bp, unsigned int adr, int kind)
+static char *func_and_line(char *bp, unsigned int adr, int kind)
 {
   int f_has; // [esp+0h] [ebp-Ch] BYREF
   int line; // [esp+4h] [ebp-8h] BYREF
@@ -990,7 +990,7 @@ static char *__cdecl func_and_line(char *bp, unsigned int adr, int kind)
   return bp;
 }
 
-static char *__cdecl source_line(unsigned int adr, char **pfile, int *pline)
+static char *source_line(unsigned int adr, char **pfile, int *pline)
 {
   int line; // [esp+0h] [ebp-Ch] BYREF
   char *obj_path; // [esp+4h] [ebp-8h] BYREF
@@ -1008,7 +1008,7 @@ static char *__cdecl source_line(unsigned int adr, char **pfile, int *pline)
   return string_by_file_and_line(file, line, obj_path);
 }
 
-static char *__cdecl disasm(
+static char *disasm(
         char *buf,
         unsigned int adr,
         unsigned int prev,
@@ -1474,7 +1474,7 @@ LABEL_84:
   return buf;
 }
 
-static void __cdecl display_symbol_once(char *old, unsigned int adr, int f_iw, int f_adr)
+static void display_symbol_once(char *old, unsigned int adr, int f_iw, int f_adr)
 {
   int line; // [esp+4h] [ebp-C10h] BYREF
   char *sl; // [esp+8h] [ebp-C0Ch]
@@ -1517,7 +1517,7 @@ LABEL_16:
   strcpy(old, v9);
 }
 
-int __cdecl di_cmd(int ac, char **av)
+int di_cmd(int ac, char **av)
 {
   int v2; // eax
   const char *v4; // eax
@@ -1650,7 +1650,7 @@ int __cdecl di_cmd(int ac, char **av)
   return 0;
 }
 
-static int __cdecl name_regno(int kind, int z, char *name, int *pval)
+static int name_regno(int kind, int z, char *name, int *pval)
 {
   int v6; // eax
   int v7; // eax
@@ -1717,7 +1717,7 @@ static int __cdecl name_regno(int kind, int z, char *name, int *pval)
   }
 }
 
-static int __cdecl assemble_pseudo_instruction(char *name, char *bp, unsigned int *ovals, int olen)
+static int assemble_pseudo_instruction(char *name, char *bp, unsigned int *ovals, int olen)
 {
   int v4; // eax
   char _c; // [esp+Bh] [ebp-815h]
@@ -1812,7 +1812,7 @@ LABEL_59:
   return ds_error("invalid pseudo instrution - %s", name);
 }
 
-static int __cdecl assemble(char *buf, unsigned int *ovals, int olen, int f_ma)
+static int assemble(char *buf, unsigned int *ovals, int olen, int f_ma)
 {
   int v4; // eax
   int v5; // eax
@@ -2453,7 +2453,7 @@ LABEL_274:
   return 4;
 }
 
-int __cdecl as_cmd(int ac, char **av)
+int as_cmd(int ac, char **av)
 {
   int f_ma; // [esp+0h] [ebp-404h] BYREF
   char buf[1024]; // [esp+4h] [ebp-400h] BYREF
@@ -2490,7 +2490,7 @@ int __cdecl as_cmd(int ac, char **av)
     return -1;
 }
 
-static void __cdecl clear_bts()
+static void clear_bts()
 {
   BT *q; // [esp+0h] [ebp-8h]
   BT *p; // [esp+4h] [ebp-4h]
@@ -2505,7 +2505,7 @@ static void __cdecl clear_bts()
   bt_no = 0;
 }
 
-static BT *__cdecl append_bt(unsigned int adr, unsigned int sp)
+static BT *append_bt(unsigned int adr, unsigned int sp)
 {
   BT *tail; // edx
   BT *p; // [esp+4h] [ebp-4h]
@@ -2528,7 +2528,7 @@ static BT *__cdecl append_bt(unsigned int adr, unsigned int sp)
   return p;
 }
 
-int __cdecl eval_bt_reg(char *name, unsigned int *padr)
+int eval_bt_reg(char *name, unsigned int *padr)
 {
   unsigned int wv; // [esp+0h] [ebp-8h] BYREF
   BT *bt; // [esp+4h] [ebp-4h]
@@ -2546,7 +2546,7 @@ int __cdecl eval_bt_reg(char *name, unsigned int *padr)
   return ds_error("backtrace register not found - %s", name);
 }
 
-int __cdecl eval_sfa_reg(char *name, unsigned int *padr)
+int eval_sfa_reg(char *name, unsigned int *padr)
 {
   unsigned int wv; // [esp+0h] [ebp-8h] BYREF
   BT *bt; // [esp+4h] [ebp-4h]
@@ -2564,7 +2564,7 @@ int __cdecl eval_sfa_reg(char *name, unsigned int *padr)
   return ds_error("frame address register not found - %s", name);
 }
 
-int __cdecl eval_sfs_reg(char *name, unsigned int *padr)
+int eval_sfs_reg(char *name, unsigned int *padr)
 {
   unsigned int wv; // [esp+4h] [ebp-8h] BYREF
   BT *bt; // [esp+8h] [ebp-4h]
@@ -2582,7 +2582,7 @@ int __cdecl eval_sfs_reg(char *name, unsigned int *padr)
   return ds_error("frame size register not found - %s", name);
 }
 
-static int __cdecl bt_fetch_word(unsigned int adr, unsigned int *pval)
+static int bt_fetch_word(unsigned int adr, unsigned int *pval)
 {
   unsigned int val; // [esp+0h] [ebp-4h] BYREF
 
@@ -2592,7 +2592,7 @@ static int __cdecl bt_fetch_word(unsigned int adr, unsigned int *pval)
   return 0;
 }
 
-static int __cdecl backtrace_to_end_of_prologue(unsigned __int8 *ins_buf, unsigned int adr0, BT_REG *br)
+static int backtrace_to_end_of_prologue(unsigned __int8 *ins_buf, unsigned int adr0, BT_REG *br)
 {
   unsigned int adr; // [esp+4h] [ebp-4h]
 
@@ -2602,7 +2602,7 @@ static int __cdecl backtrace_to_end_of_prologue(unsigned __int8 *ins_buf, unsign
   return 0;
 }
 
-static int __cdecl backtrace_to_top_of_function(unsigned __int8 *ins_buf, unsigned int adr0, BT_REG *br, BT *bt)
+static int backtrace_to_top_of_function(unsigned __int8 *ins_buf, unsigned int adr0, BT_REG *br, BT *bt)
 {
   unsigned int sp; // esi
   unsigned int v5; // edx
@@ -2636,13 +2636,13 @@ static int __cdecl backtrace_to_top_of_function(unsigned __int8 *ins_buf, unsign
   return 0;
 }
 
-static int __cdecl backtrace_to_prev_function(BT_REG *br)
+static int backtrace_to_prev_function(BT_REG *br)
 {
   br->pc = br->ra - 8;
   return 0;
 }
 
-void __cdecl disp_bt(BT_REG *br, int cnt)
+void disp_bt(BT_REG *br, int cnt)
 {
   unsigned int adr1; // [esp+0h] [ebp-418h] BYREF
   unsigned int adr0; // [esp+4h] [ebp-414h] BYREF
@@ -2685,7 +2685,7 @@ void __cdecl disp_bt(BT_REG *br, int cnt)
   ds_free(ins_buf);
 }
 
-int __cdecl bt_cmd(int ac, char **av)
+int bt_cmd(int ac, char **av)
 {
   BT_REG br; // [esp+0h] [ebp-10h] BYREF
   int cnt; // [esp+Ch] [ebp-4h] BYREF

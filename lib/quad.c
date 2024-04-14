@@ -2,10 +2,10 @@
 
 quad ds_qzero = { { 0u, 0u, 0u, 0u } };
 
-static int __cdecl ds_qcmp(quad x, quad y);
-static int __cdecl ds_qdivide(quad *rdp, quad *rmp, quad x, quad y);
+static int ds_qcmp(quad x, quad y);
+static int ds_qdivide(quad *rdp, quad *rmp, quad x, quad y);
 
-twin __cdecl ds_cwt(unsigned int v)
+twin ds_cwt(unsigned int v)
 {
   twin result; // rax
   int v2; // [esp+14h] [ebp+Ch]
@@ -20,12 +20,12 @@ twin __cdecl ds_cwt(unsigned int v)
   return result;
 }
 
-unsigned int __cdecl ds_ctw(twin x)
+unsigned int ds_ctw(twin x)
 {
   return x.xa[0];
 }
 
-quad *__cdecl ds_cwq(quad *retstr, unsigned int v)
+quad *ds_cwq(quad *retstr, unsigned int v)
 {
   quad *result; // eax
 
@@ -37,12 +37,12 @@ quad *__cdecl ds_cwq(quad *retstr, unsigned int v)
   return result;
 }
 
-unsigned int __cdecl ds_cqw(quad x)
+unsigned int ds_cqw(quad x)
 {
   return x.xa[0];
 }
 
-quad *__cdecl ds_ctq(quad *retstr, twin v)
+quad *ds_ctq(quad *retstr, twin v)
 {
   quad *result; // eax
 
@@ -54,7 +54,7 @@ quad *__cdecl ds_ctq(quad *retstr, twin v)
   return result;
 }
 
-twin __cdecl ds_cqt(quad x)
+twin ds_cqt(quad x)
 {
   twin result; // rax
 
@@ -69,7 +69,7 @@ twin __cdecl ds_cqt(quad x)
   return result;
 }
 
-quad *__cdecl ds_qneg(quad *retstr, quad x)
+quad *ds_qneg(quad *retstr, quad x)
 {
   quad *result; // eax
 
@@ -81,7 +81,7 @@ quad *__cdecl ds_qneg(quad *retstr, quad x)
   return result;
 }
 
-quad *__cdecl ds_qor(quad *retstr, quad x, quad y)
+quad *ds_qor(quad *retstr, quad x, quad y)
 {
   quad *result; // eax
 
@@ -93,7 +93,7 @@ quad *__cdecl ds_qor(quad *retstr, quad x, quad y)
   return result;
 }
 
-quad *__cdecl ds_qxor(quad *retstr, quad x, quad y)
+quad *ds_qxor(quad *retstr, quad x, quad y)
 {
   quad *result; // eax
 
@@ -105,7 +105,7 @@ quad *__cdecl ds_qxor(quad *retstr, quad x, quad y)
   return result;
 }
 
-quad *__cdecl ds_qand(quad *retstr, quad x, quad y)
+quad *ds_qand(quad *retstr, quad x, quad y)
 {
   quad *result; // eax
 
@@ -117,7 +117,7 @@ quad *__cdecl ds_qand(quad *retstr, quad x, quad y)
   return result;
 }
 
-int __cdecl ds_qblt(quad x, quad y)
+int ds_qblt(quad x, quad y)
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -131,7 +131,7 @@ int __cdecl ds_qblt(quad x, quad y)
   return 0;
 }
 
-int __cdecl ds_qble(quad x, quad y)
+int ds_qble(quad x, quad y)
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -145,7 +145,7 @@ int __cdecl ds_qble(quad x, quad y)
   return 1;
 }
 
-int __cdecl ds_qbgt(quad x, quad y)
+int ds_qbgt(quad x, quad y)
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -159,7 +159,7 @@ int __cdecl ds_qbgt(quad x, quad y)
   return 0;
 }
 
-int __cdecl ds_qbge(quad x, quad y)
+int ds_qbge(quad x, quad y)
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -173,7 +173,7 @@ int __cdecl ds_qbge(quad x, quad y)
   return 1;
 }
 
-int __cdecl ds_qbeq(quad x, quad y)
+int ds_qbeq(quad x, quad y)
 {
   int result; // eax
 
@@ -183,7 +183,7 @@ int __cdecl ds_qbeq(quad x, quad y)
   return result;
 }
 
-quad *__cdecl ds_qshr(quad *retstr, quad x, quad y)
+quad *ds_qshr(quad *retstr, quad x, quad y)
 {
   unsigned int v3; // eax
   int sa; // [esp+8h] [ebp-14h]
@@ -221,7 +221,7 @@ quad *__cdecl ds_qshr(quad *retstr, quad x, quad y)
   return retstr;
 }
 
-quad *__cdecl ds_qshl(quad *retstr, quad x, quad y)
+quad *ds_qshl(quad *retstr, quad x, quad y)
 {
   unsigned int v3; // eax
   int sa; // [esp+8h] [ebp-14h]
@@ -259,7 +259,7 @@ quad *__cdecl ds_qshl(quad *retstr, quad x, quad y)
   return retstr;
 }
 
-quad *__cdecl ds_qadd(quad *retstr, quad x, quad y)
+quad *ds_qadd(quad *retstr, quad x, quad y)
 {
   unsigned int l; // [esp+4h] [ebp-14h]
   unsigned int l_1; // [esp+4h] [ebp-14h]
@@ -284,7 +284,7 @@ quad *__cdecl ds_qadd(quad *retstr, quad x, quad y)
   return retstr;
 }
 
-quad *__cdecl ds_qsub(quad *retstr, quad x, quad y)
+quad *ds_qsub(quad *retstr, quad x, quad y)
 {
   unsigned int l; // [esp+4h] [ebp-14h]
   unsigned int l_1; // [esp+4h] [ebp-14h]
@@ -309,7 +309,7 @@ quad *__cdecl ds_qsub(quad *retstr, quad x, quad y)
   return retstr;
 }
 
-quad *__cdecl ds_qmul(quad *retstr, quad x, quad y)
+quad *ds_qmul(quad *retstr, quad x, quad y)
 {
   quad v4; // [esp+8h] [ebp-48h] BYREF
   int n; // [esp+18h] [ebp-38h]
@@ -349,7 +349,7 @@ quad *__cdecl ds_qmul(quad *retstr, quad x, quad y)
   return retstr;
 }
 
-static int __cdecl ds_qcmp(quad x, quad y)
+static int ds_qcmp(quad x, quad y)
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -363,7 +363,7 @@ static int __cdecl ds_qcmp(quad x, quad y)
   return 0;
 }
 
-static int __cdecl ds_qdivide(quad *rdp, quad *rmp, quad x, quad y)
+static int ds_qdivide(quad *rdp, quad *rmp, quad x, quad y)
 {
   quad v5; // [esp+8h] [ebp-44h] BYREF
   quad v6; // [esp+18h] [ebp-34h] BYREF
@@ -399,7 +399,7 @@ static int __cdecl ds_qdivide(quad *rdp, quad *rmp, quad x, quad y)
   return 0;
 }
 
-quad *__cdecl ds_qdiv(quad *retstr, quad x, quad y)
+quad *ds_qdiv(quad *retstr, quad x, quad y)
 {
   quad rv; // [esp+4h] [ebp-10h] BYREF
 
@@ -408,7 +408,7 @@ quad *__cdecl ds_qdiv(quad *retstr, quad x, quad y)
   return retstr;
 }
 
-quad *__cdecl ds_qmod(quad *retstr, quad x, quad y)
+quad *ds_qmod(quad *retstr, quad x, quad y)
 {
   quad rv; // [esp+4h] [ebp-10h] BYREF
 

@@ -11,12 +11,12 @@ static int to_usec = 0;
 
 static DS_DESC *target_desc;
 
-static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db);
-static void __cdecl start_cons();
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl usage(int f_true);
+static DSP_BUF *recv_ttyp(DS_DESC *desc, DSP_BUF *db);
+static void start_cons();
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db);
+static int usage(int f_true);
 
-static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_ttyp(DS_DESC *desc, DSP_BUF *db)
 {
   int len; // [esp+0h] [ebp-10h]
   int i; // [esp+4h] [ebp-Ch]
@@ -59,7 +59,7 @@ static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db)
   }
 }
 
-static void __cdecl start_cons()
+static void start_cons()
 {
   DS_DESC *desc; // [esp+0h] [ebp-4h]
 
@@ -78,7 +78,7 @@ static void __cdecl start_cons()
   ds_printf("\n");
 }
 
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   int n; // [esp+0h] [ebp-Ch]
@@ -131,7 +131,7 @@ LABEL_23:
   return ds_free_buf(db);
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -146,7 +146,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int v2; // eax
   int r; // [esp+0h] [ebp-Ch]

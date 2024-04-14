@@ -18,13 +18,13 @@ int (*ds_check_reserved_name_func)(char *name) = NULL;
 
 static int *pstatus_by_child = NULL;
 
-static void __cdecl sigchld(int arg);
-static int __cdecl read_kbd(int kbd, int escape);
-static int __cdecl read_dev(int dev);
-static int __cdecl write_dev(int dev);
-static int __cdecl write_dsp(int dsp);
+static void sigchld(int arg);
+static int read_kbd(int kbd, int escape);
+static int read_dev(int dev);
+static int write_dev(int dev);
+static int write_dsp(int dsp);
 
-int __cdecl ds_rdwr_mem_align(int code, int align, int cpuid, int space, unsigned int adr, void *ptr, int len)
+int ds_rdwr_mem_align(int code, int align, int cpuid, int space, unsigned int adr, void *ptr, int len)
 {
   if ( ds_rdwr_mem_align_func )
     return ds_rdwr_mem_align_func(
@@ -39,7 +39,7 @@ int __cdecl ds_rdwr_mem_align(int code, int align, int cpuid, int space, unsigne
     return ds_error("invalid memory reference (rdwr_align)");
 }
 
-int __cdecl ds_load_mem(unsigned int adr, void *ptr, int len)
+int ds_load_mem(unsigned int adr, void *ptr, int len)
 {
   if ( ds_load_mem_func )
     return ds_load_mem_func(adr, ptr, len);
@@ -47,7 +47,7 @@ int __cdecl ds_load_mem(unsigned int adr, void *ptr, int len)
     return ds_error("invalid memory reference (load)");
 }
 
-int __cdecl ds_store_mem(unsigned int adr, void *ptr, int len)
+int ds_store_mem(unsigned int adr, void *ptr, int len)
 {
   if ( ds_store_mem_func )
     return ds_store_mem_func(adr, ptr, len);
@@ -55,7 +55,7 @@ int __cdecl ds_store_mem(unsigned int adr, void *ptr, int len)
     return ds_error("invalid memory reference (store)");
 }
 
-int __cdecl ds_load_quad_reg(char *name, quad *pq)
+int ds_load_quad_reg(char *name, quad *pq)
 {
   if ( ds_load_quad_reg_func )
     return ds_load_quad_reg_func(name, pq);
@@ -63,7 +63,7 @@ int __cdecl ds_load_quad_reg(char *name, quad *pq)
     return ds_error("invalid register reference (load quad)");
 }
 
-int __cdecl ds_store_quad_reg(char *name, quad qv)
+int ds_store_quad_reg(char *name, quad qv)
 {
   if ( ds_store_quad_reg_func )
     return ds_store_quad_reg_func(name, qv);
@@ -71,7 +71,7 @@ int __cdecl ds_store_quad_reg(char *name, quad qv)
     return ds_error("invalid register reference (store quad)");
 }
 
-int __cdecl ds_symbol_to_value(char *name, unsigned int *pv)
+int ds_symbol_to_value(char *name, unsigned int *pv)
 {
   if ( ds_symbol_to_value_func )
     return ds_symbol_to_value_func(name, pv);
@@ -79,7 +79,7 @@ int __cdecl ds_symbol_to_value(char *name, unsigned int *pv)
     return ds_error("invalid symbol reference (symbol_to_value)");
 }
 
-int __cdecl ds_exit(int code)
+int ds_exit(int code)
 {
   int result; // eax
 
@@ -157,7 +157,7 @@ int __cdecl ds_exit(int code)
   return result;
 }
 
-int __cdecl ds_exit_invalid_version(char *manager_version, int n, char *client_version)
+int ds_exit_invalid_version(char *manager_version, int n, char *client_version)
 {
   int v3; // eax
   int v5; // [esp-4h] [ebp-8h]
@@ -177,7 +177,7 @@ int __cdecl ds_exit_invalid_version(char *manager_version, int n, char *client_v
   return -1;
 }
 
-int __cdecl ds_fork()
+int ds_fork()
 {
   int pid; // [esp+0h] [ebp-4h]
 
@@ -210,7 +210,7 @@ int __cdecl ds_fork()
 }
 
 #ifndef _WIN32
-static void __cdecl sigchld(int arg)
+static void sigchld(int arg)
 {
   int status; // [esp+4h] [ebp-4h] BYREF
 
@@ -222,7 +222,7 @@ static void __cdecl sigchld(int arg)
 }
 #endif
 
-int __cdecl ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
+int ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
 {
   char *v4; // eax
   int fd; // [esp+0h] [ebp-Ch]
@@ -257,7 +257,7 @@ int __cdecl ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
 #endif
 }
 
-int __cdecl ds_read(int fd, void *ptr, int n)
+int ds_read(int fd, void *ptr, int n)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -271,7 +271,7 @@ int __cdecl ds_read(int fd, void *ptr, int n)
   return r;
 }
 
-int __cdecl ds_write(int fd, void *ptr, int n)
+int ds_write(int fd, void *ptr, int n)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -285,7 +285,7 @@ int __cdecl ds_write(int fd, void *ptr, int n)
   return r;
 }
 
-char *__cdecl ds_basename(char *name)
+char *ds_basename(char *name)
 {
   char *p; // [esp+0h] [ebp-4h]
 
@@ -296,12 +296,12 @@ char *__cdecl ds_basename(char *name)
     return name;
 }
 
-char *__cdecl ds_getenv(char *env)
+char *ds_getenv(char *env)
 {
   return getenv(env);
 }
 
-void __cdecl ds_bzero(void *ptr, int len)
+void ds_bzero(void *ptr, int len)
 {
 #ifdef _WIN32
   memset(ptr, 0, len);
@@ -310,7 +310,7 @@ void __cdecl ds_bzero(void *ptr, int len)
 #endif
 }
 
-int __cdecl ds_gettime(int64_t *psec, int64_t *pusec)
+int ds_gettime(int64_t *psec, int64_t *pusec)
 {
   struct timeval tval; // [esp+0h] [ebp-8h] BYREF
 
@@ -323,22 +323,22 @@ int __cdecl ds_gettime(int64_t *psec, int64_t *pusec)
   return 0;
 }
 
-char *__cdecl ds_strchr(char *str, int ch)
+char *ds_strchr(char *str, int ch)
 {
   return strchr(str, ch);
 }
 
-char *__cdecl ds_strcat(char *dst, char *src)
+char *ds_strcat(char *dst, char *src)
 {
   return strcat(dst, src);
 }
 
-int __cdecl ds_strncmp(char *s1, char *s2, int n)
+int ds_strncmp(char *s1, char *s2, int n)
 {
   return strncmp(s1, s2, n);
 }
 
-char *__cdecl ds_tilde_expand(char *buf, char *str)
+char *ds_tilde_expand(char *buf, char *str)
 {
 #ifndef _WIN32
   struct passwd *pw; // [esp+4h] [ebp-410h]
@@ -381,17 +381,17 @@ char *__cdecl ds_tilde_expand(char *buf, char *str)
   }
 }
 
-int __cdecl ds_gethostname(char *hostname, int n)
+int ds_gethostname(char *hostname, int n)
 {
   return gethostname(hostname, n);
 }
 
-char *__cdecl ds_getcwd(char *buf, int size)
+char *ds_getcwd(char *buf, int size)
 {
   return getcwd(buf, size);
 }
 
-char *__cdecl ds_abs_path(char *buf, int len, char *fname)
+char *ds_abs_path(char *buf, int len, char *fname)
 {
   int n; // [esp+0h] [ebp-4h]
 
@@ -407,7 +407,7 @@ char *__cdecl ds_abs_path(char *buf, int len, char *fname)
   return strcat(buf, fname);
 }
 
-static int __cdecl read_kbd(int kbd, int escape)
+static int read_kbd(int kbd, int escape)
 {
   CQ *v3; // edx
   char ch; // [esp+7h] [ebp-5h] BYREF
@@ -427,7 +427,7 @@ static int __cdecl read_kbd(int kbd, int escape)
   return 0;
 }
 
-static int __cdecl read_dev(int dev)
+static int read_dev(int dev)
 {
   CQ *v2; // edx
   char ch; // [esp+7h] [ebp-5h] BYREF
@@ -445,7 +445,7 @@ static int __cdecl read_dev(int dev)
   return 0;
 }
 
-static int __cdecl write_dev(int dev)
+static int write_dev(int dev)
 {
   char ch; // [esp+3h] [ebp-5h] BYREF
   CQ *q; // [esp+4h] [ebp-4h]
@@ -462,7 +462,7 @@ static int __cdecl write_dev(int dev)
     return ds_error("!write dev");
 }
 
-static int __cdecl write_dsp(int dsp)
+static int write_dsp(int dsp)
 {
   char ch; // [esp+3h] [ebp-5h] BYREF
   CQ *q; // [esp+4h] [ebp-4h]
@@ -479,7 +479,7 @@ static int __cdecl write_dsp(int dsp)
     return ds_error("!write dsp");
 }
 
-DS_DESC *__cdecl ds_open_comport(char *name, DS_RECV_FUNC *recv_func)
+DS_DESC *ds_open_comport(char *name, DS_RECV_FUNC *recv_func)
 {
   int fd; // [esp+0h] [ebp-4h]
 
@@ -490,7 +490,7 @@ DS_DESC *__cdecl ds_open_comport(char *name, DS_RECV_FUNC *recv_func)
   return 0;
 }
 
-DS_DESC *__cdecl ds_open_netdev(char *name, DS_RECV_FUNC *recv_func)
+DS_DESC *ds_open_netdev(char *name, DS_RECV_FUNC *recv_func)
 {
   int fd; // [esp+0h] [ebp-4h]
 
@@ -501,7 +501,7 @@ DS_DESC *__cdecl ds_open_netdev(char *name, DS_RECV_FUNC *recv_func)
   return 0;
 }
 
-int __cdecl ds_comp_main(char *device, int escape)
+int ds_comp_main(char *device, int escape)
 {
   fd_set wfds; // [esp+10h] [ebp-10Ch] BYREF
   fd_set rfds; // [esp+90h] [ebp-8Ch] BYREF

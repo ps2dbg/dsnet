@@ -5,7 +5,7 @@ static sig_t sigint;
 #endif
 static int kbd_raw = 0;
 
-int __cdecl ds_ioctl(int fd, int cmd, void *arg)
+int ds_ioctl(int fd, int cmd, void *arg)
 {
 #ifndef _WIN32
   return ioctl(fd, cmd, arg);
@@ -15,7 +15,7 @@ int __cdecl ds_ioctl(int fd, int cmd, void *arg)
 #endif
 }
 
-void *__cdecl ds_fopen(char *fname, char *mode)
+void *ds_fopen(char *fname, char *mode)
 {
   char path[1025]; // [esp+0h] [ebp-408h] BYREF
   void *r; // [esp+404h] [ebp-4h]
@@ -27,7 +27,7 @@ void *__cdecl ds_fopen(char *fname, char *mode)
   return r;
 }
 
-void *__cdecl ds_fopen_low(char *fname, char *mode)
+void *ds_fopen_low(char *fname, char *mode)
 {
   char path[1025]; // [esp+0h] [ebp-404h] BYREF
 
@@ -35,7 +35,7 @@ void *__cdecl ds_fopen_low(char *fname, char *mode)
   return fopen(path, mode);
 }
 
-int __cdecl ds_fclose(void *stream)
+int ds_fclose(void *stream)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -47,7 +47,7 @@ int __cdecl ds_fclose(void *stream)
   return r;
 }
 
-int __cdecl ds_fread(void *ptr, int size, int n, void *stream, int f_allow_eof)
+int ds_fread(void *ptr, int size, int n, void *stream, int f_allow_eof)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -62,7 +62,7 @@ int __cdecl ds_fread(void *ptr, int size, int n, void *stream, int f_allow_eof)
   return r;
 }
 
-int __cdecl ds_fwrite(void *ptr, int size, int n, void *stream)
+int ds_fwrite(void *ptr, int size, int n, void *stream)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -72,7 +72,7 @@ int __cdecl ds_fwrite(void *ptr, int size, int n, void *stream)
   return r;
 }
 
-int __cdecl ds_fseek(void *stream, int offset, int whence)
+int ds_fseek(void *stream, int offset, int whence)
 {
   int r; // [esp+0h] [ebp-4h]
   int whencea; // [esp+14h] [ebp+10h]
@@ -99,7 +99,7 @@ int __cdecl ds_fseek(void *stream, int offset, int whence)
   return r;
 }
 
-void *__cdecl ds_fload(void *stream, int whence, int off, int siz, int cnt)
+void *ds_fload(void *stream, int whence, int off, int siz, int cnt)
 {
   void *p; // [esp+0h] [ebp-4h]
 
@@ -112,7 +112,7 @@ void *__cdecl ds_fload(void *stream, int whence, int off, int siz, int cnt)
   return p;
 }
 
-int __cdecl ds_fsize(char *fname, int *psize)
+int ds_fsize(char *fname, int *psize)
 {
   char path[1025]; // [esp+0h] [ebp-45Ch] BYREF
   struct stat stbuf; // [esp+404h] [ebp-58h] BYREF
@@ -124,7 +124,7 @@ int __cdecl ds_fsize(char *fname, int *psize)
   return 0;
 }
 
-void *__cdecl ds_popen(char *cmd, char *type)
+void *ds_popen(char *cmd, char *type)
 {
   void *r; // [esp+0h] [ebp-4h]
 
@@ -141,7 +141,7 @@ void *__cdecl ds_popen(char *cmd, char *type)
   return r;
 }
 
-int __cdecl ds_pclose(void *stream)
+int ds_pclose(void *stream)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -156,7 +156,7 @@ int __cdecl ds_pclose(void *stream)
   return r;
 }
 
-int __cdecl ds_access(char *fname, int rmode)
+int ds_access(char *fname, int rmode)
 {
   char path[1025]; // [esp+0h] [ebp-408h] BYREF
   int mode; // [esp+404h] [ebp-4h]

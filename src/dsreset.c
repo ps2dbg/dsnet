@@ -12,10 +12,10 @@ static int f_poweroff = 0;
 static DS_DESC *target_desc;
 static NETMP_BOOTP mb;
 
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl usage(int f_true);
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db);
+static int usage(int f_true);
 
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   int n; // [esp+0h] [ebp-Ch]
@@ -82,7 +82,7 @@ static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -97,7 +97,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   unsigned int wv; // [esp+0h] [ebp-1Ch] BYREF
   quad qv; // [esp+4h] [ebp-18h] BYREF

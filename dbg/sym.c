@@ -7,12 +7,12 @@ static struct {MOD_SYMS *head;MOD_SYMS *tail;} mod_syms_list = { NULL, NULL };
 
 static struct {SYMLINE *head;SYMLINE *tail;} symlines;
 
-static int __cdecl add_symline(unsigned int value, char *bp);
-static void __cdecl show_and_free_symline();
-static int __cdecl is_dup_sym(char *bp, char *str);
-static int __cdecl is_gcc_label(char *str);
+static int add_symline(unsigned int value, char *bp);
+static void show_and_free_symline();
+static int is_dup_sym(char *bp, char *str);
+static int is_gcc_label(char *str);
 
-void __cdecl clear_module_symbol()
+void clear_module_symbol()
 {
   MOD_SYMS *q; // [esp+0h] [ebp-8h]
   MOD_SYMS *p; // [esp+4h] [ebp-4h]
@@ -26,7 +26,7 @@ void __cdecl clear_module_symbol()
   mod_syms_list.head = 0;
 }
 
-void __cdecl clear_module_symbol_with_name(char *name)
+void clear_module_symbol_with_name(char *name)
 {
   MOD_SYMS *q; // [esp+8h] [ebp-8h]
   MOD_SYMS *p; // [esp+Ch] [ebp-4h]
@@ -49,7 +49,7 @@ void __cdecl clear_module_symbol_with_name(char *name)
   }
 }
 
-void __cdecl add_module_symbol(char *name, int adr, int siz, int id)
+void add_module_symbol(char *name, int adr, int siz, int id)
 {
   size_t v4; // eax
   MOD_SYMS *tail; // edx
@@ -74,7 +74,7 @@ void __cdecl add_module_symbol(char *name, int adr, int siz, int id)
   }
 }
 
-void __cdecl clear_symbol()
+void clear_symbol()
 {
   SYMS *q; // [esp+0h] [ebp-8h]
   SYMS *p; // [esp+4h] [ebp-4h]
@@ -93,7 +93,7 @@ void __cdecl clear_symbol()
   clear_module_symbol();
 }
 
-void __cdecl clear_symbol_with_id(int id)
+void clear_symbol_with_id(int id)
 {
   SYMS *q; // [esp+8h] [ebp-8h]
   SYMS *p; // [esp+Ch] [ebp-4h]
@@ -120,7 +120,7 @@ void __cdecl clear_symbol_with_id(int id)
   }
 }
 
-int __cdecl match_symbol(char *str, int nstr, char *name)
+int match_symbol(char *str, int nstr, char *name)
 {
   if ( !str )
     return 1;
@@ -133,7 +133,7 @@ int __cdecl match_symbol(char *str, int nstr, char *name)
   return 0;
 }
 
-static int __cdecl add_symline(unsigned int value, char *bp)
+static int add_symline(unsigned int value, char *bp)
 {
   size_t v2; // eax
   struct symline *back; // ecx
@@ -175,7 +175,7 @@ static int __cdecl add_symline(unsigned int value, char *bp)
   return 0;
 }
 
-static void __cdecl show_and_free_symline()
+static void show_and_free_symline()
 {
   SYMLINE *q; // [esp+0h] [ebp-8h]
   SYMLINE *p; // [esp+4h] [ebp-4h]
@@ -190,7 +190,7 @@ static void __cdecl show_and_free_symline()
   symlines.head = 0;
 }
 
-int __cdecl module_base(int id, int base, int shndx, int info)
+int module_base(int id, int base, int shndx, int info)
 {
   if ( base == -1 )
     return 0;
@@ -201,7 +201,7 @@ int __cdecl module_base(int id, int base, int shndx, int info)
   return mod_address_by_id(id);
 }
 
-int __cdecl show_symbol(int ac, char **av)
+int show_symbol(int ac, char **av)
 {
   char *v3; // eax
   int v4; // eax
@@ -370,13 +370,13 @@ LABEL_33:
   return 0;
 }
 
-int __cdecl look_eemod(
+int look_eemod(
         void *stream,
         DS_ELF_EHDR *ehdr,
         DS_ELF_SHDR *shdr,
         int id,
         int base,
-        void (__cdecl *clear_func)())
+        void (*clear_func)())
 {
   int i; // [esp+4h] [ebp-Ch]
   EEMOD *eemod; // [esp+8h] [ebp-8h]
@@ -416,7 +416,7 @@ LABEL_16:
     id = mod_id_by_name(id, eemod->modulename, eemod->moduleversion);
     if ( id > 0 )
     {
-      ((void (__cdecl *)(int))clear_func)(id);
+      ((void (*)(int))clear_func)(id);
 LABEL_19:
       ds_free(eemod);
       return id;
@@ -427,13 +427,13 @@ LABEL_20:
   return -1;
 }
 
-int __cdecl look_iopmod(
+int look_iopmod(
         void *stream,
         DS_ELF_EHDR *ehdr,
         DS_ELF_SHDR *shdr,
         int id,
         int base,
-        void (__cdecl *clear_func)())
+        void (*clear_func)())
 {
   int i; // [esp+4h] [ebp-Ch]
   IOPMOD *iopmod; // [esp+8h] [ebp-8h]
@@ -471,7 +471,7 @@ LABEL_14:
     id = mod_id_by_name(id, iopmod->modulename, iopmod->moduleversion);
     if ( id > 0 )
     {
-      ((void (__cdecl *)(int))clear_func)(id);
+      ((void (*)(int))clear_func)(id);
 LABEL_17:
       ds_free(iopmod);
       return id;
@@ -482,7 +482,7 @@ LABEL_18:
   return -1;
 }
 
-int __cdecl load_symbol(void *stream, DS_ELF_EHDR *ehdr, DS_ELF_SHDR *shdr, int symndx, int strndx, int id, int base)
+int load_symbol(void *stream, DS_ELF_EHDR *ehdr, DS_ELF_SHDR *shdr, int symndx, int strndx, int id, int base)
 {
   DS_ELF_SHDR *v8; // eax
   SYMS *tail; // edx
@@ -528,9 +528,9 @@ int __cdecl load_symbol(void *stream, DS_ELF_EHDR *ehdr, DS_ELF_SHDR *shdr, int 
   for ( i = 0; v10 > i; ++i )
     ++psym;
 #ifdef DSNET_COMPILING_E
-  ida = look_eemod(stream, ehdr, shdr, id, base, (void (__cdecl *)())clear_symbol_with_id);
+  ida = look_eemod(stream, ehdr, shdr, id, base, (void (*)())clear_symbol_with_id);
 #elif DSNET_COMPILING_I
-  ida = look_iopmod(stream, ehdr, shdr, id, base, (void (__cdecl *)())clear_symbol_with_id);
+  ida = look_iopmod(stream, ehdr, shdr, id, base, (void (*)())clear_symbol_with_id);
 #endif /* DSNET_COMPILING_I */
   syms = (SYMS *)ds_alloc(sizeof(SYMS));
   if ( !syms )
@@ -566,7 +566,7 @@ LABEL_20:
   return 0;
 }
 
-static int __cdecl is_dup_sym(char *bp, char *str)
+static int is_dup_sym(char *bp, char *str)
 {
   int n; // [esp+4h] [ebp-408h]
   char *p; // [esp+8h] [ebp-404h]
@@ -589,7 +589,7 @@ static int __cdecl is_dup_sym(char *bp, char *str)
   return 0;
 }
 
-int __cdecl address_to_func(unsigned int adr, unsigned int *padr0, unsigned int *padr1)
+int address_to_func(unsigned int adr, unsigned int *padr0, unsigned int *padr1)
 {
   unsigned int value; // [esp+0h] [ebp-18h]
   unsigned int value_1; // [esp+0h] [ebp-18h]
@@ -647,7 +647,7 @@ LABEL_18:
   return 0;
 }
 
-int __cdecl address_to_symbol(char *buf, unsigned int adr, int force_delta)
+int address_to_symbol(char *buf, unsigned int adr, int force_delta)
 {
   int v3; // eax
   int v4; // eax
@@ -758,7 +758,7 @@ LABEL_20:
   return bp - buf;
 }
 
-int __cdecl symbol_to_value(char *name, unsigned int *pv)
+int symbol_to_value(char *name, unsigned int *pv)
 {
   int v2; // eax
   unsigned __int8 v4; // dl
@@ -845,7 +845,7 @@ int __cdecl symbol_to_value(char *name, unsigned int *pv)
   return -1;
 }
 
-int __cdecl symbol_completion(DS_HISTBUF *hb, char *name)
+int symbol_completion(DS_HISTBUF *hb, char *name)
 {
   unsigned __int8 v3; // dl
   unsigned __int8 v4; // dl
@@ -1009,7 +1009,7 @@ int __cdecl symbol_completion(DS_HISTBUF *hb, char *name)
   }
 }
 
-static int __cdecl is_gcc_label(char *str)
+static int is_gcc_label(char *str)
 {
   return !strcmp(str, "gcc2_compiled.") || strcmp(str, "__gnu_compiled_c") == 0;
 }

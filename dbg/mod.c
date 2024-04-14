@@ -6,33 +6,33 @@ static IMOD *last_imod = NULL;
 static unsigned int *mblks = NULL;
 static unsigned int *mblke = NULL;
 
-static int __cdecl mod_id_by_name_internal(int id, char *name, int ver);
-static IMOD *__cdecl look_imod(unsigned int id);
-static IMOD *__cdecl alloc_imod(int id, int ac, char **av);
-static IMOD *__cdecl free_imod(IMOD *p);
-static void __cdecl set_modname(IMOD *p, char *name);
-static void __cdecl load_mod_symbols(IMOD *p);
-static void __cdecl print_id(char *str, IMOD *p);
-static void __cdecl print_addr(char *str, IMOD *p);
-static void __cdecl print_size_0(char *str, IMOD *p);
-static void __cdecl print_last_addr(char *str, IMOD *p);
-static void __cdecl print_vers(char *str, IMOD *p);
-static void __cdecl print_name(char *str, IMOD *p);
-static void __cdecl print_flags(char *str, IMOD *p);
-static void __cdecl print_entry(char *str, IMOD *p);
-static void __cdecl print_gp(char *str, IMOD *p);
-static void __cdecl print_tsize(char *str, IMOD *p);
-static void __cdecl print_dsize(char *str, IMOD *p);
-static void __cdecl print_bsize(char *str, IMOD *p);
+static int mod_id_by_name_internal(int id, char *name, int ver);
+static IMOD *look_imod(unsigned int id);
+static IMOD *alloc_imod(int id, int ac, char **av);
+static IMOD *free_imod(IMOD *p);
+static void set_modname(IMOD *p, char *name);
+static void load_mod_symbols(IMOD *p);
+static void print_id(char *str, IMOD *p);
+static void print_addr(char *str, IMOD *p);
+static void print_size_0(char *str, IMOD *p);
+static void print_last_addr(char *str, IMOD *p);
+static void print_vers(char *str, IMOD *p);
+static void print_name(char *str, IMOD *p);
+static void print_flags(char *str, IMOD *p);
+static void print_entry(char *str, IMOD *p);
+static void print_gp(char *str, IMOD *p);
+static void print_tsize(char *str, IMOD *p);
+static void print_dsize(char *str, IMOD *p);
+static void print_bsize(char *str, IMOD *p);
 #ifdef DSNET_COMPILING_E
-static void __cdecl print_erxstub(char *str, IMOD *p);
-static void __cdecl print_erxlib(char *str, IMOD *p);
+static void print_erxstub(char *str, IMOD *p);
+static void print_erxlib(char *str, IMOD *p);
 #endif /* DSNET_COMPILING_E */
-static void __cdecl print_args(IMOD *p);
-static void __cdecl print_status(char *fmt, IMOD *p);
-static void __cdecl print_retval(char *fmt, IMOD *p);
+static void print_args(IMOD *p);
+static void print_status(char *fmt, IMOD *p);
+static void print_retval(char *fmt, IMOD *p);
 
-static int __cdecl mod_id_by_name_internal(int id, char *name, int ver)
+static int mod_id_by_name_internal(int id, char *name, int ver)
 {
   IMOD *p; // [esp+4h] [ebp-8h]
 
@@ -49,7 +49,7 @@ static int __cdecl mod_id_by_name_internal(int id, char *name, int ver)
     return ds_error("module ID mismatch (0x%x->0x%x)", id, p->id);
 }
 
-int __cdecl mod_id_by_name(int id, char *name, int ver)
+int mod_id_by_name(int id, char *name, int ver)
 {
   int r; // [esp+4h] [ebp-Ch]
   int r_1; // [esp+4h] [ebp-Ch]
@@ -72,7 +72,7 @@ int __cdecl mod_id_by_name(int id, char *name, int ver)
   return 0;
 }
 
-int __cdecl mod_fetch_id(int id)
+int mod_fetch_id(int id)
 {
   IMOD *p; // [esp+0h] [ebp-4h]
   IMOD *p_1; // [esp+0h] [ebp-4h]
@@ -92,7 +92,7 @@ int __cdecl mod_fetch_id(int id)
   return ds_error("module id (0x%x) not found", 0);
 }
 
-unsigned int __cdecl mod_address_by_id(int id)
+unsigned int mod_address_by_id(int id)
 {
   IMOD *p; // [esp+0h] [ebp-4h]
 
@@ -110,7 +110,7 @@ unsigned int __cdecl mod_address_by_id(int id)
   return p->info.mod_addr;
 }
 
-void __cdecl mod_set_vaddr(int id, unsigned int vaddr)
+void mod_set_vaddr(int id, unsigned int vaddr)
 {
   int flags; // ecx
   IMOD *p; // [esp+0h] [ebp-4h]
@@ -131,7 +131,7 @@ void __cdecl mod_set_vaddr(int id, unsigned int vaddr)
   }
 }
 
-static IMOD *__cdecl look_imod(unsigned int id)
+static IMOD *look_imod(unsigned int id)
 {
   IMOD *p; // [esp+0h] [ebp-4h]
 
@@ -143,7 +143,7 @@ static IMOD *__cdecl look_imod(unsigned int id)
   return 0;
 }
 
-static IMOD *__cdecl alloc_imod(int id, int ac, char **av)
+static IMOD *alloc_imod(int id, int ac, char **av)
 {
   IMOD *tail; // edx
   struct imod *back; // ecx
@@ -231,7 +231,7 @@ LABEL_20:
   return p;
 }
 
-static IMOD *__cdecl free_imod(IMOD *p)
+static IMOD *free_imod(IMOD *p)
 {
   if ( p )
   {
@@ -250,7 +250,7 @@ static IMOD *__cdecl free_imod(IMOD *p)
   return 0;
 }
 
-void __cdecl clear_mod_list()
+void clear_mod_list()
 {
   IMOD *forw; // [esp+0h] [ebp-8h]
   IMOD *p; // [esp+4h] [ebp-4h]
@@ -264,7 +264,7 @@ void __cdecl clear_mod_list()
   imod_list.head = 0;
 }
 
-static void __cdecl set_modname(IMOD *p, char *name)
+static void set_modname(IMOD *p, char *name)
 {
   size_t v2; // eax
   char *v3; // eax
@@ -278,7 +278,7 @@ static void __cdecl set_modname(IMOD *p, char *name)
     strcpy(p->name, name);
 }
 
-static void __cdecl load_mod_symbols(IMOD *p)
+static void load_mod_symbols(IMOD *p)
 {
   int flags; // ebx
   char *dp; // [esp+4h] [ebp-808h]
@@ -305,7 +305,7 @@ static void __cdecl load_mod_symbols(IMOD *p)
   }
 }
 
-int __cdecl iload_callback(unsigned int id, int cmd, void *ptr, int len)
+int iload_callback(unsigned int id, int cmd, void *ptr, int len)
 {
   unsigned int *ids; // [esp+Ch] [ebp-10h]
   IMOD *p; // [esp+14h] [ebp-8h]
@@ -410,7 +410,7 @@ LABEL_5:
   }
 }
 
-int __cdecl mload_cmd(int ac, char **av)
+int mload_cmd(int ac, char **av)
 {
   int flags; // ecx
   int v4; // ecx
@@ -442,7 +442,7 @@ int __cdecl mload_cmd(int ac, char **av)
   return r;
 }
 
-int __cdecl mstart_cmd(int ac, char **av)
+int mstart_cmd(int ac, char **av)
 {
   int flags; // ecx
   int v4; // ecx
@@ -575,7 +575,7 @@ int __cdecl mstart_cmd(int ac, char **av)
   }
 }
 
-int __cdecl mremove_cmd(int ac, char **av)
+int mremove_cmd(int ac, char **av)
 {
   unsigned int pv; // [esp+0h] [ebp-Ch] BYREF
   IMOD *q; // [esp+4h] [ebp-8h]
@@ -612,7 +612,7 @@ int __cdecl mremove_cmd(int ac, char **av)
   return 0;
 }
 
-static void __cdecl print_id(char *str, IMOD *p)
+static void print_id(char *str, IMOD *p)
 {
   if ( (p->flags & 1) != 0 )
     ds_printf("%s%2x", str, p->id);
@@ -620,7 +620,7 @@ static void __cdecl print_id(char *str, IMOD *p)
     ds_printf("%s--", str);
 }
 
-static void __cdecl print_addr(char *str, IMOD *p)
+static void print_addr(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
 #ifdef DSNET_COMPILING_E
@@ -633,7 +633,7 @@ static void __cdecl print_addr(char *str, IMOD *p)
     ds_printf("%s------", str);
 }
 
-static void __cdecl print_size_0(char *str, IMOD *p)
+static void print_size_0(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
     ds_printf("%s%5x", str, p->info.bss_size + p->info.data_size + p->info.text_size);
@@ -641,7 +641,7 @@ static void __cdecl print_size_0(char *str, IMOD *p)
     ds_printf("%s-----", str);
 }
 
-static void __cdecl print_last_addr(char *str, IMOD *p)
+static void print_last_addr(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
 #ifdef DSNET_COMPILING_E
@@ -654,7 +654,7 @@ static void __cdecl print_last_addr(char *str, IMOD *p)
     ds_printf("%s------", str);
 }
 
-static void __cdecl print_vers(char *str, IMOD *p)
+static void print_vers(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
     ds_printf("%s%2d.%-2d", str, HIBYTE(p->info.version), (unsigned __int8)p->info.version);
@@ -662,7 +662,7 @@ static void __cdecl print_vers(char *str, IMOD *p)
     ds_printf("%s--.--", str);
 }
 
-static void __cdecl print_name(char *str, IMOD *p)
+static void print_name(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
     ds_printf("%s%S", str, p->name);
@@ -670,7 +670,7 @@ static void __cdecl print_name(char *str, IMOD *p)
     ds_printf("%s", str);
 }
 
-static void __cdecl print_flags(char *str, IMOD *p)
+static void print_flags(char *str, IMOD *p)
 {
   const char *v2; // eax
   const char *v3; // eax
@@ -729,7 +729,7 @@ static void __cdecl print_flags(char *str, IMOD *p)
   }
 }
 
-static void __cdecl print_entry(char *str, IMOD *p)
+static void print_entry(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
   {
@@ -738,7 +738,7 @@ static void __cdecl print_entry(char *str, IMOD *p)
   }
 }
 
-static void __cdecl print_gp(char *str, IMOD *p)
+static void print_gp(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
   {
@@ -747,7 +747,7 @@ static void __cdecl print_gp(char *str, IMOD *p)
   }
 }
 
-static void __cdecl print_tsize(char *str, IMOD *p)
+static void print_tsize(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
     ds_printf("%s%5x", str, p->info.text_size);
@@ -755,7 +755,7 @@ static void __cdecl print_tsize(char *str, IMOD *p)
     ds_printf("%s-----", str);
 }
 
-static void __cdecl print_dsize(char *str, IMOD *p)
+static void print_dsize(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
     ds_printf("%s%5x", str, p->info.data_size);
@@ -763,7 +763,7 @@ static void __cdecl print_dsize(char *str, IMOD *p)
     ds_printf("%s-----", str);
 }
 
-static void __cdecl print_bsize(char *str, IMOD *p)
+static void print_bsize(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 )
     ds_printf("%s%5x", str, p->info.bss_size);
@@ -772,20 +772,20 @@ static void __cdecl print_bsize(char *str, IMOD *p)
 }
 
 #ifdef DSNET_COMPILING_E
-static void __cdecl print_erxstub(char *str, IMOD *p)
+static void print_erxstub(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 && p->erx_stub_addr != -1 )
     ds_printf("%s%x-%x", str, p->erx_stub_addr, p->erx_stub_size + p->erx_stub_addr - 1);
 }
 
-static void __cdecl print_erxlib(char *str, IMOD *p)
+static void print_erxlib(char *str, IMOD *p)
 {
   if ( (p->flags & 2) != 0 && p->erx_lib_addr != -1 )
     ds_printf("%s%x-%x", str, p->erx_lib_addr, p->erx_lib_size + p->erx_lib_addr - 1);
 }
 #endif /* DSNET_COMPILING_E */
 
-static void __cdecl print_args(IMOD *p)
+static void print_args(IMOD *p)
 {
   size_t v1; // ecx
   int na; // [esp+0h] [ebp-Ch]
@@ -809,7 +809,7 @@ static void __cdecl print_args(IMOD *p)
   }
 }
 
-static void __cdecl print_status(char *fmt, IMOD *p)
+static void print_status(char *fmt, IMOD *p)
 {
   int status; // eax
 
@@ -838,13 +838,13 @@ static void __cdecl print_status(char *fmt, IMOD *p)
   }
 }
 
-static void __cdecl print_retval(char *fmt, IMOD *p)
+static void print_retval(char *fmt, IMOD *p)
 {
   if ( (p->flags & 4) != 0 && p->status <= 4u && p->status >= 3u )
     ds_printf(fmt, p->retval);
 }
 
-int __cdecl mlist_cmd(int ac, char **av)
+int mlist_cmd(int ac, char **av)
 {
   int flags; // ecx
   int f_long; // [esp+0h] [ebp-14h]
@@ -992,7 +992,7 @@ int __cdecl mlist_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl memlist_cmd(int ac, char **av)
+int memlist_cmd(int ac, char **av)
 {
   int flags; // ebx
   unsigned int v4; // edx

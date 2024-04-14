@@ -3,56 +3,56 @@
 typedef eegsdata_t MM;
 typedef struct {unsigned int sdram_data1; unsigned int sdram_data2; unsigned int sdram_data3; unsigned int sdram_data4;} NN;
 
-extern int __cdecl IsSend(eegsdata_t *mm, int type);
-extern int __cdecl IsPrim(eegsdata_t *mm);
-extern int __cdecl IsMEMIF(eegsdata_t *mm, int mmd);
-extern int __cdecl GetDDAValidPixel(eegsdata_t *mm);
-extern int __cdecl GetPgn(eegsdata_t *mm);
-extern int __cdecl IsDDA(eegsdata_t *mm, int pgn);
-extern int __cdecl GetReadDRAM(eegsdata_t *mm);
-extern int __cdecl GetReadDRAM_bit(eegsdata_t *mm);
-extern int __cdecl GetWriteDRAM(eegsdata_t *mm);
-extern int __cdecl GetWriteDRAM_bit(eegsdata_t *mm);
-extern int __cdecl GetPageMiss(eegsdata_t *mm);
-extern int __cdecl GetPageMiss_bit(eegsdata_t *mm);
-extern int __cdecl GetTransSRAM(eegsdata_t *mm);
-extern int __cdecl GetTransSRAM_bit(eegsdata_t *mm);
-extern int __cdecl GetReadSRAM(eegsdata_t *mm);
-extern int __cdecl IsTransClut(eegsdata_t *mm);
-extern int __cdecl IsCrtDisplay(eegsdata_t *mm);
-extern int __cdecl GetOutValidPixel(eegsdata_t *mm);
-extern int __cdecl GetOutValidPixel_bit(eegsdata_t *mm);
-extern int __cdecl IsAfterdsresetCheck(eegsdata_t *mm);
-extern int __cdecl IsAfterdsreset(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl IsAfterGSResetCheck(eegsdata_t *mm);
-extern int __cdecl IsAfterGSReset(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl IsPath(eegsdata_t *mm, int path);
-extern void __cdecl InitGS(gs_pa *gs);
-extern void __cdecl UpdateGS(eegsdata_t *mm, gs_pa *gs);
-extern void __cdecl print_gs(gs_pa *gs);
-extern int __cdecl SRV_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl TRD_Check(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl TRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl OUTPIXEL_Check(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl OUTPIXEL_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl TTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl CTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl PMS_Check(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl PMS_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl MRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl MWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl PWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl PGN_Check(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl PGN_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl DISP_Check(VERIFY_PFM *verify, eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl PrintGS(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl IsHostLocal(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl IsLocalHost(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl IsLocalLocal(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl IsSprite(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl PFM_SDRAMCheck(NN *nn, NN *end, int opt);
-extern int __cdecl IsEEPerform(eegsdata_t *mm, eegsdata_t *end, int *opt);
-extern int __cdecl Bist_Calculation(int n, int cnt, int mode);
+extern int IsSend(eegsdata_t *mm, int type);
+extern int IsPrim(eegsdata_t *mm);
+extern int IsMEMIF(eegsdata_t *mm, int mmd);
+extern int GetDDAValidPixel(eegsdata_t *mm);
+extern int GetPgn(eegsdata_t *mm);
+extern int IsDDA(eegsdata_t *mm, int pgn);
+extern int GetReadDRAM(eegsdata_t *mm);
+extern int GetReadDRAM_bit(eegsdata_t *mm);
+extern int GetWriteDRAM(eegsdata_t *mm);
+extern int GetWriteDRAM_bit(eegsdata_t *mm);
+extern int GetPageMiss(eegsdata_t *mm);
+extern int GetPageMiss_bit(eegsdata_t *mm);
+extern int GetTransSRAM(eegsdata_t *mm);
+extern int GetTransSRAM_bit(eegsdata_t *mm);
+extern int GetReadSRAM(eegsdata_t *mm);
+extern int IsTransClut(eegsdata_t *mm);
+extern int IsCrtDisplay(eegsdata_t *mm);
+extern int GetOutValidPixel(eegsdata_t *mm);
+extern int GetOutValidPixel_bit(eegsdata_t *mm);
+extern int IsAfterdsresetCheck(eegsdata_t *mm);
+extern int IsAfterdsreset(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int IsAfterGSResetCheck(eegsdata_t *mm);
+extern int IsAfterGSReset(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int IsPath(eegsdata_t *mm, int path);
+extern void InitGS(gs_pa *gs);
+extern void UpdateGS(eegsdata_t *mm, gs_pa *gs);
+extern void print_gs(gs_pa *gs);
+extern int SRV_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int TRD_Check(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int TRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int OUTPIXEL_Check(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int OUTPIXEL_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int TTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int CTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int PMS_Check(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int PMS_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int MRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int MWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int PWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int PGN_Check(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int PGN_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int DISP_Check(VERIFY_PFM *verify, eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int PrintGS(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int IsHostLocal(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int IsLocalHost(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int IsLocalLocal(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int IsSprite(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int PFM_SDRAMCheck(NN *nn, NN *end, int opt);
+extern int IsEEPerform(eegsdata_t *mm, eegsdata_t *end, int *opt);
+extern int Bist_Calculation(int n, int cnt, int mode);
 
 static int status_116 = 0;
 static int status_120 = 0;
@@ -127,24 +127,24 @@ static int m14_193;
 static int m15_194;
 static int m16_195;
 
-int __cdecl IsSend(eegsdata_t *mm, int type)
+int IsSend(eegsdata_t *mm, int type)
 {
   return (mm->Ap1a & 4) == 0
       && type == ((32 * ((mm->Ap1a & 2) != 0)) | (16 * (mm->Ap1a & 1)) | (8 * (mm->Ap0b >> 7)) | (4
                                                                                                 * ((mm->Ap0b & 0x40) != 0)) | (2 * ((mm->Ap0b & 0x20) != 0)) | ((mm->Ap0b & 0x10) != 0));
 }
 
-int __cdecl IsPrim(eegsdata_t *mm)
+int IsPrim(eegsdata_t *mm)
 {
   return mm->Aja & 1;
 }
 
-int __cdecl IsMEMIF(eegsdata_t *mm, int mmd)
+int IsMEMIF(eegsdata_t *mm, int mmd)
 {
   return ((4 * (mm->Atpce & 1)) | (2 * (mm->Ajb >> 7)) | ((mm->Ajb & 0x40) != 0)) == mmd;
 }
 
-int __cdecl GetDDAValidPixel(eegsdata_t *mm)
+int GetDDAValidPixel(eegsdata_t *mm)
 {
   int pgn; // [esp+4h] [ebp-4h]
 
@@ -156,22 +156,22 @@ int __cdecl GetDDAValidPixel(eegsdata_t *mm)
     return (16 * (mm->Ap1b >> 7)) | (8 * ((mm->Ap1b & 0x40) != 0)) | (4 * ((mm->Ap1b & 0x20) != 0)) | (2 * ((mm->Ap1b & 0x10) != 0)) | ((mm->Ap1b & 8) != 0);
 }
 
-int __cdecl GetPgn(eegsdata_t *mm)
+int GetPgn(eegsdata_t *mm)
 {
   return (16 * (mm->Ap1b >> 7)) | (8 * ((mm->Ap1b & 0x40) != 0)) | (4 * ((mm->Ap1b & 0x20) != 0)) | (2 * ((mm->Ap1b & 0x10) != 0)) | ((mm->Ap1b & 8) != 0);
 }
 
-int __cdecl IsDDA(eegsdata_t *mm, int pgn)
+int IsDDA(eegsdata_t *mm, int pgn)
 {
   return pgn == ((16 * (mm->Ap1b >> 7)) | (8 * ((mm->Ap1b & 0x40) != 0)) | (4 * ((mm->Ap1b & 0x20) != 0)) | (2 * ((mm->Ap1b & 0x10) != 0)) | ((mm->Ap1b & 8) != 0));
 }
 
-int __cdecl GetReadDRAM(eegsdata_t *mm)
+int GetReadDRAM(eegsdata_t *mm)
 {
   return ((mm->Atpc0 ^ 1) & 1) + !(mm->Atpce >> 7) + (((mm->Aja >> 2) ^ 1) & 1) + (((mm->Aja >> 1) ^ 1) & 1);
 }
 
-int __cdecl GetReadDRAM_bit(eegsdata_t *mm)
+int GetReadDRAM_bit(eegsdata_t *mm)
 {
   int v1; // ecx
   int v2; // edx
@@ -189,7 +189,7 @@ int __cdecl GetReadDRAM_bit(eegsdata_t *mm)
   return result;
 }
 
-int __cdecl GetWriteDRAM(eegsdata_t *mm)
+int GetWriteDRAM(eegsdata_t *mm)
 {
   return (((mm->Atpc0 >> 2) ^ 1) & 1)
        + (((mm->Atpc0 >> 1) ^ 1) & 1)
@@ -197,7 +197,7 @@ int __cdecl GetWriteDRAM(eegsdata_t *mm)
        + (((mm->Aja >> 3) ^ 1) & 1);
 }
 
-int __cdecl GetWriteDRAM_bit(eegsdata_t *mm)
+int GetWriteDRAM_bit(eegsdata_t *mm)
 {
   int v1; // ecx
   int v2; // edx
@@ -215,7 +215,7 @@ int __cdecl GetWriteDRAM_bit(eegsdata_t *mm)
   return result;
 }
 
-int __cdecl GetPageMiss(eegsdata_t *mm)
+int GetPageMiss(eegsdata_t *mm)
 {
   return (((mm->Atpc0 >> 4) ^ 1) & 1)
        + (((mm->Atpc0 >> 3) ^ 1) & 1)
@@ -223,7 +223,7 @@ int __cdecl GetPageMiss(eegsdata_t *mm)
        + (((mm->Aja >> 5) ^ 1) & 1);
 }
 
-int __cdecl GetPageMiss_bit(eegsdata_t *mm)
+int GetPageMiss_bit(eegsdata_t *mm)
 {
   int v1; // ecx
   int v2; // edx
@@ -241,7 +241,7 @@ int __cdecl GetPageMiss_bit(eegsdata_t *mm)
   return result;
 }
 
-int __cdecl GetTransSRAM(eegsdata_t *mm)
+int GetTransSRAM(eegsdata_t *mm)
 {
   return (((mm->Atpc1 >> 2) ^ 1) & 1)
        + (((mm->Atpc1 >> 1) ^ 1) & 1)
@@ -249,7 +249,7 @@ int __cdecl GetTransSRAM(eegsdata_t *mm)
        + (((mm->Ajb >> 3) ^ 1) & 1);
 }
 
-int __cdecl GetTransSRAM_bit(eegsdata_t *mm)
+int GetTransSRAM_bit(eegsdata_t *mm)
 {
   int v1; // ecx
   int v2; // edx
@@ -267,7 +267,7 @@ int __cdecl GetTransSRAM_bit(eegsdata_t *mm)
   return result;
 }
 
-int __cdecl GetReadSRAM(eegsdata_t *mm)
+int GetReadSRAM(eegsdata_t *mm)
 {
   return 16 * ((mm->Atpce & 0x40) != 0)
        + 8 * ((mm->Atpce & 0x20) != 0)
@@ -276,17 +276,17 @@ int __cdecl GetReadSRAM(eegsdata_t *mm)
        + ((mm->Atpce & 4) != 0);
 }
 
-int __cdecl IsTransClut(eegsdata_t *mm)
+int IsTransClut(eegsdata_t *mm)
 {
   return (mm->Ajb & 0x20) != 0;
 }
 
-int __cdecl IsCrtDisplay(eegsdata_t *mm)
+int IsCrtDisplay(eegsdata_t *mm)
 {
   return (mm->Atpce & 2) != 0;
 }
 
-int __cdecl GetOutValidPixel(eegsdata_t *mm)
+int GetOutValidPixel(eegsdata_t *mm)
 {
   int i; // [esp+8h] [ebp-4h]
 
@@ -302,13 +302,13 @@ int __cdecl GetOutValidPixel(eegsdata_t *mm)
   return i;
 }
 
-int __cdecl GetOutValidPixel_bit(eegsdata_t *mm)
+int GetOutValidPixel_bit(eegsdata_t *mm)
 {
   return ((mm->Atpc1 & 1) << 7) | (mm->Atpc0 >> 7 << 6) | (32 * ((mm->Atpc0 & 0x40) != 0)) | (16
                                                                                             * ((mm->Atpc0 & 0x20) != 0)) | (8 * ((mm->Ajb & 4) != 0)) | (4 * ((mm->Ajb & 2) != 0)) | (2 * (mm->Ajb & 1)) | (mm->Aja >> 7);
 }
 
-int __cdecl IsAfterdsresetCheck(eegsdata_t *mm)
+int IsAfterdsresetCheck(eegsdata_t *mm)
 {
   int v1; // ebx
 
@@ -326,7 +326,7 @@ int __cdecl IsAfterdsresetCheck(eegsdata_t *mm)
   return v1;
 }
 
-int __cdecl IsAfterdsreset(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int IsAfterdsreset(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   while ( end > mm )
   {
@@ -337,7 +337,7 @@ int __cdecl IsAfterdsreset(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return 1;
 }
 
-int __cdecl IsAfterGSResetCheck(eegsdata_t *mm)
+int IsAfterGSResetCheck(eegsdata_t *mm)
 {
   int v1; // ebx
 
@@ -355,7 +355,7 @@ int __cdecl IsAfterGSResetCheck(eegsdata_t *mm)
   return v1;
 }
 
-int __cdecl IsAfterGSReset(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int IsAfterGSReset(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   while ( end > mm )
   {
@@ -366,12 +366,12 @@ int __cdecl IsAfterGSReset(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return 1;
 }
 
-int __cdecl IsPath(eegsdata_t *mm, int path)
+int IsPath(eegsdata_t *mm, int path)
 {
   return path == ((2 * ((mm->Ap1b & 4) != 0)) | ((mm->Ap1b & 2) != 0));
 }
 
-void __cdecl InitGS(gs_pa *gs)
+void InitGS(gs_pa *gs)
 {
   gs->ddapixel = 0;
   gs->pgn = 0;
@@ -394,7 +394,7 @@ void __cdecl InitGS(gs_pa *gs)
   gs->disp = 0;
 }
 
-void __cdecl UpdateGS(eegsdata_t *mm, gs_pa *gs)
+void UpdateGS(eegsdata_t *mm, gs_pa *gs)
 {
   gs->prim = IsPrim(mm);
   gs->ddapixel += GetDDAValidPixel(mm);
@@ -417,7 +417,7 @@ void __cdecl UpdateGS(eegsdata_t *mm, gs_pa *gs)
   gs->outpixel_bit = GetOutValidPixel_bit(mm);
 }
 
-void __cdecl print_gs(gs_pa *gs)
+void print_gs(gs_pa *gs)
 {
   printf(
     "prim %d ddapixel %d ddasetup %d ddawait %d read %d write %d miss %d outpixel %d\n",
@@ -431,7 +431,7 @@ void __cdecl print_gs(gs_pa *gs)
     gs->outpixel);
 }
 
-int __cdecl SRV_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int SRV_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -468,7 +468,7 @@ int __cdecl SRV_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl TRD_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int TRD_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -498,7 +498,7 @@ int __cdecl TRD_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl TRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int TRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa pregs; // [esp+4h] [ebp-A0h] BYREF
   gs_pa gs; // [esp+50h] [ebp-54h] BYREF
@@ -555,7 +555,7 @@ int __cdecl TRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl OUTPIXEL_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int OUTPIXEL_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -592,7 +592,7 @@ int __cdecl OUTPIXEL_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl OUTPIXEL_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int OUTPIXEL_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -652,7 +652,7 @@ LABEL_26:
   return test;
 }
 
-int __cdecl TTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int TTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -689,7 +689,7 @@ int __cdecl TTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl CTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int CTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -726,7 +726,7 @@ int __cdecl CTR_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl PMS_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int PMS_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -753,7 +753,7 @@ int __cdecl PMS_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl PMS_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int PMS_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -801,7 +801,7 @@ int __cdecl PMS_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl MRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int MRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -838,7 +838,7 @@ int __cdecl MRD_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl MWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int MWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -875,7 +875,7 @@ int __cdecl MWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl PWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int PWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+8h] [ebp-5Ch] BYREF
   int test; // [esp+54h] [ebp-10h]
@@ -919,7 +919,7 @@ int __cdecl PWT_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl PGN_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int PGN_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -949,7 +949,7 @@ int __cdecl PGN_Check(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return test;
 }
 
-int __cdecl PGN_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int PGN_CheckStrict(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+4h] [ebp-54h] BYREF
   int test; // [esp+50h] [ebp-8h]
@@ -1008,7 +1008,7 @@ LABEL_14:
   return test;
 }
 
-int __cdecl DISP_Check(VERIFY_PFM *verify, eegsdata_t *mm, eegsdata_t *end, int *opt)
+int DISP_Check(VERIFY_PFM *verify, eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   int status; // eax
   gs_pa gs; // [esp+0h] [ebp-4Ch] BYREF
@@ -1041,7 +1041,7 @@ int __cdecl DISP_Check(VERIFY_PFM *verify, eegsdata_t *mm, eegsdata_t *end, int 
   return 0;
 }
 
-int __cdecl PrintGS(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int PrintGS(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+0h] [ebp-50h] BYREF
   int status; // [esp+4Ch] [ebp-4h]
@@ -1065,7 +1065,7 @@ int __cdecl PrintGS(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return 1;
 }
 
-int __cdecl IsHostLocal(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int IsHostLocal(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+0h] [ebp-50h] BYREF
   int status; // [esp+4Ch] [ebp-4h]
@@ -1090,7 +1090,7 @@ int __cdecl IsHostLocal(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return 1;
 }
 
-int __cdecl IsLocalHost(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int IsLocalHost(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   gs_pa gs; // [esp+0h] [ebp-50h] BYREF
   int status; // [esp+4Ch] [ebp-4h]
@@ -1115,7 +1115,7 @@ int __cdecl IsLocalHost(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return 1;
 }
 
-int __cdecl IsLocalLocal(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int IsLocalLocal(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   while ( end > mm )
   {
@@ -1142,7 +1142,7 @@ int __cdecl IsLocalLocal(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return 1;
 }
 
-int __cdecl IsSprite(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int IsSprite(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   while ( end > mm )
   {
@@ -1178,7 +1178,7 @@ int __cdecl IsSprite(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return 1;
 }
 
-int __cdecl PFM_SDRAMCheck(NN *nn, NN *end, int opt)
+int PFM_SDRAMCheck(NN *nn, NN *end, int opt)
 {
   int error; // [esp+0h] [ebp-Ch]
   int test; // [esp+4h] [ebp-8h]
@@ -1364,7 +1364,7 @@ int __cdecl PFM_SDRAMCheck(NN *nn, NN *end, int opt)
   return test;
 }
 
-int __cdecl IsEEPerform(eegsdata_t *mm, eegsdata_t *end, int *opt)
+int IsEEPerform(eegsdata_t *mm, eegsdata_t *end, int *opt)
 {
   unsigned int v4; // [esp+10h] [ebp-1Ch]
   unsigned int bist_ans; // [esp+18h] [ebp-14h]
@@ -1425,7 +1425,7 @@ int __cdecl IsEEPerform(eegsdata_t *mm, eegsdata_t *end, int *opt)
   return 1;
 }
 
-int __cdecl Bist_Calculation(int n, int cnt, int mode)
+int Bist_Calculation(int n, int cnt, int mode)
 {
   if ( mode )
   {
@@ -1645,7 +1645,7 @@ int __cdecl Bist_Calculation(int n, int cnt, int mode)
   }
 }
 
-int __cdecl check_pfm(VERIFY_PFM *verify, char *p, int mode, int size, char *checkStr)
+int check_pfm(VERIFY_PFM *verify, char *p, int mode, int size, char *checkStr)
 {
   int opt[4]; // [esp+0h] [ebp-24h] BYREF
   NN *n_end; // [esp+10h] [ebp-14h]
@@ -1710,7 +1710,7 @@ int __cdecl check_pfm(VERIFY_PFM *verify, char *p, int mode, int size, char *che
   return PrintGS(mm, end, opt);
 }
 
-int __cdecl reset_pfm(VERIFY_PFM *verify, char *checkStr)
+int reset_pfm(VERIFY_PFM *verify, char *checkStr)
 {
   if ( !strcmp(checkStr, "DISP_Check") )
   {
@@ -1721,7 +1721,7 @@ int __cdecl reset_pfm(VERIFY_PFM *verify, char *checkStr)
   return 0;
 }
 
-int __cdecl result_pfm(VERIFY_PFM *verify, int mode, char *checkStr)
+int result_pfm(VERIFY_PFM *verify, int mode, char *checkStr)
 {
   if ( m_result )
   {

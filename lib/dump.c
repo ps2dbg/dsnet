@@ -1,14 +1,14 @@
 #include "dsnet_prototypes.h"
 
-static int __cdecl print_dcmp(unsigned __int8 *bp, int n);
-static int __cdecl print_ttyp(unsigned __int8 *bp, int n);
-static int __cdecl print_drfp(unsigned __int8 *bp, int n);
-static int __cdecl print_netmp(unsigned __int8 *bp, int n);
-static int __cdecl print_dbgp(unsigned __int8 *bp, int n, int f_ee);
-static int __cdecl print_iloadp(unsigned __int8 *bp, int n);
-static int __cdecl print_eloadp(unsigned __int8 *bp, int n);
+static int print_dcmp(unsigned __int8 *bp, int n);
+static int print_ttyp(unsigned __int8 *bp, int n);
+static int print_drfp(unsigned __int8 *bp, int n);
+static int print_netmp(unsigned __int8 *bp, int n);
+static int print_dbgp(unsigned __int8 *bp, int n, int f_ee);
+static int print_iloadp(unsigned __int8 *bp, int n);
+static int print_eloadp(unsigned __int8 *bp, int n);
 
-static int __cdecl print_dcmp(unsigned __int8 *bp, int n)
+static int print_dcmp(unsigned __int8 *bp, int n)
 {
   int v3; // eax
   unsigned __int16 *v5; // [esp+20h] [ebp+8h]
@@ -70,7 +70,7 @@ static int __cdecl print_dcmp(unsigned __int8 *bp, int n)
   return 24;
 }
 
-static int __cdecl print_ttyp(unsigned __int8 *bp, int n)
+static int print_ttyp(unsigned __int8 *bp, int n)
 {
   int v3; // [esp-4h] [ebp-Ch]
   unsigned int wv; // [esp+0h] [ebp-8h]
@@ -94,7 +94,7 @@ static int __cdecl print_ttyp(unsigned __int8 *bp, int n)
   return n;
 }
 
-static int __cdecl print_drfp(unsigned __int8 *bp, int n)
+static int print_drfp(unsigned __int8 *bp, int n)
 {
   int result; // eax
   int v3; // [esp-4h] [ebp-14h]
@@ -276,7 +276,7 @@ LABEL_45:
   return result;
 }
 
-static int __cdecl print_netmp(unsigned __int8 *bp, int n)
+static int print_netmp(unsigned __int8 *bp, int n)
 {
   int v3; // [esp-4h] [ebp-20h]
   char *msg; // [esp+8h] [ebp-14h]
@@ -335,7 +335,7 @@ static int __cdecl print_netmp(unsigned __int8 *bp, int n)
   return n;
 }
 
-static int __cdecl print_dbgp(unsigned __int8 *bp, int n, int f_ee)
+static int print_dbgp(unsigned __int8 *bp, int n, int f_ee)
 {
   int result; // eax
   char *v4; // eax
@@ -522,7 +522,7 @@ LABEL_63:
   return result;
 }
 
-static int __cdecl print_iloadp(unsigned __int8 *bp, int n)
+static int print_iloadp(unsigned __int8 *bp, int n)
 {
   int result; // eax
   char *v3; // eax
@@ -672,7 +672,7 @@ static int __cdecl print_iloadp(unsigned __int8 *bp, int n)
   return result;
 }
 
-static int __cdecl print_eloadp(unsigned __int8 *bp, int n)
+static int print_eloadp(unsigned __int8 *bp, int n)
 {
   int result; // eax
   char *v3; // eax
@@ -809,7 +809,7 @@ static int __cdecl print_eloadp(unsigned __int8 *bp, int n)
   return result;
 }
 
-void __cdecl ds_dump(char *str, DECI2_HDR *dh, int n)
+void ds_dump(char *str, DECI2_HDR *dh, int n)
 {
   int protocol; // eax
   unsigned __int8 *v4; // [esp+0h] [ebp-Ch]

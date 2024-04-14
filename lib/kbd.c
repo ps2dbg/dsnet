@@ -6,7 +6,7 @@ static struct termios oterm_area;
 static struct termios *oterm = NULL;
 #endif
 
-int __cdecl ds_raw_kbd()
+int ds_raw_kbd()
 {
 #ifndef _WIN32
   struct termios new_area; // [esp+4h] [ebp-44h] BYREF
@@ -34,7 +34,7 @@ int __cdecl ds_raw_kbd()
   return fd;
 }
 
-int __cdecl ds_resume_kbd()
+int ds_resume_kbd()
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -50,7 +50,7 @@ int __cdecl ds_resume_kbd()
   return r;
 }
 
-DS_DESC *__cdecl ds_open_kbd(DS_RECV_FUNC *recv_func, int f_prompt)
+DS_DESC *ds_open_kbd(DS_RECV_FUNC *recv_func, int f_prompt)
 {
   int fd; // [esp+0h] [ebp-4h]
 

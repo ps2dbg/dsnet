@@ -29,9 +29,9 @@ static const char TARG_IDENT[16] =
   '\0'
 };
 
-static void __cdecl show_statics(int tb, int mst, int mut, int tst, int tut);
+static void show_statics(int tb, int mst, int mut, int tst, int tut);
 
-int __cdecl dmem_cmd(int ac, char **av)
+int dmem_cmd(int ac, char **av)
 {
   int result; // eax
   int v3; // ebx
@@ -276,7 +276,7 @@ LABEL_17:
 }
 
 // local variable allocation has failed, the output may be wrong!
-int __cdecl smem_cmd(int ac, char **av)
+int smem_cmd(int ac, char **av)
 {
   int result; // eax
   twin *p_tv; // [esp-14h] [ebp-464h]
@@ -457,7 +457,7 @@ LABEL_53:
   return result;
 }
 
-int __cdecl inp_cmd(int ac, char **av)
+int inp_cmd(int ac, char **av)
 {
   int result; // eax
   const char *v3; // eax
@@ -674,7 +674,7 @@ LABEL_13:
 }
 
 // local variable allocation has failed, the output may be wrong!
-int __cdecl out_cmd(int ac, char **av)
+int out_cmd(int ac, char **av)
 {
   twin *p_tv; // [esp-14h] [ebp-464h]
   quad v4; // [esp-10h] [ebp-460h] OVERLAPPED
@@ -843,7 +843,7 @@ LABEL_47:
   return 0;
 }
 
-static void __cdecl show_statics(int tb, int mst, int mut, int tst, int tut)
+static void show_statics(int tb, int mst, int mut, int tst, int tut)
 {
   long double v5; // fst7
   int v6; // [esp+Ch] [ebp-1Ch]
@@ -876,7 +876,7 @@ static void __cdecl show_statics(int tb, int mst, int mut, int tst, int tut)
     (double)v5);
 }
 
-int __cdecl bload_cmd(int ac, char **av)
+int bload_cmd(int ac, char **av)
 {
   int64_t tu0; // [esp+0h] [ebp-44h] BYREF
   int64_t psec; // [esp+4h] [ebp-40h] BYREF
@@ -960,7 +960,7 @@ LABEL_25:
   return r;
 }
 
-int __cdecl bsave_cmd(int ac, char **av)
+int bsave_cmd(int ac, char **av)
 {
   int v3; // eax
   int64_t tu0; // [esp+0h] [ebp-48h] BYREF
@@ -1050,7 +1050,7 @@ LABEL_29:
   return r;
 }
 
-int __cdecl pload_cmd(int ac, char **av)
+int pload_cmd(int ac, char **av)
 {
   unsigned int type; // eax
   int v4; // [esp+4h] [ebp-43Ch] BYREF

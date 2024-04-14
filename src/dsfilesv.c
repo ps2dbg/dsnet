@@ -16,11 +16,11 @@ static DS_DESC *target_desc;
 static DS_OPTION *opt_iopconf;
 static DS_OPTION *opt_iopmodules;
 
-static void __cdecl drfp_error(DSP_BUF *db);
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl usage(int f_true);
+static void drfp_error(DSP_BUF *db);
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db);
+static int usage(int f_true);
 
-static void __cdecl drfp_error(DSP_BUF *db)
+static void drfp_error(DSP_BUF *db)
 {
   if ( target_desc )
     ds_send_desc(target_desc, db);
@@ -28,7 +28,7 @@ static void __cdecl drfp_error(DSP_BUF *db)
     ds_free_buf(db);
 }
 
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   int n; // [esp+0h] [ebp-Ch]
@@ -101,7 +101,7 @@ static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -120,7 +120,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int v2; // eax
   int r; // [esp+0h] [ebp-10h]
@@ -210,7 +210,7 @@ int __cdecl main(int ac, char **av)
 #endif /* DSNET_COMPILING_I */
     ds_exit(135);
   dsm_waiting = 1;
-  ds_drfp_err_func = (void (__cdecl *)())drfp_error;
+  ds_drfp_err_func = (void (*)())drfp_error;
   while ( 1 )
   {
     r = ds_select_desc(to_sec, to_usec);

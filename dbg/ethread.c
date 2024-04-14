@@ -104,16 +104,16 @@ static int code_17 = 1;
 static int sid_18 = 0;
 static int mode_19 = 1;
 
-static int __cdecl isnumstr(char *str);
+static int isnumstr(char *str);
 
-static int __cdecl isnumstr(char *str)
+static int isnumstr(char *str)
 {
   while ( *str > 47 && *str <= 57 )
     ++str;
   return *str == 0;
 }
 
-int __cdecl dt_cmd(int ac, char **av)
+int dt_cmd(int ac, char **av)
 {
   int i_3; // [esp+0h] [ebp-28h]
   BT_REG br; // [esp+4h] [ebp-24h] BYREF
@@ -299,7 +299,7 @@ int __cdecl dt_cmd(int ac, char **av)
   return 0;
 }
 
-void __cdecl disp_tcb(DBGP_HDR *hdr, int fmode)
+void disp_tcb(DBGP_HDR *hdr, int fmode)
 {
   float fpr; // [esp+Ch] [ebp-4DCh] BYREF
   char buf[1024]; // [esp+10h] [ebp-4D8h] BYREF
@@ -439,12 +439,12 @@ void __cdecl disp_tcb(DBGP_HDR *hdr, int fmode)
   }
 }
 
-void __cdecl disp_thread_list_all(DBGP_HDR *hdr)
+void disp_thread_list_all(DBGP_HDR *hdr)
 {
   ;
 }
 
-void __cdecl disp_thread_list(DBGP_EE_THREADLIST_DATA *pdata)
+void disp_thread_list(DBGP_EE_THREADLIST_DATA *pdata)
 {
   char buf[1024]; // [esp+8h] [ebp-454h] BYREF
   int j; // [esp+408h] [ebp-54h]
@@ -476,7 +476,7 @@ void __cdecl disp_thread_list(DBGP_EE_THREADLIST_DATA *pdata)
   ds_printf("\n");
 }
 
-int __cdecl ds_cmd(int ac, char **av)
+int ds_cmd(int ac, char **av)
 {
   int j_3; // [esp+0h] [ebp-20h]
   unsigned int pv; // [esp+4h] [ebp-1Ch] BYREF
@@ -554,7 +554,7 @@ int __cdecl ds_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl intr_cmd(int ac, char **av)
+int intr_cmd(int ac, char **av)
 {
   int enable; // [esp+10h] [ebp-494h]
   char *dmac[16]; // [esp+14h] [ebp-490h] BYREF

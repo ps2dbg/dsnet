@@ -10,19 +10,19 @@ static unsigned int sam_fd = 4294967295u;
 static unsigned int mem_fd = 4294967295u;
 static char *pmem = NULL;
 
-static void __cdecl wcopy(unsigned int *dst, unsigned int *src, unsigned int size);
-static int __cdecl IsLevel0(gifdata_t *p);
-static void __cdecl ConvertGIF(gifdata_t *p);
-static int __cdecl IsPA();
-static int __cdecl IsSupportDMA();
-static int __cdecl IsSupportEEGS();
-static int __cdecl IsSupportGIF();
-static int __cdecl IsSupportIOP();
-static int __cdecl IsNotEEGSSampling();
-static int __cdecl IsSampling();
-static unsigned int __cdecl GetPLXRegister(unsigned int sam_fd);
-static void __cdecl dma_copy(unsigned int baddr, unsigned int offset, unsigned int size);
-static DSP_BUF *__cdecl ds_send_pamp(
+static void wcopy(unsigned int *dst, unsigned int *src, unsigned int size);
+static int IsLevel0(gifdata_t *p);
+static void ConvertGIF(gifdata_t *p);
+static int IsPA();
+static int IsSupportDMA();
+static int IsSupportEEGS();
+static int IsSupportGIF();
+static int IsSupportIOP();
+static int IsNotEEGSSampling();
+static int IsSampling();
+static unsigned int GetPLXRegister(unsigned int sam_fd);
+static void dma_copy(unsigned int baddr, unsigned int offset, unsigned int size);
+static DSP_BUF *ds_send_pamp(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -30,14 +30,14 @@ static DSP_BUF *__cdecl ds_send_pamp(
         unsigned int result,
         void *ptr,
         int len);
-static void __cdecl copy_gif_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count);
-static unsigned int __cdecl GetIOPRas(unsigned int addr);
-static unsigned int __cdecl GetIOPCas(unsigned int addr);
-static void __cdecl SetIOPData(iopdata_t *d, iopfpga_t *s);
-static void __cdecl copy_iop_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count);
-static void __cdecl copy_rdmem(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count);
-static void __cdecl copy_eegs_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count);
-static DSP_BUF *__cdecl ds_send_pamp_gif_record(
+static void copy_gif_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count);
+static unsigned int GetIOPRas(unsigned int addr);
+static unsigned int GetIOPCas(unsigned int addr);
+static void SetIOPData(iopdata_t *d, iopfpga_t *s);
+static void copy_iop_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count);
+static void copy_rdmem(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count);
+static void copy_eegs_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count);
+static DSP_BUF *ds_send_pamp_gif_record(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -46,7 +46,7 @@ static DSP_BUF *__cdecl ds_send_pamp_gif_record(
         unsigned int stop,
         unsigned int offset,
         int count);
-static DSP_BUF *__cdecl ds_send_pamp_rdmem(
+static DSP_BUF *ds_send_pamp_rdmem(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -55,7 +55,7 @@ static DSP_BUF *__cdecl ds_send_pamp_rdmem(
         unsigned int stop,
         unsigned int offset,
         int count);
-static DSP_BUF *__cdecl ds_send_pamp_iop_rdmem(
+static DSP_BUF *ds_send_pamp_iop_rdmem(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -64,7 +64,7 @@ static DSP_BUF *__cdecl ds_send_pamp_iop_rdmem(
         unsigned int stop,
         unsigned int offset,
         int count);
-static DSP_BUF *__cdecl ds_send_pamp_iop_record(
+static DSP_BUF *ds_send_pamp_iop_record(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -73,7 +73,7 @@ static DSP_BUF *__cdecl ds_send_pamp_iop_record(
         unsigned int stop,
         unsigned int offset,
         int count);
-static DSP_BUF *__cdecl ds_send_pamp_eegs_record(
+static DSP_BUF *ds_send_pamp_eegs_record(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -82,225 +82,225 @@ static DSP_BUF *__cdecl ds_send_pamp_eegs_record(
         unsigned int stop,
         unsigned int offset,
         int count);
-static DSP_BUF *__cdecl recv_pamp_notpa(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_getversion(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_writereg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_readreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_eegs_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_eegs_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_gif_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_gif_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_iop_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_iop_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_reset(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_a_getselect(
+static DSP_BUF *recv_pamp_notpa(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_getversion(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_writereg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_readreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_eegs_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_eegs_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_gif_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_gif_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_iop_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_iop_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_reset(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_master_trigger_a_getselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_b_getselect(
+static DSP_BUF *recv_pamp_master_trigger_b_getselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_c_getselect(
+static DSP_BUF *recv_pamp_master_trigger_c_getselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_d_getselect(
+static DSP_BUF *recv_pamp_master_trigger_d_getselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_a_putselect(
+static DSP_BUF *recv_pamp_master_trigger_a_putselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_b_putselect(
+static DSP_BUF *recv_pamp_master_trigger_b_putselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_c_putselect(
+static DSP_BUF *recv_pamp_master_trigger_c_putselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_d_putselect(
+static DSP_BUF *recv_pamp_master_trigger_d_putselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_getstatus(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_gettrigpos(
+static DSP_BUF *recv_pamp_master_getstatus(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_master_trigger_gettrigpos(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_trigger_puttrigpos(
+static DSP_BUF *recv_pamp_master_trigger_puttrigpos(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_sampling_start(
+static DSP_BUF *recv_pamp_master_sampling_start(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_master_sampling_stop(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_master_sampling_stop(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
 static // local variable allocation has failed, the output may be wrong!
-DSP_BUF *__cdecl recv_pamp_iop_trigger_a_getdata(
+DSP_BUF *recv_pamp_iop_trigger_a_getdata(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
 static // local variable allocation has failed, the output may be wrong!
-DSP_BUF *__cdecl recv_pamp_iop_trigger_b_getdata(
+DSP_BUF *recv_pamp_iop_trigger_b_getdata(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_putdata(
+static DSP_BUF *recv_pamp_iop_trigger_a_putdata(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_putdata(
+static DSP_BUF *recv_pamp_iop_trigger_b_putdata(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_getstatus(
+static DSP_BUF *recv_pamp_iop_trigger_getstatus(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_getintc(
+static DSP_BUF *recv_pamp_iop_trigger_a_getintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_putintc(
+static DSP_BUF *recv_pamp_iop_trigger_a_putintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_getintc(
+static DSP_BUF *recv_pamp_iop_trigger_b_getintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_putintc(
+static DSP_BUF *recv_pamp_iop_trigger_b_putintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_putreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_getreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_putvblanking(
+static DSP_BUF *recv_pamp_gif_trigger_a_putreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_gif_trigger_a_getreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_gif_trigger_a_putvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_getintc(
+static DSP_BUF *recv_pamp_gif_trigger_a_getintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_getintc(
+static DSP_BUF *recv_pamp_gif_trigger_b_getintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_putintc(
+static DSP_BUF *recv_pamp_gif_trigger_a_putintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_putintc(
+static DSP_BUF *recv_pamp_gif_trigger_b_putintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_getvblanking(
+static DSP_BUF *recv_pamp_gif_trigger_a_getvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_putvblanking(
+static DSP_BUF *recv_pamp_iop_trigger_a_putvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_getvblanking(
+static DSP_BUF *recv_pamp_iop_trigger_a_getvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_putvblanking(
+static DSP_BUF *recv_pamp_iop_trigger_b_putvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_getvblanking(
+static DSP_BUF *recv_pamp_iop_trigger_b_getvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_putreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_getreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_getvblanking(
+static DSP_BUF *recv_pamp_gif_trigger_b_putreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_gif_trigger_b_getreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len);
+static DSP_BUF *recv_pamp_gif_trigger_b_getvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_putvblanking(
+static DSP_BUF *recv_pamp_gif_trigger_b_putvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_getstatus(
+static DSP_BUF *recv_pamp_gif_trigger_getstatus(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
         unsigned int *args,
         int len);
 
-static void __cdecl wcopy(unsigned int *dst, unsigned int *src, unsigned int size)
+static void wcopy(unsigned int *dst, unsigned int *src, unsigned int size)
 {
   unsigned int *end; // [esp+0h] [ebp-4h]
 
@@ -309,7 +309,7 @@ static void __cdecl wcopy(unsigned int *dst, unsigned int *src, unsigned int siz
     *dst++ = *src++;
 }
 
-static int __cdecl IsLevel0(gifdata_t *p)
+static int IsLevel0(gifdata_t *p)
 {
   int result; // eax
 
@@ -326,7 +326,7 @@ static int __cdecl IsLevel0(gifdata_t *p)
   return result;
 }
 
-static void __cdecl ConvertGIF(gifdata_t *p)
+static void ConvertGIF(gifdata_t *p)
 {
   char v1; // dl
   char v2; // dl
@@ -391,7 +391,7 @@ static void __cdecl ConvertGIF(gifdata_t *p)
   p->GINT &= ~8u;
 }
 
-static int __cdecl IsPA()
+static int IsPA()
 {
   int v0; // ebx
   struct stat stbuf; // [esp+4h] [ebp-58h] BYREF
@@ -406,32 +406,32 @@ static int __cdecl IsPA()
   return ispa_32;
 }
 
-static int __cdecl IsSupportDMA()
+static int IsSupportDMA()
 {
   return IsPA() && screg[128] > 0x2093010;
 }
 
-static int __cdecl IsSupportEEGS()
+static int IsSupportEEGS()
 {
   return 1;
 }
 
-static int __cdecl IsSupportGIF()
+static int IsSupportGIF()
 {
   return 1;
 }
 
-static int __cdecl IsSupportIOP()
+static int IsSupportIOP()
 {
   return 1;
 }
 
-static int __cdecl IsNotEEGSSampling()
+static int IsNotEEGSSampling()
 {
   return IsSupportEEGS() && !screg[16423];
 }
 
-static int __cdecl IsSampling()
+static int IsSampling()
 {
   if ( IsSupportEEGS() && (screg[0x4000] & 0x80000000) != 0 )
     return 1;
@@ -440,7 +440,7 @@ static int __cdecl IsSampling()
   return IsSupportIOP() && (screg[49152] & 0x80000000) != 0;
 }
 
-static unsigned int __cdecl GetPLXRegister(unsigned int sam_fd)
+static unsigned int GetPLXRegister(unsigned int sam_fd)
 {
   void *p; // [esp+0h] [ebp-8h]
   void *p_1; // [esp+0h] [ebp-8h]
@@ -491,7 +491,7 @@ static unsigned int __cdecl GetPLXRegister(unsigned int sam_fd)
   return 5;
 }
 
-unsigned int __cdecl ds_open_sam()
+unsigned int ds_open_sam()
 {
   if ( !IsPA() )
     return 6;
@@ -505,7 +505,7 @@ unsigned int __cdecl ds_open_sam()
   return 2;
 }
 
-void __cdecl set_dma(unsigned int phyAdr, unsigned int adrs, unsigned int bytes)
+void set_dma(unsigned int phyAdr, unsigned int adrs, unsigned int bytes)
 {
   unsigned int v3; // edx
   unsigned int v4; // edx
@@ -524,7 +524,7 @@ void __cdecl set_dma(unsigned int phyAdr, unsigned int adrs, unsigned int bytes)
   plcrs[42] = v4;
 }
 
-static void __cdecl dma_copy(unsigned int baddr, unsigned int offset, unsigned int size)
+static void dma_copy(unsigned int baddr, unsigned int offset, unsigned int size)
 {
   unsigned int end; // [esp+4h] [ebp-4h]
 
@@ -540,7 +540,7 @@ static void __cdecl dma_copy(unsigned int baddr, unsigned int offset, unsigned i
   }
 }
 
-unsigned int __cdecl ds_close_sam(unsigned int sam_fd)
+unsigned int ds_close_sam(unsigned int sam_fd)
 {
   close(sam_fd);
   close(mem_fd);
@@ -548,7 +548,7 @@ unsigned int __cdecl ds_close_sam(unsigned int sam_fd)
   return 0;
 }
 
-static DSP_BUF *__cdecl ds_send_pamp(
+static DSP_BUF *ds_send_pamp(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -579,7 +579,7 @@ static DSP_BUF *__cdecl ds_send_pamp(
   }
 }
 
-static void __cdecl copy_gif_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count)
+static void copy_gif_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count)
 {
   unsigned int v4; // eax
   int v5; // ebx
@@ -744,22 +744,22 @@ static void __cdecl copy_gif_record(unsigned __int8 *dst, unsigned int stop, uns
   }
 }
 
-unsigned int __cdecl GetIOPAddr(unsigned int ras, unsigned int cas)
+unsigned int GetIOPAddr(unsigned int ras, unsigned int cas)
 {
   return (4 * ((2 * (_WORD)cas) & 0x200 | (cas >> 1) & 0x100 | (unsigned __int8)cas)) | ((ras & 0x400 | ((_WORD)ras << 9) & 0x200 | (ras >> 1) & 0x1FF) << 12);
 }
 
-static unsigned int __cdecl GetIOPRas(unsigned int addr)
+static unsigned int GetIOPRas(unsigned int addr)
 {
   return ((addr & 0x200000) != 0) | (addr >> 12) & 0x400 | (addr >> 11) & 0x3FE;
 }
 
-static unsigned int __cdecl GetIOPCas(unsigned int addr)
+static unsigned int GetIOPCas(unsigned int addr)
 {
   return (addr >> 1) & 0x200 | (addr >> 3) & 0x100 | (unsigned __int8)(addr >> 2);
 }
 
-static void __cdecl SetIOPData(iopdata_t *d, iopfpga_t *s)
+static void SetIOPData(iopdata_t *d, iopfpga_t *s)
 {
   __int16 v2; // dx
   int v3; // ecx
@@ -798,7 +798,7 @@ static void __cdecl SetIOPData(iopdata_t *d, iopfpga_t *s)
   HIBYTE(d->REFRESH) &= ~0x40u;
 }
 
-void __cdecl ConvertIOP(unsigned __int8 *dst, unsigned __int8 *src, int linesize)
+void ConvertIOP(unsigned __int8 *dst, unsigned __int8 *src, int linesize)
 {
   char v3; // cl
   char v4; // cl
@@ -844,7 +844,7 @@ void __cdecl ConvertIOP(unsigned __int8 *dst, unsigned __int8 *src, int linesize
   }
 }
 
-static void __cdecl copy_iop_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count)
+static void copy_iop_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count)
 {
   unsigned int v4; // eax
   unsigned int linesize; // [esp+8h] [ebp-8h]
@@ -871,7 +871,7 @@ static void __cdecl copy_iop_record(unsigned __int8 *dst, unsigned int stop, uns
   }
 }
 
-static void __cdecl copy_rdmem(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count)
+static void copy_rdmem(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count)
 {
   unsigned int stopaddr; // [esp+8h] [ebp-4h]
 
@@ -893,7 +893,7 @@ static void __cdecl copy_rdmem(unsigned __int8 *dst, unsigned int stop, unsigned
   }
 }
 
-static void __cdecl copy_eegs_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count)
+static void copy_eegs_record(unsigned __int8 *dst, unsigned int stop, unsigned int offset, unsigned int count)
 {
   unsigned int v4; // eax
   int v5; // ebx
@@ -1038,7 +1038,7 @@ static void __cdecl copy_eegs_record(unsigned __int8 *dst, unsigned int stop, un
   }
 }
 
-static DSP_BUF *__cdecl ds_send_pamp_gif_record(
+static DSP_BUF *ds_send_pamp_gif_record(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -1067,7 +1067,7 @@ static DSP_BUF *__cdecl ds_send_pamp_gif_record(
   }
 }
 
-static DSP_BUF *__cdecl ds_send_pamp_rdmem(
+static DSP_BUF *ds_send_pamp_rdmem(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -1096,7 +1096,7 @@ static DSP_BUF *__cdecl ds_send_pamp_rdmem(
   }
 }
 
-static DSP_BUF *__cdecl ds_send_pamp_iop_rdmem(
+static DSP_BUF *ds_send_pamp_iop_rdmem(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -1125,7 +1125,7 @@ static DSP_BUF *__cdecl ds_send_pamp_iop_rdmem(
   }
 }
 
-static DSP_BUF *__cdecl ds_send_pamp_iop_record(
+static DSP_BUF *ds_send_pamp_iop_record(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -1154,7 +1154,7 @@ static DSP_BUF *__cdecl ds_send_pamp_iop_record(
   }
 }
 
-static DSP_BUF *__cdecl ds_send_pamp_eegs_record(
+static DSP_BUF *ds_send_pamp_eegs_record(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *dh,
@@ -1183,12 +1183,12 @@ static DSP_BUF *__cdecl ds_send_pamp_eegs_record(
   }
 }
 
-static DSP_BUF *__cdecl recv_pamp_notpa(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_notpa(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   return ds_send_pamp(desc, db, dh, *(_DWORD *)&dh[1].length + 1, 6u, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_getversion(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_getversion(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   PAMP_VERSION ver; // [esp+4h] [ebp-14h] BYREF
 
@@ -1209,7 +1209,7 @@ static DSP_BUF *__cdecl recv_pamp_getversion(DS_DESC *desc, DSP_BUF *db, DECI2_H
   return ds_send_pamp(desc, db, dh, 1u, 0, &ver, 20);
 }
 
-static DSP_BUF *__cdecl recv_pamp_writereg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_writereg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int no; // [esp+8h] [ebp-Ch]
   unsigned int kind; // [esp+Ch] [ebp-8h]
@@ -1227,7 +1227,7 @@ static DSP_BUF *__cdecl recv_pamp_writereg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR
   return ds_send_pamp(desc, db, dh, *(_DWORD *)&dh[1].length + 1, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_readreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_readreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int no; // [esp+0h] [ebp-14h]
   unsigned int kind; // [esp+4h] [ebp-10h]
@@ -1246,7 +1246,7 @@ static DSP_BUF *__cdecl recv_pamp_readreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR 
   return ds_send_pamp(desc, db, dh, *(_DWORD *)&dh[1].length + 1, 0, &val, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_eegs_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_eegs_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int size; // [esp+0h] [ebp-10h]
   unsigned int offset; // [esp+4h] [ebp-Ch]
@@ -1262,7 +1262,7 @@ static DSP_BUF *__cdecl recv_pamp_eegs_record(DS_DESC *desc, DSP_BUF *db, DECI2_
   return ds_send_pamp_eegs_record(desc, db, dh, *ph + 1, 0, screg[32769], offset, size);
 }
 
-static DSP_BUF *__cdecl recv_pamp_eegs_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_eegs_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int size; // [esp+0h] [ebp-10h]
   unsigned int offset; // [esp+4h] [ebp-Ch]
@@ -1278,7 +1278,7 @@ static DSP_BUF *__cdecl recv_pamp_eegs_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_H
   return ds_send_pamp_rdmem(desc, db, dh, *ph + 1, 0, screg[32769], offset, size);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_gif_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int size; // [esp+0h] [ebp-10h]
   unsigned int offset; // [esp+4h] [ebp-Ch]
@@ -1294,7 +1294,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_record(DS_DESC *desc, DSP_BUF *db, DECI2_H
   return ds_send_pamp(desc, db, dh, *ph + 1, 1u, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_gif_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int size; // [esp+0h] [ebp-10h]
   unsigned int offset; // [esp+4h] [ebp-Ch]
@@ -1310,7 +1310,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HD
   return ds_send_pamp(desc, db, dh, *ph + 1, 1u, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_iop_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int size; // [esp+0h] [ebp-10h]
   unsigned int offset; // [esp+4h] [ebp-Ch]
@@ -1326,7 +1326,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_rdmem(DS_DESC *desc, DSP_BUF *db, DECI2_HD
   return ds_send_pamp(desc, db, dh, *ph + 1, 1u, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_iop_record(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int size; // [esp+0h] [ebp-10h]
   unsigned int offset; // [esp+4h] [ebp-Ch]
@@ -1342,7 +1342,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_record(DS_DESC *desc, DSP_BUF *db, DECI2_H
   return ds_send_pamp(desc, db, dh, *ph + 1, 1u, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_reset(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_reset(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   screg[1] = 0x80000000;
   screg[1] = 0;
@@ -1366,7 +1366,7 @@ static DSP_BUF *__cdecl recv_pamp_reset(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   return ds_send_pamp(desc, db, dh, 3u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_a_getselect(
+static DSP_BUF *recv_pamp_master_trigger_a_getselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1381,7 +1381,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_a_getselect(
   return ds_send_pamp(desc, db, dh, 0x11u, 0, &reg, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_b_getselect(
+static DSP_BUF *recv_pamp_master_trigger_b_getselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1396,7 +1396,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_b_getselect(
   return ds_send_pamp(desc, db, dh, 0x15u, 0, &reg, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_c_getselect(
+static DSP_BUF *recv_pamp_master_trigger_c_getselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1411,7 +1411,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_c_getselect(
   return ds_send_pamp(desc, db, dh, 0x19u, 0, &reg, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_d_getselect(
+static DSP_BUF *recv_pamp_master_trigger_d_getselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1426,7 +1426,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_d_getselect(
   return ds_send_pamp(desc, db, dh, 0x1Du, 0, &reg, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_a_putselect(
+static DSP_BUF *recv_pamp_master_trigger_a_putselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1439,7 +1439,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_a_putselect(
   return ds_send_pamp(desc, db, dh, 0x13u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_b_putselect(
+static DSP_BUF *recv_pamp_master_trigger_b_putselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1452,7 +1452,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_b_putselect(
   return ds_send_pamp(desc, db, dh, 0x17u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_c_putselect(
+static DSP_BUF *recv_pamp_master_trigger_c_putselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1465,7 +1465,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_c_putselect(
   return ds_send_pamp(desc, db, dh, 0x1Bu, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_d_putselect(
+static DSP_BUF *recv_pamp_master_trigger_d_putselect(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1478,7 +1478,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_d_putselect(
   return ds_send_pamp(desc, db, dh, 0x1Fu, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_getstatus(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_master_getstatus(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int status; // [esp+4h] [ebp-8h] BYREF
   unsigned int v7; // [esp+8h] [ebp-4h]
@@ -1490,7 +1490,7 @@ static DSP_BUF *__cdecl recv_pamp_master_getstatus(DS_DESC *desc, DSP_BUF *db, D
   return ds_send_pamp(desc, db, dh, 9u, 0, &status, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_gettrigpos(
+static DSP_BUF *recv_pamp_master_trigger_gettrigpos(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1517,7 +1517,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_gettrigpos(
   return ds_send_pamp(desc, db, dh, 0x21u, 0, &status, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_trigger_puttrigpos(
+static DSP_BUF *recv_pamp_master_trigger_puttrigpos(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1552,7 +1552,7 @@ static DSP_BUF *__cdecl recv_pamp_master_trigger_puttrigpos(
   return ds_send_pamp(desc, db, dh, 0x23u, v9, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_sampling_start(
+static DSP_BUF *recv_pamp_master_sampling_start(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1609,7 +1609,7 @@ static DSP_BUF *__cdecl recv_pamp_master_sampling_start(
   return ds_send_pamp(desc, db, dh, 5u, v10, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_master_sampling_stop(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_master_sampling_stop(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   unsigned int v6; // [esp+0h] [ebp-4h]
 
@@ -1626,7 +1626,7 @@ static DSP_BUF *__cdecl recv_pamp_master_sampling_stop(DS_DESC *desc, DSP_BUF *d
 }
 
 // local variable allocation has failed, the output may be wrong!
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_getdata(
+static DSP_BUF *recv_pamp_iop_trigger_a_getdata(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1678,7 +1678,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_getdata(
 }
 
 // local variable allocation has failed, the output may be wrong!
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_getdata(
+static DSP_BUF *recv_pamp_iop_trigger_b_getdata(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1729,7 +1729,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_getdata(
   return ds_send_pamp(desc, db, dh, 0x30021u, 0, &data, 20);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_putdata(
+static DSP_BUF *recv_pamp_iop_trigger_a_putdata(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1812,7 +1812,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_putdata(
   return ds_send_pamp(desc, db, dh, 0x30013u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_putdata(
+static DSP_BUF *recv_pamp_iop_trigger_b_putdata(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1898,7 +1898,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_putdata(
   return ds_send_pamp(desc, db, dh, 0x30023u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_getstatus(
+static DSP_BUF *recv_pamp_iop_trigger_getstatus(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1913,7 +1913,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_getstatus(
   return ds_send_pamp(desc, db, dh, 0x30019u, 0, &intc, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_getintc(
+static DSP_BUF *recv_pamp_iop_trigger_a_getintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1932,7 +1932,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_getintc(
   return ds_send_pamp(desc, db, dh, 0x30019u, v8, &intc, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_putintc(
+static DSP_BUF *recv_pamp_iop_trigger_a_putintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1965,7 +1965,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_putintc(
   return ds_send_pamp(desc, db, dh, 0x30017u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_getintc(
+static DSP_BUF *recv_pamp_iop_trigger_b_getintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -1984,7 +1984,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_getintc(
   return ds_send_pamp(desc, db, dh, 0x30025u, v8, &intc, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_putintc(
+static DSP_BUF *recv_pamp_iop_trigger_b_putintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2017,7 +2017,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_putintc(
   return ds_send_pamp(desc, db, dh, 0x30027u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_putreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_gif_trigger_a_putreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   if ( IsSampling() )
     return ds_send_pamp(desc, db, dh, *(_DWORD *)&dh[1].length + 1, 2u, 0, 0);
@@ -2030,7 +2030,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_putreg(DS_DESC *desc, DSP_BUF *d
   return ds_send_pamp(desc, db, dh, 0x20013u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_getreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_gif_trigger_a_getreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   TRIG_REG reg; // [esp+4h] [ebp-18h] BYREF
 
@@ -2043,7 +2043,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_getreg(DS_DESC *desc, DSP_BUF *d
   return ds_send_pamp(desc, db, dh, 0x20011u, 0, &reg, 24);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_putvblanking(
+static DSP_BUF *recv_pamp_gif_trigger_a_putvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2056,7 +2056,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_putvblanking(
   return ds_send_pamp(desc, db, dh, 0x20017u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_getintc(
+static DSP_BUF *recv_pamp_gif_trigger_a_getintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2073,7 +2073,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_getintc(
   return ds_send_pamp(desc, db, dh, 0x20019u, v7, &gint, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_getintc(
+static DSP_BUF *recv_pamp_gif_trigger_b_getintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2090,7 +2090,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_getintc(
   return ds_send_pamp(desc, db, dh, 0x20029u, v7, &gint, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_putintc(
+static DSP_BUF *recv_pamp_gif_trigger_a_putintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2104,7 +2104,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_putintc(
   return ds_send_pamp(desc, db, dh, 0x2001Bu, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_putintc(
+static DSP_BUF *recv_pamp_gif_trigger_b_putintc(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2118,7 +2118,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_putintc(
   return ds_send_pamp(desc, db, dh, 0x2002Bu, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_getvblanking(
+static DSP_BUF *recv_pamp_gif_trigger_a_getvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2133,7 +2133,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_a_getvblanking(
   return ds_send_pamp(desc, db, dh, 0x20015u, 0, &vblank, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_putvblanking(
+static DSP_BUF *recv_pamp_iop_trigger_a_putvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2161,7 +2161,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_putvblanking(
   return ds_send_pamp(desc, db, dh, 0x3001Bu, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_getvblanking(
+static DSP_BUF *recv_pamp_iop_trigger_a_getvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2180,7 +2180,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_a_getvblanking(
   return ds_send_pamp(desc, db, dh, 0x30019u, v8, &vblank, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_putvblanking(
+static DSP_BUF *recv_pamp_iop_trigger_b_putvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2193,7 +2193,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_putvblanking(
   return ds_send_pamp(desc, db, dh, 0x3002Bu, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_getvblanking(
+static DSP_BUF *recv_pamp_iop_trigger_b_getvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2212,7 +2212,7 @@ static DSP_BUF *__cdecl recv_pamp_iop_trigger_b_getvblanking(
   return ds_send_pamp(desc, db, dh, 0x30029u, v8, &vblank, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_putreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_gif_trigger_b_putreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   if ( IsSampling() )
     return ds_send_pamp(desc, db, dh, *(_DWORD *)&dh[1].length + 1, 2u, 0, 0);
@@ -2225,7 +2225,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_putreg(DS_DESC *desc, DSP_BUF *d
   return ds_send_pamp(desc, db, dh, 0x20023u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_getreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
+static DSP_BUF *recv_pamp_gif_trigger_b_getreg(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int len)
 {
   TRIG_REG reg; // [esp+4h] [ebp-18h] BYREF
 
@@ -2238,7 +2238,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_getreg(DS_DESC *desc, DSP_BUF *d
   return ds_send_pamp(desc, db, dh, 0x20021u, 0, &reg, 24);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_getvblanking(
+static DSP_BUF *recv_pamp_gif_trigger_b_getvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2253,7 +2253,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_getvblanking(
   return ds_send_pamp(desc, db, dh, 0x20025u, 0, &vb, 4);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_putvblanking(
+static DSP_BUF *recv_pamp_gif_trigger_b_putvblanking(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2266,7 +2266,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_b_putvblanking(
   return ds_send_pamp(desc, db, dh, 0x20027u, 0, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_pamp_gif_trigger_getstatus(
+static DSP_BUF *recv_pamp_gif_trigger_getstatus(
         DS_DESC *desc,
         DSP_BUF *db,
         DECI2_HDR *dh,
@@ -2281,7 +2281,7 @@ static DSP_BUF *__cdecl recv_pamp_gif_trigger_getstatus(
   return ds_send_pamp(desc, db, dh, 0x20003u, 0, &status, 4);
 }
 
-DSP_BUF *__cdecl ds_recv_pamp(DS_DESC *desc, DSP_BUF *db)
+DSP_BUF *ds_recv_pamp(DS_DESC *desc, DSP_BUF *db)
 {
   unsigned int code; // [esp+0h] [ebp-10h]
   unsigned int *args; // [esp+4h] [ebp-Ch]

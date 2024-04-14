@@ -251,17 +251,17 @@ static EE_REGS ee_regs[] =
 extern quad regbuf_vals[11][32]; // defined in dbg.c
 extern unsigned int regbuf_mask[11]; // defined in dbg.c
 
-static void __cdecl print_symcr(unsigned int rcr);
-static void __cdecl print_rcr(unsigned int rcr);
-static void __cdecl print_symsr(unsigned int rsr);
-static void __cdecl print_rsr(unsigned int rsr);
-static void __cdecl print_bpc(unsigned int bpc);
-static void __cdecl print_vuc(char *name, int kind, int number, unsigned int val);
-static int __cdecl set_regmasks(unsigned int *masks, char *name);
-static int __cdecl dr_default_setmask(unsigned int *masks, int kind, int number);
-static int __cdecl dr_default(char *fmt, unsigned int *masks, quad *vals);
+static void print_symcr(unsigned int rcr);
+static void print_rcr(unsigned int rcr);
+static void print_symsr(unsigned int rsr);
+static void print_rsr(unsigned int rsr);
+static void print_bpc(unsigned int bpc);
+static void print_vuc(char *name, int kind, int number, unsigned int val);
+static int set_regmasks(unsigned int *masks, char *name);
+static int dr_default_setmask(unsigned int *masks, int kind, int number);
+static int dr_default(char *fmt, unsigned int *masks, quad *vals);
 
-static void __cdecl print_symcr(unsigned int rcr)
+static void print_symcr(unsigned int rcr)
 {
   unsigned int v1; // eax
 
@@ -369,14 +369,14 @@ LABEL_19:
   ds_printf("\" ");
 }
 
-static void __cdecl print_rcr(unsigned int rcr)
+static void print_rcr(unsigned int rcr)
 {
   ds_printf("$cause   = 0x%W [", rcr);
   print_symcr(rcr);
   ds_printf("]");
 }
 
-static void __cdecl print_symsr(unsigned int rsr)
+static void print_symsr(unsigned int rsr)
 {
   char *v1; // eax
   char *v2; // eax
@@ -510,14 +510,14 @@ static void __cdecl print_symsr(unsigned int rsr)
   ds_printf(" ");
 }
 
-static void __cdecl print_rsr(unsigned int rsr)
+static void print_rsr(unsigned int rsr)
 {
   ds_printf("$status  = 0x%W [", rsr);
   print_symsr(rsr);
   ds_printf("]");
 }
 
-static void __cdecl print_bpc(unsigned int bpc)
+static void print_bpc(unsigned int bpc)
 {
   const char *v1; // eax
   const char *v2; // eax
@@ -632,7 +632,7 @@ static void __cdecl print_bpc(unsigned int bpc)
   ds_printf(" ]");
 }
 
-static void __cdecl print_vuc(char *name, int kind, int number, unsigned int val)
+static void print_vuc(char *name, int kind, int number, unsigned int val)
 {
   const char *v4; // eax
   const char *v5; // eax
@@ -1129,7 +1129,7 @@ static void __cdecl print_vuc(char *name, int kind, int number, unsigned int val
   ds_printf(" ]");
 }
 
-static int __cdecl set_regmasks(unsigned int *masks, char *name)
+static int set_regmasks(unsigned int *masks, char *name)
 {
   int v3; // eax
   int rk; // [esp+18h] [ebp-10h]
@@ -1257,7 +1257,7 @@ static int __cdecl set_regmasks(unsigned int *masks, char *name)
   }
 }
 
-int __cdecl check_reserved_name(char *name)
+int check_reserved_name(char *name)
 {
   EE_REGS *reg; // [esp+0h] [ebp-4h]
 
@@ -1281,7 +1281,7 @@ int __cdecl check_reserved_name(char *name)
   return 0;
 }
 
-int __cdecl load_quad_reg(char *name, quad *pv)
+int load_quad_reg(char *name, quad *pv)
 {
   unsigned int v3; // edx
   unsigned int v4; // edx
@@ -1404,7 +1404,7 @@ LABEL_16:
   }
 }
 
-int __cdecl store_quad_reg(char *name, quad val)
+int store_quad_reg(char *name, quad val)
 {
   int n; // [esp+0h] [ebp-1634h]
   int i; // [esp+4h] [ebp-1630h]
@@ -1420,7 +1420,7 @@ int __cdecl store_quad_reg(char *name, quad val)
   return store_quad_registers(masks, vals, n);
 }
 
-static int __cdecl dr_default_setmask(unsigned int *masks, int kind, int number)
+static int dr_default_setmask(unsigned int *masks, int kind, int number)
 {
   if ( (masks[kind] & (1 << number)) != 0 )
     return 0;
@@ -1428,7 +1428,7 @@ static int __cdecl dr_default_setmask(unsigned int *masks, int kind, int number)
   return 1;
 }
 
-static int __cdecl dr_default(char *fmt, unsigned int *masks, quad *vals)
+static int dr_default(char *fmt, unsigned int *masks, quad *vals)
 {
   char *v3; // eax
   int v4; // eax
@@ -1659,7 +1659,7 @@ static int __cdecl dr_default(char *fmt, unsigned int *masks, quad *vals)
   return 0;
 }
 
-int __cdecl dreg_cmd(int ac, char **av)
+int dreg_cmd(int ac, char **av)
 {
   char v3; // al
   unsigned int v4; // eax
@@ -2177,7 +2177,7 @@ LABEL_116:
   }
 }
 
-int __cdecl sreg_cmd(int ac, char **av)
+int sreg_cmd(int ac, char **av)
 {
   int f_force; // [esp+0h] [ebp-14h]
   quad val; // [esp+4h] [ebp-10h] BYREF
@@ -2211,7 +2211,7 @@ int __cdecl sreg_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl hbp_cmd(int ac, char **av)
+int hbp_cmd(int ac, char **av)
 {
   char *v3; // eax
   char *v4; // eax
@@ -2637,7 +2637,7 @@ LABEL_168:
   return 0;
 }
 
-int __cdecl rload_cmd(int ac, char **av)
+int rload_cmd(int ac, char **av)
 {
   int v3; // eax
   char *v4; // eax
@@ -2761,7 +2761,7 @@ LABEL_72:
   return r;
 }
 
-int __cdecl rsave_cmd(int ac, char **av)
+int rsave_cmd(int ac, char **av)
 {
   int v3; // eax
   int quad_registers; // eax
