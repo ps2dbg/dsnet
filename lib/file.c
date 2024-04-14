@@ -103,11 +103,11 @@ void *__cdecl ds_fload(void *stream, int whence, int off, int siz, int cnt)
 {
   void *p; // [esp+0h] [ebp-4h]
 
-  p = ds_alloc_mem_low("file.c", "ds_fload", cnt * siz + 1);
+  p = ds_alloc(cnt * siz + 1);
   if ( !p )
     return 0;
   if ( ds_fseek(stream, off, whence) == -1 || cnt != ds_fread(p, siz, cnt, stream, 0) )
-    return ds_free_mem_low(p, "file.c", "ds_fload");
+    return ds_free(p);
   *((_BYTE *)p + cnt * siz) = 0;
   return p;
 }

@@ -57,7 +57,7 @@ static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
   app = (char *)ds_program_name;
   if ( desc->psnet_priv )
     return (DS_PSNETD_PRIV *)desc->psnet_priv;
-  p = (DS_PSNETD_PRIV *)ds_alloc_mem_low("psnet.c", "init_psnet", sizeof(DS_PSNETD_PRIV));
+  p = (DS_PSNETD_PRIV *)ds_alloc(sizeof(DS_PSNETD_PRIV));
   if ( !p )
     return 0;
   ds_bzero(p, sizeof(DS_PSNETD_PRIV));
@@ -67,7 +67,7 @@ static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
   p->gseq = 1;
   p->tseq = 1;
   p->snd_len = 156;
-  v3 = (char *)ds_alloc_mem_low("psnet.c", "init_psnet", p->snd_len);
+  v3 = (char *)ds_alloc(p->snd_len);
   p->snd_ptr = v3;
   p->snd_buf = v3;
   if ( !v3 )
@@ -101,8 +101,8 @@ void __cdecl ds_free_psnet(DS_DESC *desc)
   p = (DS_PSNETD_PRIV *)desc->psnet_priv;
   if ( p )
   {
-    ds_free_mem_low(p->snd_buf, "psnet.c", "_ds_free_psnet");
-    ds_free_mem_low(p->rcv_buf, "psnet.c", "_ds_free_psnet");
+    ds_free(p->snd_buf);
+    ds_free(p->rcv_buf);
   }
 }
 
@@ -119,9 +119,9 @@ static int __cdecl recv_deci1_hook(DS_PSNETD_PRIV *p, DS_DECI1 *deci1, void *ptr
     return 0;
   if ( req == 1308754176 )
   {
-    p->rcv_buf = (char *)ds_free_mem_low(p->rcv_buf, "psnet.c", "recv_deci1_hook");
+    p->rcv_buf = (char *)ds_free(p->rcv_buf);
     p->read_len = 10;
-    v5 = (char *)ds_alloc_mem_low("psnet.c", "recv_deci1_hook", p->read_len);
+    v5 = (char *)ds_alloc(p->read_len);
     p->rcv_buf = v5;
     if ( v5 )
     {
@@ -234,7 +234,7 @@ int __cdecl ds_read_psnet(DS_DESC *desc, char *buf, int len)
         return -1;
       }
       v11 = p->rcv_hdr.len;
-      v5 = (char *)ds_alloc_mem_low("psnet.c", "_ds_read_psnet", v11 - 32);
+      v5 = (char *)ds_alloc(v11 - 32);
       p->rcv_buf = v5;
       if ( !v5 )
         return -1;
@@ -264,7 +264,7 @@ LABEL_12:
     if ( recv_deci1_hook(p, deci1, p->rcv_buf, v11) )
     {
       p->rcv_len = 0;
-      p->rcv_buf = (char *)ds_free_mem_low(p->rcv_buf, "psnet.c", "_ds_read_psnet");
+      p->rcv_buf = (char *)ds_free(p->rcv_buf);
       errno = 11;
       return -1;
     }
@@ -281,7 +281,7 @@ LABEL_12:
     if ( v8 <= 0 )
     {
       p->rcv_len = 0;
-      p->rcv_buf = (char *)ds_free_mem_low(p->rcv_buf, "psnet.c", "_ds_read_psnet");
+      p->rcv_buf = (char *)ds_free(p->rcv_buf);
     }
   }
   return r_2;
@@ -293,7 +293,7 @@ static int __cdecl send_treset(DS_PSNETD_PRIV *p)
   char *cp; // [esp+0h] [ebp-4h]
 
   p->snd_len = 36;
-  v1 = (char *)ds_alloc_mem_low("psnet.c", "send_treset", p->snd_len);
+  v1 = (char *)ds_alloc(p->snd_len);
   p->snd_ptr = v1;
   p->snd_buf = v1;
   if ( !v1 )
@@ -351,7 +351,7 @@ int __cdecl ds_write_psnet(DS_DESC *desc, char *buf, int len)
       else
         v5 = len + 32 * v4;
       p->snd_len = v5;
-      v6 = (char *)ds_alloc_mem_low("psnet.c", "_ds_write_psnet", p->snd_len);
+      v6 = (char *)ds_alloc(p->snd_len);
       p->snd_buf = v6;
       p->snd_ptr = v6;
       if ( !v6 )
@@ -381,7 +381,7 @@ int __cdecl ds_write_psnet(DS_DESC *desc, char *buf, int len)
   p->snd_len = v7;
   if ( v7 > 0 )
     return 0;
-  p->snd_buf = (char *)ds_free_mem_low(p->snd_buf, "psnet.c", "_ds_write_psnet");
+  p->snd_buf = (char *)ds_free(p->snd_buf);
   return p->snd_dslen;
 }
 

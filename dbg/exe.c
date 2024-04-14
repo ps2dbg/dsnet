@@ -57,7 +57,7 @@ static int __cdecl get_target_brkpt(int flag)
   r = -1;
   if ( !dbconf.nbrkpt )
     return ds_error("dbconf.nbrkpt is zero");
-  cbps = (DBGP_BRKPT_DATA *)ds_alloc_mem_low("exe.c", "get_target_brkpt", sizeof(DBGP_BRKPT_DATA) * dbconf.nbrkpt);
+  cbps = (DBGP_BRKPT_DATA *)ds_alloc(sizeof(DBGP_BRKPT_DATA) * dbconf.nbrkpt);
   if ( !cbps )
     return -1;
   if ( get_brkpt(cbps, &nc) >= 0 )
@@ -76,7 +76,7 @@ static int __cdecl get_target_brkpt(int flag)
     r = 0;
   }
   if ( cbps )
-    ds_free_mem_low(cbps, "exe.c", "get_target_brkpt");
+    ds_free(cbps);
   return r;
 }
 
@@ -110,7 +110,7 @@ static int __cdecl put_target_brkpt(int flag)
   }
   if ( nr > dbconf.nbrkpt )
     return ds_error("too many breakpoints (%d < %d)", dbconf.nbrkpt, nr);
-  rbps = (DBGP_BRKPT_DATA *)ds_alloc_mem_low("exe.c", "put_target_brkpt", sizeof(DBGP_BRKPT_DATA) * nr);
+  rbps = (DBGP_BRKPT_DATA *)ds_alloc(sizeof(DBGP_BRKPT_DATA) * nr);
   if ( !rbps )
     return -1;
   v4 = 0;
@@ -146,7 +146,7 @@ LABEL_23:
   }
   if ( put_brkpt(rbps, nr) >= 0 )
     r = 0;
-  ds_free_mem_low(rbps, "exe.c", "put_target_brkpt");
+  ds_free(rbps);
   return r;
 }
 
@@ -321,7 +321,7 @@ static int __cdecl add_brkpt(int flag, unsigned int adr, unsigned int cnt)
       return 0;
     }
   }
-  bp_1 = (BRKPT *)ds_alloc_mem_low("exe.c", "add_brkpt", sizeof(BRKPT));
+  bp_1 = (BRKPT *)ds_alloc(sizeof(BRKPT));
   if ( !bp_1 )
     return -1;
   v8 = flag;
@@ -373,7 +373,7 @@ static int __cdecl del_brkpt(int flag, unsigned int adr)
         bp->back->forw = bp->forw;
       else
         bps.head = bp->forw;
-      ds_free_mem_low(bp, "exe.c", "del_brkpt");
+      ds_free(bp);
       ++r;
     }
   }
@@ -1949,7 +1949,7 @@ int __cdecl set_runarg(int ac, char **av)
   int i_2; // [esp+Ch] [ebp-4h]
 
   if ( run_args )
-    run_args = (char *)ds_free_mem_low(run_args, "exe.c", "set_runarg");
+    run_args = (char *)ds_free(run_args);
   run_argc = 0;
   buf = ds_decode_args(ac, av);
   if ( !buf )
@@ -1962,7 +1962,7 @@ int __cdecl set_runarg(int ac, char **av)
     run_args_len = strlen(av[i_3++]) + v3;
   }
   run_args_len += sizeof(_DWORD) * ac;
-  run_args = (char *)ds_alloc_mem_low("exe.c", "set_runarg", run_args_len);
+  run_args = (char *)ds_alloc(run_args_len);
   bp = run_args;
   if ( !run_args )
     return -1;
@@ -1978,7 +1978,7 @@ int __cdecl set_runarg(int ac, char **av)
     bp = &v5[strlen(av[i_2]) + 1];
   }
   run_argc = ac;
-  ds_free_mem_low(buf, "exe.c", "set_runarg");
+  ds_free(buf);
   return 0;
 }
 

@@ -2774,12 +2774,12 @@ static void __cdecl dup_and_exe(char *cmd)
   if ( cmd && *cmd )
   {
     v1 = strlen(cmd);
-    buf = (char *)ds_alloc_mem_low("dbg.c", "dup_and_exe", v1 + 1);
+    buf = (char *)ds_alloc(v1 + 1);
     if ( buf )
     {
       v2 = strcpy(buf, cmd);
       ds_cmd_execute(v2, 0);
-      ds_free_mem_low(buf, "dbg.c", "dup_and_exe");
+      ds_free(buf);
     }
   }
 }

@@ -79,9 +79,12 @@ extern int __cdecl ds_log_cmd(int ac, char **av);
 
 // root/dsnet/lib/mem.c
 
+#define ds_alloc(_s) (ds_alloc_mem_low(__FILE__, __FUNCTION__, (_s)))
+#define ds_free(_p) (ds_free_mem_low((_p), __FILE__, __FUNCTION__))
+
 extern void __cdecl ds_status_mem();
-extern void *__cdecl ds_alloc_mem_low(char *file, char *func, int size);
-extern void *__cdecl ds_free_mem_low(void *ptr, char *file, char *func);
+extern void *__cdecl ds_alloc_mem_low(const char *file, const char *func, int size);
+extern void *__cdecl ds_free_mem_low(void *ptr, const char *file, const char *func);
 
 // root/dsnet/lib/misc.c
 

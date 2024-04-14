@@ -25,11 +25,11 @@ void __cdecl clear_mdebug()
   for ( p = mdebug_list.head; p; p = q )
   {
     q = p->forw;
-    ds_free_mem_low(p->shdr, "mdebug.c", "clear_mdebug");
-    ds_free_mem_low(p->fdt_adrs, "mdebug.c", "clear_mdebug");
-    ds_free_mem_low(p->pdt_adrs, "mdebug.c", "clear_mdebug");
-    ds_free_mem_low(p->path, "mdebug.c", "clear_mdebug");
-    ds_free_mem_low(p, "mdebug.c", "clear_mdebug");
+    ds_free(p->shdr);
+    ds_free(p->fdt_adrs);
+    ds_free(p->pdt_adrs);
+    ds_free(p->path);
+    ds_free(p);
   }
   mdebug_list.tail = 0;
   mdebug_list.head = 0;
@@ -54,11 +54,11 @@ void __cdecl clear_mdebug_with_id(int id)
         p->back->forw = p->forw;
       else
         mdebug_list.head = p->forw;
-      ds_free_mem_low(p->shdr, "mdebug.c", "clear_mdebug_with_id");
-      ds_free_mem_low(p->fdt_adrs, "mdebug.c", "clear_mdebug_with_id");
-      ds_free_mem_low(p->pdt_adrs, "mdebug.c", "clear_mdebug_with_id");
-      ds_free_mem_low(p->path, "mdebug.c", "clear_mdebug_with_id");
-      ds_free_mem_low(p, "mdebug.c", "clear_mdebug_with_id");
+      ds_free(p->shdr);
+      ds_free(p->fdt_adrs);
+      ds_free(p->pdt_adrs);
+      ds_free(p->path);
+      ds_free(p);
     }
   }
   clear_source_line_buffer();
@@ -411,7 +411,7 @@ static char *__cdecl set_abs_path(char *fname)
   if ( !ds_abs_path(path, 1024, fname) )
     return 0;
   v2 = strlen(path);
-  r = (char *)ds_alloc_mem_low("mdebug.c", "set_abs_path", v2 + 1);
+  r = (char *)ds_alloc(v2 + 1);
   if ( r )
     return strcpy(r, path);
   else
@@ -459,10 +459,10 @@ int __cdecl load_mdebug(
   if ( !shdr )
     return -1;
 
-  md = ds_alloc_mem_low("mdebug.c", "load_mdebug", sizeof(MDEBUG));
+  md = ds_alloc(sizeof(MDEBUG));
   if ( !md )
   {
-    ds_free_mem_low(shdr, "mdebug.c", "load_mdebug");
+    ds_free(shdr);
     return -1;
   }
 
@@ -600,12 +600,12 @@ int __cdecl load_mdebug(
   for ( FDT *fdt = md->fdts; md->fdte > fdt; ++fdt )
     ;
 
-  md->fdt_adrs = ds_alloc_mem_low("mdebug.c", "load_mdebug", sizeof(ADRS) * shdr->ifdMax);
+  md->fdt_adrs = ds_alloc(sizeof(ADRS) * shdr->ifdMax);
 
   if ( !md->fdt_adrs )
     goto error;
 
-  md->pdt_adrs = ds_alloc_mem_low("mdebug.c", "load_mdebug", sizeof(ADRS) * shdr->ipdMax);
+  md->pdt_adrs = ds_alloc(sizeof(ADRS) * shdr->ipdMax);
 
   if ( !md->pdt_adrs)
     goto error;
@@ -678,11 +678,11 @@ int __cdecl load_mdebug(
   return 0;
 
 error:
-  ds_free_mem_low(md->shdr, "mdebug.c", "load_mdebug");
-  ds_free_mem_low(md->fdt_adrs, "mdebug.c", "load_mdebug");
-  ds_free_mem_low(md->pdt_adrs, "mdebug.c", "load_mdebug");
-  ds_free_mem_low(md->path, "mdebug.c", "load_mdebug");
-  ds_free_mem_low(md, "mdebug.c", "load_mdebug");
+  ds_free(md->shdr);
+  ds_free(md->fdt_adrs);
+  ds_free(md->pdt_adrs);
+  ds_free(md->path);
+  ds_free(md);
 
   return -1;
 }
@@ -891,8 +891,8 @@ LABEL_25:
 
 static void __cdecl clear_source_line_buffer()
 {
-  cur_fname = (char *)ds_free_mem_low(cur_fname, "mdebug.c", "clear_source_line_buffer");
-  cur_buf = (char *)ds_free_mem_low(cur_buf, "mdebug.c", "clear_source_line_buffer");
+  cur_fname = (char *)ds_free(cur_fname);
+  cur_buf = (char *)ds_free(cur_buf);
   cur_size = 0;
 }
 
@@ -973,7 +973,7 @@ char *__cdecl string_by_file_and_line(char *fname, int line, char *obj_path)
   if ( ds_fsize(s2, &cur_size) < 0 )
     return 0;
   v4 = strlen(s2);
-  cur_fname = (char *)ds_alloc_mem_low("mdebug.c", "string_by_file_and_line", v4 + 1);
+  cur_fname = (char *)ds_alloc(v4 + 1);
   if ( !cur_fname )
     return 0;
   strcpy(cur_fname, s2);
@@ -998,7 +998,7 @@ LABEL_17:
     return 0;
   for ( q = p; pe > q && *q != 10; ++q )
     ;
-  v6 = (char *)ds_alloc_mem_low("mdebug.c", "string_by_file_and_line", q - p + 1);
+  v6 = (char *)ds_alloc(q - p + 1);
   r = v6;
   if ( !v6 )
     return 0;

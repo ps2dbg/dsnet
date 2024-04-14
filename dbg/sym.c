@@ -20,7 +20,7 @@ void __cdecl clear_module_symbol()
   for ( p = mod_syms_list.head; p; p = q )
   {
     q = p->forw;
-    ds_free_mem_low(p, "sym.c", "clear_module_symbol");
+    ds_free(p);
   }
   mod_syms_list.tail = 0;
   mod_syms_list.head = 0;
@@ -44,7 +44,7 @@ void __cdecl clear_module_symbol_with_name(char *name)
         p->back->forw = p->forw;
       else
         mod_syms_list.head = p->forw;
-      ds_free_mem_low(p, "sym.c", "clear_module_symbol_with_name");
+      ds_free(p);
     }
   }
 }
@@ -56,7 +56,7 @@ void __cdecl add_module_symbol(char *name, int adr, int siz, int id)
   MOD_SYMS *p; // [esp+8h] [ebp-4h]
 
   v4 = strlen(name);
-  p = (MOD_SYMS *)ds_alloc_mem_low("sym.c", "add_module_symbol", v4 + sizeof(MOD_SYMS) + 1);
+  p = (MOD_SYMS *)ds_alloc(v4 + sizeof(MOD_SYMS) + 1);
   if ( p )
   {
     strcpy(p->name, name);
@@ -82,11 +82,11 @@ void __cdecl clear_symbol()
   for ( p = syms_list.head; p; p = q )
   {
     q = p->forw;
-    ds_free_mem_low(p->symtab, "sym.c", "clear_symbol");
-    ds_free_mem_low(p->shstrtab, "sym.c", "clear_symbol");
-    ds_free_mem_low(p->strtab, "sym.c", "clear_symbol");
-    ds_free_mem_low(p->shdr, "sym.c", "clear_symbol");
-    ds_free_mem_low(p, "sym.c", "clear_symbol");
+    ds_free(p->symtab);
+    ds_free(p->shstrtab);
+    ds_free(p->strtab);
+    ds_free(p->shdr);
+    ds_free(p);
   }
   syms_list.tail = 0;
   syms_list.head = 0;
@@ -111,11 +111,11 @@ void __cdecl clear_symbol_with_id(int id)
         p->back->forw = p->forw;
       else
         syms_list.head = p->forw;
-      ds_free_mem_low(p->symtab, "sym.c", "clear_symbol_with_id");
-      ds_free_mem_low(p->shstrtab, "sym.c", "clear_symbol_with_id");
-      ds_free_mem_low(p->strtab, "sym.c", "clear_symbol_with_id");
-      ds_free_mem_low(p->shdr, "sym.c", "clear_symbol_with_id");
-      ds_free_mem_low(p, "sym.c", "clear_symbol_with_id");
+      ds_free(p->symtab);
+      ds_free(p->shstrtab);
+      ds_free(p->strtab);
+      ds_free(p->shdr);
+      ds_free(p);
     }
   }
 }
@@ -144,7 +144,7 @@ static int __cdecl add_symline(unsigned int value, char *bp)
 
   v2 = strlen(bp);
   n = v2 + 1;
-  p = (SYMLINE *)ds_alloc_mem_low("sym.c", "add_symline", v2 + sizeof(SYMLINE) + 1);
+  p = (SYMLINE *)ds_alloc(v2 + sizeof(SYMLINE) + 1);
   if ( !p )
     return -1;
   p->value = value;
@@ -184,7 +184,7 @@ static void __cdecl show_and_free_symline()
   {
     q = p->forw;
     ds_printf("%s\n", (const char *)&p[1]);
-    ds_free_mem_low(p, "sym.c", "show_and_free_symline");
+    ds_free(p);
   }
   symlines.tail = 0;
   symlines.head = 0;
@@ -418,12 +418,12 @@ LABEL_16:
     {
       ((void (__cdecl *)(int))clear_func)(id);
 LABEL_19:
-      ds_free_mem_low(eemod, "sym.c", "look_eemod");
+      ds_free(eemod);
       return id;
     }
   }
 LABEL_20:
-  ds_free_mem_low(eemod, "sym.c", "look_eemod");
+  ds_free(eemod);
   return -1;
 }
 
@@ -473,12 +473,12 @@ LABEL_14:
     {
       ((void (__cdecl *)(int))clear_func)(id);
 LABEL_17:
-      ds_free_mem_low(iopmod, "sym.c", "look_iopmod");
+      ds_free(iopmod);
       return id;
     }
   }
 LABEL_18:
-  ds_free_mem_low(iopmod, "sym.c", "look_iopmod");
+  ds_free(iopmod);
   return -1;
 }
 
@@ -532,7 +532,7 @@ int __cdecl load_symbol(void *stream, DS_ELF_EHDR *ehdr, DS_ELF_SHDR *shdr, int 
 #elif DSNET_COMPILING_I
   ida = look_iopmod(stream, ehdr, shdr, id, base, (void (__cdecl *)())clear_symbol_with_id);
 #endif /* DSNET_COMPILING_I */
-  syms = (SYMS *)ds_alloc_mem_low("sym.c", "load_symbol", sizeof(SYMS));
+  syms = (SYMS *)ds_alloc(sizeof(SYMS));
   if ( !syms )
     goto LABEL_20;
   syms->id = ida;
@@ -543,15 +543,15 @@ int __cdecl load_symbol(void *stream, DS_ELF_EHDR *ehdr, DS_ELF_SHDR *shdr, int 
   syms->shnum = ehdr->shnum;
   syms->nsymtab = v10;
   n = sizeof(DS_ELF_SHDR) * ehdr->shnum;
-  v8 = (DS_ELF_SHDR *)ds_alloc_mem_low("sym.c", "load_symbol", n);
+  v8 = (DS_ELF_SHDR *)ds_alloc(n);
   syms->shdr = v8;
   if ( !v8 )
   {
-    ds_free_mem_low(syms, "sym.c", "load_symbol");
+    ds_free(syms);
 LABEL_20:
-    ds_free_mem_low(shstrtab, "sym.c", "load_symbol");
-    ds_free_mem_low(symtab, "sym.c", "load_symbol");
-    ds_free_mem_low(strtab, "sym.c", "load_symbol");
+    ds_free(shstrtab);
+    ds_free(symtab);
+    ds_free(strtab);
     return -1;
   }
   memcpy(syms->shdr, shdr, n);
@@ -786,13 +786,13 @@ int __cdecl symbol_to_value(char *name, unsigned int *pv)
     {
       if ( *cp == 58 )
       {
-        file = (char *)ds_alloc_mem_low("sym.c", "symbol_to_value", cp - name + 1);
+        file = (char *)ds_alloc(cp - name + 1);
         if ( !file )
           return -1;
         memcpy(file, name, cp - name);
         file[cp - name] = 0;
         r = symbol_to_value_by_mdebug(file, cp + 1, pv);
-        ds_free_mem_low(file, "sym.c", "symbol_to_value");
+        ds_free(file);
         return r;
       }
     }

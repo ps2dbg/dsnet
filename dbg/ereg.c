@@ -2757,7 +2757,7 @@ int __cdecl rload_cmd(int ac, char **av)
   if ( !store_quad_registers(amasks, tvals, n_1) )
     r = 0;
 LABEL_72:
-  ds_free_mem_low(buf, "ereg.c", "rload_cmd");
+  ds_free(buf);
   return r;
 }
 

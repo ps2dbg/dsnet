@@ -187,12 +187,12 @@ DS_OPTION *__cdecl ds_set_option(char *name, int type, char *str, int val, int f
   }
   if ( !p )
   {
-    p = (DS_OPTION *)ds_alloc_mem_low("cmds.c", "ds_set_option", sizeof(DS_OPTION));
+    p = (DS_OPTION *)ds_alloc(sizeof(DS_OPTION));
     if ( !p )
       ds_exit(135);
     ds_bzero(p, sizeof(DS_OPTION));
     v5 = strlen(name);
-    v6 = (char *)ds_alloc_mem_low("cmds.c", "ds_set_option", v5 + 1);
+    v6 = (char *)ds_alloc(v5 + 1);
     p->name = v6;
     if ( !v6 )
       ds_exit(135);
@@ -211,11 +211,11 @@ DS_OPTION *__cdecl ds_set_option(char *name, int type, char *str, int val, int f
   {
     if ( (p->type & 3) == 3 )
     {
-      p->str = (char *)ds_free_mem_low(p->str, "cmds.c", "ds_set_option");
+      p->str = (char *)ds_free(p->str);
       if ( str )
       {
         v8 = strlen(str);
-        v9 = (char *)ds_alloc_mem_low("cmds.c", "ds_set_option", v8 + 1);
+        v9 = (char *)ds_alloc(v8 + 1);
         p->str = v9;
         if ( !v9 )
           ds_exit(135);
@@ -227,11 +227,11 @@ DS_OPTION *__cdecl ds_set_option(char *name, int type, char *str, int val, int f
       }
       if ( f_def )
       {
-        p->def_str = (char *)ds_free_mem_low(p->def_str, "cmds.c", "ds_set_option");
+        p->def_str = (char *)ds_free(p->def_str);
         if ( str )
         {
           v10 = strlen(str);
-          v11 = (char *)ds_alloc_mem_low("cmds.c", "ds_set_option", v10 + 1);
+          v11 = (char *)ds_alloc(v10 + 1);
           p->def_str = v11;
           if ( !v11 )
             ds_exit(135);
@@ -261,7 +261,7 @@ DS_OPTION *__cdecl ds_set_option(char *name, int type, char *str, int val, int f
       p->back->forw = p->forw;
     else
       ds_option_list.head = p->forw;
-    ds_free_mem_low(p, "cmds.c", "ds_set_option");
+    ds_free(p);
     return 0;
   }
 }
@@ -402,7 +402,7 @@ int __cdecl ds_set_cmd(int ac, char **av)
                 p->back->forw = p->forw;
               else
                 ds_option_list.head = p->forw;
-              ds_free_mem_low(p, "cmds.c", "ds_set_cmd");
+              ds_free(p);
             }
             else
             {
@@ -502,7 +502,7 @@ static int __cdecl read_option(char *fname)
     v2 = q++;
     if ( p != v2 )
     {
-      dest = (char *)ds_alloc_mem_low("cmds.c", "read_option", q - p);
+      dest = (char *)ds_alloc(q - p);
       if ( !dest )
         break;
       if ( cl )
@@ -529,11 +529,11 @@ static int __cdecl read_option(char *fname)
         if ( pac > 0 && !strcmp("option", av[0]) )
           ds_set_cmd(pac, av);
       }
-      ds_free_mem_low(dest, "cmds.c", "read_option");
+      ds_free(dest);
     }
     p = q;
   }
-  ds_free_mem_low(buf, "cmds.c", "read_option");
+  ds_free(buf);
   return 0;
 }
 
@@ -659,7 +659,7 @@ int __cdecl ds_source_cmd(int ac, char **av)
       if ( strncmp("option ", p, 7u) )
       {
         r = -1;
-        line = (char *)ds_alloc_mem_low("cmds.c", "ds_source_cmd", q - p);
+        line = (char *)ds_alloc(q - p);
         if ( !line )
           break;
         if ( cl )
@@ -683,18 +683,18 @@ int __cdecl ds_source_cmd(int ac, char **av)
           ;
         if ( p >= pe )
         {
-          buf = (char *)ds_free_mem_low(buf, "cmds.c", "ds_source_cmd");
+          buf = (char *)ds_free(buf);
           q = p;
         }
         r = ds_cmd_execute(line, 0);
-        ds_free_mem_low(line, "cmds.c", "ds_source_cmd");
+        ds_free(line);
         if ( r )
           break;
       }
     }
     p = q;
   }
-  ds_free_mem_low(buf, "cmds.c", "ds_source_cmd");
+  ds_free(buf);
   return r;
 }
 
@@ -805,7 +805,7 @@ int __cdecl ds_if_cmd(int ac, char **av)
   }
   if ( n <= 0 )
     return 0;
-  str = (char *)ds_alloc_mem_low("cmds.c", "ds_if_cmd", n);
+  str = (char *)ds_alloc(n);
   if ( !str )
     return -1;
   n_1 = 0;
@@ -823,7 +823,7 @@ int __cdecl ds_if_cmd(int ac, char **av)
     ++n_1;
   }
   v9 = ds_cmd_execute(str, 0);
-  ds_free_mem_low(str, "cmds.c", "ds_if_cmd");
+  ds_free(str);
   return v9;
 }
 
@@ -913,7 +913,7 @@ int __cdecl ds_repeat_cmd(int ac, char **av)
     v3 = n + 1;
     n = strlen(ava[i]) + v3;
   }
-  src = (char *)ds_alloc_mem_low("cmds.c", "ds_repeat_cmd", n);
+  src = (char *)ds_alloc(n);
   if ( !src )
     return -1;
   i = 0;
@@ -946,7 +946,7 @@ int __cdecl ds_repeat_cmd(int ac, char **av)
         break;
       }
     }
-    dest = (char *)ds_alloc_mem_low("cmds.c", "ds_repeat_cmd", n);
+    dest = (char *)ds_alloc(n);
     if ( !dest )
     {
       v11 = -1;
@@ -954,7 +954,7 @@ int __cdecl ds_repeat_cmd(int ac, char **av)
     }
     strcpy(dest, src);
     v11 = ds_cmd_execute(dest, 0);
-    ds_free_mem_low(dest, "cmds.c", "ds_repeat_cmd");
+    ds_free(dest);
     if ( v11 < 0 )
       break;
     if ( pv < 0 || i < pv - 1 )
@@ -1005,7 +1005,7 @@ int __cdecl ds_repeat_cmd(int ac, char **av)
       ++i;
     v11 = 0;
   }
-  ds_free_mem_low(src, "cmds.c", "ds_repeat_cmd");
+  ds_free(src);
   return v11;
 }
 
@@ -1067,7 +1067,7 @@ int __cdecl ds_add_show_arg(char *name, int (__cdecl *func)(int ac, char **av))
   SHOW_ARG *tail; // edx
   SHOW_ARG *sa; // [esp+4h] [ebp-4h]
 
-  sa = (SHOW_ARG *)ds_alloc_mem_low("cmds.c", "ds_add_show_arg", sizeof(SHOW_ARG));
+  sa = (SHOW_ARG *)ds_alloc(sizeof(SHOW_ARG));
   if ( !sa )
     return -1;
   sa->name = name;
@@ -1129,7 +1129,7 @@ int __cdecl ds_add_help(char *name, int (__cdecl *func)(char *name))
   HELP_ARG *tail; // edx
   HELP_ARG *ha; // [esp+4h] [ebp-4h]
 
-  ha = (HELP_ARG *)ds_alloc_mem_low("cmds.c", "ds_add_help", sizeof(HELP_ARG));
+  ha = (HELP_ARG *)ds_alloc(sizeof(HELP_ARG));
   if ( !ha )
     return -1;
   ha->name = name;
@@ -1256,7 +1256,7 @@ void __cdecl ds_cmd_install(char *name, char *arg, char *help, int (__cdecl *fun
   int na; // [esp+8h] [ebp-8h]
   CMD_ENTRY *p; // [esp+Ch] [ebp-4h]
 
-  p = (CMD_ENTRY *)ds_alloc_mem_low("cmds.c", "ds_cmd_install", sizeof(CMD_ENTRY));
+  p = (CMD_ENTRY *)ds_alloc(sizeof(CMD_ENTRY));
   if ( !p )
     ds_exit(135);
   p->name = name;
@@ -1448,9 +1448,9 @@ int __cdecl ds_alias_cmd(int ac, char **av)
             p_2->back->forw = p_2->forw;
           else
             aliases.head = p_2->forw;
-          ds_free_mem_low(p_2->name, "cmds.c", "ds_alias_cmd");
-          ds_free_mem_low(p_2->value, "cmds.c", "ds_alias_cmd");
-          ds_free_mem_low(p_2, "cmds.c", "ds_alias_cmd");
+          ds_free(p_2->name);
+          ds_free(p_2->value);
+          ds_free(p_2);
         }
         else
         {
@@ -1477,19 +1477,19 @@ int __cdecl ds_alias_cmd(int ac, char **av)
           p_3->back->forw = p_3->forw;
         else
           aliases.head = p_3->forw;
-        ds_free_mem_low(p_3->value, "cmds.c", "ds_alias_cmd");
+        ds_free(p_3->value);
       }
       else
       {
-        p_3 = (ALIAS *)ds_alloc_mem_low("cmds.c", "ds_alias_cmd", sizeof(ALIAS));
+        p_3 = (ALIAS *)ds_alloc(sizeof(ALIAS));
         if ( !p_3 )
           return -1;
         v3 = strlen(*ava);
-        v4 = (char *)ds_alloc_mem_low("cmds.c", "ds_alias_cmd", v3 + 1);
+        v4 = (char *)ds_alloc(v3 + 1);
         p_3->name = v4;
         if ( !v4 )
         {
-          ds_free_mem_low(p_3, "cmds.c", "ds_alias_cmd");
+          ds_free(p_3);
           return -1;
         }
         strcpy(p_3->name, *ava);
@@ -1497,7 +1497,7 @@ int __cdecl ds_alias_cmd(int ac, char **av)
       n_3 = 0;
       for ( i = 1; aca > i; ++i )
         n_3 += strlen(ava[i]) + 1;
-      v5 = (char *)ds_alloc_mem_low("cmds.c", "ds_alias_cmd", n_3);
+      v5 = (char *)ds_alloc(n_3);
       p_3->value = v5;
       s = v5;
       if ( v5 )
@@ -1525,8 +1525,8 @@ int __cdecl ds_alias_cmd(int ac, char **av)
       }
       else
       {
-        ds_free_mem_low(p_3->name, "cmds.c", "ds_alias_cmd");
-        ds_free_mem_low(p_3, "cmds.c", "ds_alias_cmd");
+        ds_free(p_3->name);
+        ds_free(p_3);
         return -1;
       }
     }
@@ -1538,9 +1538,9 @@ int __cdecl ds_alias_cmd(int ac, char **av)
       for ( p = aliases.head; p; p = q )
       {
         q = p->forw;
-        ds_free_mem_low(p->name, "cmds.c", "ds_alias_cmd");
-        ds_free_mem_low(p->value, "cmds.c", "ds_alias_cmd");
-        ds_free_mem_low(p, "cmds.c", "ds_alias_cmd");
+        ds_free(p->name);
+        ds_free(p->value);
+        ds_free(p);
       }
       aliases.tail = 0;
       aliases.head = 0;

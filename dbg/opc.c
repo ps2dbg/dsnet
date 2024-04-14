@@ -1509,7 +1509,7 @@ LABEL_9:
       goto LABEL_16;
     }
     ds_printf("%-8d%s\n", line, sl);
-    ds_free_mem_low(sl, "opc.c", "display_symbol_once");
+    ds_free(sl);
   }
 LABEL_16:
   if ( !*old || strcmp(old, v9) )
@@ -1625,7 +1625,7 @@ int __cdecl di_cmd(int ac, char **av)
       if ( sl )
       {
         ds_printf("%-8d%s\n", line, sl);
-        ds_free_mem_low(sl, "opc.c", "di_cmd");
+        ds_free(sl);
       }
     }
     if ( v13 )
@@ -2498,7 +2498,7 @@ static void __cdecl clear_bts()
   for ( p = bts.head; p; p = q )
   {
     q = p->forw;
-    ds_free_mem_low(p, "opc.c", "clear_bts");
+    ds_free(p);
   }
   bts.tail = 0;
   bts.head = 0;
@@ -2510,7 +2510,7 @@ static BT *__cdecl append_bt(unsigned int adr, unsigned int sp)
   BT *tail; // edx
   BT *p; // [esp+4h] [ebp-4h]
 
-  p = (BT *)ds_alloc_mem_low("opc.c", "append_bt", sizeof(BT));
+  p = (BT *)ds_alloc(sizeof(BT));
   if ( !p )
     return 0;
   p->no = bt_no++;
@@ -2665,7 +2665,7 @@ void __cdecl disp_bt(BT_REG *br, int cnt)
       || !br->pc
       || !br->sp
       || !br->ra
-      || (n = br->pc - adr0, (ins_buf = (unsigned __int8 *)ds_alloc_mem_low("opc.c", "disp_bt", n)) == 0)
+      || (n = br->pc - adr0, (ins_buf = (unsigned __int8 *)ds_alloc(n)) == 0)
       || ds_rdwr_mem_align(8, 2, 0, 0, adr0, ins_buf, n) )
     {
       ds_printf("\n");
@@ -2680,9 +2680,9 @@ void __cdecl disp_bt(BT_REG *br, int cnt)
     ds_printf(" $SFA%d=0x%W $SFS%d=0x%W\n", i, bt->sp_lo, i, bt->sp_hi - bt->sp_lo);
     if ( !br->ra || br->pc >= adr0 && adr1 > br->pc )
       break;
-    ins_buf = (unsigned __int8 *)ds_free_mem_low(ins_buf, "opc.c", "disp_bt");
+    ins_buf = (unsigned __int8 *)ds_free(ins_buf);
   }
-  ds_free_mem_low(ins_buf, "opc.c", "disp_bt");
+  ds_free(ins_buf);
 }
 
 int __cdecl bt_cmd(int ac, char **av)

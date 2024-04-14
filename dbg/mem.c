@@ -93,7 +93,7 @@ LABEL_17:
     }
     if ( cnt > 0 )
     {
-      buf = (unsigned __int8 *)ds_alloc_mem_low("mem.c", "dmem_cmd", cnt);
+      buf = (unsigned __int8 *)ds_alloc(cnt);
       if ( buf )
       {
         align = 0;
@@ -124,7 +124,7 @@ LABEL_17:
         }
         else if ( ds_rdwr_mem_align(8, align, 0, 0, dot, buf, cnt) )
         {
-          ds_free_mem_low(buf, "mem.c", "dmem_cmd");
+          ds_free(buf);
           return -1;
         }
         else
@@ -222,7 +222,7 @@ LABEL_17:
             i += 16;
             bp += 16;
           }
-          ds_free_mem_low(buf, "mem.c", "dmem_cmd");
+          ds_free(buf);
           dot += cnt;
           return 0;
         }
@@ -510,7 +510,7 @@ LABEL_18:
     }
     if ( cnt > 0 )
     {
-      buf = (unsigned __int8 *)ds_alloc_mem_low("mem.c", "inp_cmd", cnt);
+      buf = (unsigned __int8 *)ds_alloc(cnt);
       if ( buf )
       {
         align = 0;
@@ -540,7 +540,7 @@ LABEL_18:
         }
         else if ( ds_rdwr_mem_align(8, align, 0, 0, adr, buf, cnt) )
         {
-          ds_free_mem_low(buf, "mem.c", "inp_cmd");
+          ds_free(buf);
           return -1;
         }
         else
@@ -620,7 +620,7 @@ LABEL_18:
             ds_printf("\n");
             bp += 16;
           }
-          ds_free_mem_low(buf, "mem.c", "inp_cmd");
+          ds_free(buf);
           return 0;
         }
       }
@@ -910,7 +910,7 @@ int __cdecl bload_cmd(int ac, char **av)
   path = *ava;
   if ( ds_eval_word(ava[1], &adr) )
     return -1;
-  buf = (unsigned __int8 *)ds_alloc_mem_low("mem.c", "bload_cmd", 0x100000);
+  buf = (unsigned __int8 *)ds_alloc(0x100000);
   if ( !buf )
     return -1;
   stream = ds_fopen(path, "r");
@@ -955,7 +955,7 @@ int __cdecl bload_cmd(int ac, char **av)
     }
   }
 LABEL_25:
-  ds_free_mem_low(buf, "mem.c", "bload_cmd");
+  ds_free(buf);
   ds_fclose(stream);
   return r;
 }
@@ -996,7 +996,7 @@ int __cdecl bsave_cmd(int ac, char **av)
   path = *ava;
   if ( ds_eval_word(ava[1], &adr) || ds_eval_word(ava[2], (unsigned int *)&cnt) )
     return -1;
-  buf = (unsigned __int8 *)ds_alloc_mem_low("mem.c", "bsave_cmd", 0x100000);
+  buf = (unsigned __int8 *)ds_alloc(0x100000);
   if ( !buf )
     return -1;
   stream = ds_fopen(path, "w");
@@ -1045,7 +1045,7 @@ int __cdecl bsave_cmd(int ac, char **av)
     }
   }
 LABEL_29:
-  ds_free_mem_low(buf, "mem.c", "bsave_cmd");
+  ds_free(buf);
   ds_fclose(stream);
   return r;
 }
@@ -1218,7 +1218,7 @@ LABEL_22:
               buf = (unsigned __int8 *)ds_fload(stream, 0, ph->offset, 1, ph->filesz);
               if ( !buf || ds_store_mem(ph->vaddr, buf, ph->filesz) )
                 goto LABEL_85;
-              buf = (unsigned __int8 *)ds_free_mem_low(buf, "mem.c", "pload_cmd");
+              buf = (unsigned __int8 *)ds_free(buf);
 #endif /* DSNET_COMPILING_E */
 #ifdef DSNET_COMPILING_I
               if ( v4 )
@@ -1292,7 +1292,7 @@ LABEL_22:
                   buf = (unsigned __int8 *)ds_fload(stream, 0, ph->offset, 1, ph->filesz);
                   if ( !buf || ds_store_mem(ph->vaddr, buf, ph->filesz) )
                     goto LABEL_96;
-                  buf = (unsigned __int8 *)ds_free_mem_low(buf, "mem.c", "pload_cmd");
+                  buf = (unsigned __int8 *)ds_free(buf);
                 }
                 ++symndx;
                 ++ph;
@@ -1319,7 +1319,7 @@ LABEL_22:
 #endif /* DSNET_COMPILING_I */
                 {
 #ifdef DSNET_COMPILING_E
-                  ri = (DS_ELF_REGINFO *)ds_free_mem_low(ri, "mem.c", "pload_cmd");
+                  ri = (DS_ELF_REGINFO *)ds_free(ri);
                   ri = (DS_ELF_REGINFO *)ds_fload(stream, 0, sh->offset, 24, 1);
 #endif /* DSNET_COMPILING_E */
 #ifdef DSNET_COMPILING_I
@@ -1339,7 +1339,7 @@ LABEL_22:
                   {
                     if ( type == 1879048198 && sh->size == 24 )
                     {
-                      ri = (DS_ELF_REGINFO *)ds_free_mem_low(ri, "mem.c", "pload_cmd");
+                      ri = (DS_ELF_REGINFO *)ds_free(ri);
                       ri = (DS_ELF_REGINFO *)ds_fload(stream, 0, sh->offset, 24, 1);
                       if ( !ri )
                         goto LABEL_96;
@@ -1435,11 +1435,11 @@ LABEL_85:
 #ifdef DSNET_COMPILING_I
 LABEL_96:
 #endif /* DSNET_COMPILING_I */
-    ds_free_mem_low(buf, "mem.c", "pload_cmd");
-    ds_free_mem_low(ri, "mem.c", "pload_cmd");
-    ds_free_mem_low(shdr, "mem.c", "pload_cmd");
-    ds_free_mem_low(phdr, "mem.c", "pload_cmd");
-    ds_free_mem_low(ehdr, "mem.c", "pload_cmd");
+    ds_free(buf);
+    ds_free(ri);
+    ds_free(shdr);
+    ds_free(phdr);
+    ds_free(ehdr);
     ds_fclose(stream);
     return r;
   }

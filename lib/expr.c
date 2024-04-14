@@ -92,7 +92,7 @@ static char *__cdecl expr(int prio, char *str, quad *pval)
     if ( op != 43 && op != 45 && op != 126 && op != 42 && (op != 33 || s[1] == 61) )
     {
       v6 = strlen(s);
-      p = (char *)ds_alloc_mem_low("expr.c", "expr", v6 + 1);
+      p = (char *)ds_alloc(v6 + 1);
       if ( !p )
         return 0;
       q = p;
@@ -108,14 +108,14 @@ static char *__cdecl expr(int prio, char *str, quad *pval)
         }
         else if ( ds_load_quad_reg(p, pval) )
         {
-          return (char *)ds_free_mem_low(p, "expr.c", "expr");
+          return (char *)ds_free(p);
         }
       }
       else if ( ds_scan_symbol_or_hex_quad(p, pval) )
       {
-        return (char *)ds_free_mem_low(p, "expr.c", "expr");
+        return (char *)ds_free(p);
       }
-      ds_free_mem_low(p, "expr.c", "expr");
+      ds_free(p);
       goto LABEL_51;
     }
     s = expr(14, s + 1, &val);
@@ -688,7 +688,7 @@ LABEL_55:
       else
       {
         v5 = strlen(s);
-        p = (char *)ds_alloc_mem_low("expr.c", "fexpr", v5 + 1);
+        p = (char *)ds_alloc(v5 + 1);
         if ( p )
         {
           if ( *s == 36 )
@@ -719,17 +719,17 @@ LABEL_55:
           if ( *p == 36 )
           {
             ds_printf("floating register/variable reference in fexpr - not yet supported\n");
-            return (char *)ds_free_mem_low(p, "expr.c", "fexpr");
+            return (char *)ds_free(p);
           }
           else
           {
             if ( sscanf(p, "%g", pval) == 1 )
             {
-              ds_free_mem_low(p, "expr.c", "fexpr");
+              ds_free(p);
               goto LABEL_55;
             }
             ds_printf("invalid floating number (%s)\n", p);
-            return (char *)ds_free_mem_low(p, "expr.c", "fexpr");
+            return (char *)ds_free(p);
           }
         }
         else

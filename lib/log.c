@@ -53,7 +53,7 @@ void __cdecl ds_add_log(DS_DESC *desc, char *msg, DECI2_HDR *dh)
     size = nlen + dlen + sizeof(LOG_DATA) + 8 /* FIXME: correct size for struct timeval? */;
     if ( tsiz >= size )
     {
-      p = (LOG_DATA *)ds_alloc_mem_low("log.c", "ds_add_log", size);
+      p = (LOG_DATA *)ds_alloc(size);
       if ( p )
       {
         gettimeofday(&p->tval, 0);
@@ -98,7 +98,7 @@ void __cdecl ds_add_log(DS_DESC *desc, char *msg, DECI2_HDR *dh)
             else
               log_data_list.head = p_1->forw;
             n_1 = p_1->nlen + p_1->dlen + 32;
-            ds_free_mem_low(p_1, "log.c", "ds_add_log");
+            ds_free(p_1);
             ds_log_cur_size -= n_1;
           }
         }
@@ -391,7 +391,7 @@ LABEL_59:
     for ( p = log_data_list.head; p; p = q )
     {
       q = p->forw;
-      ds_free_mem_low(p, "log.c", "_ds_log_cmd");
+      ds_free(p);
     }
     log_data_list.tail = 0;
     log_data_list.head = 0;

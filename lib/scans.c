@@ -314,7 +314,7 @@ char *__cdecl ds_decode_args(int ac, char **av)
   n = 0;
   while ( ac > i_3 )
     n += strlen(av[i_3++]) + 1;
-  buf = (char *)ds_alloc_mem_low("scans.c", "ds_decode_args", n);
+  buf = (char *)ds_alloc(n);
   if ( !buf )
     return 0;
   i_1 = 0;
@@ -343,7 +343,7 @@ char *__cdecl ds_decode_args(int ac, char **av)
         if ( !*sp )
         {
           ds_error("invalid escape - %s", v11);
-          return (char *)ds_free_mem_low(buf, "scans.c", "ds_decode_args");
+          return (char *)ds_free(buf);
         }
         if ( *sp <= 47 || *sp > 55 )
         {
@@ -352,7 +352,7 @@ char *__cdecl ds_decode_args(int ac, char **av)
             if ( (isxdigit(*++sp)) == 0 )
             {
               ds_error("invalid hex - %s", v11);
-              return (char *)ds_free_mem_low(buf, "scans.c", "ds_decode_args");
+              return (char *)ds_free(buf);
             }
             ch_1 = 0;
             for ( j_1 = 0; j_1 <= 1 && (isxdigit(*sp)) != 0; ++j_1 )
@@ -418,7 +418,7 @@ char *__cdecl ds_decode_args(int ac, char **av)
     if ( quote >= 0 )
     {
       ds_error("invalid quote - %s", v11);
-      return (char *)ds_free_mem_low(buf, "scans.c", "ds_decode_args");
+      return (char *)ds_free(buf);
     }
     *bp++ = 0;
     ++i_1;

@@ -61,7 +61,7 @@ static void __cdecl clear_st_proto(int nid)
         p->back->forw = p->forw;
       else
         st_proto_list.head = p->forw;
-      ds_free_mem_low(p, "dsnetm.c", "clear_st_proto");
+      ds_free(p);
     }
   }
 }
@@ -77,7 +77,7 @@ static void __cdecl add_st_proto(DS_DESC *desc, int proto, int nid)
     if ( p->proto == (_WORD)proto && (_BYTE)nid == p->nid )
       return;
   }
-  p_1 = (ST_PROTO *)ds_alloc_mem_low("dsnetm.c", "add_st_proto", sizeof(ST_PROTO) + 1);
+  p_1 = (ST_PROTO *)ds_alloc(sizeof(ST_PROTO) + 1);
   if ( p_1 )
   {
     p_1->desc = desc;
@@ -113,7 +113,7 @@ static void __cdecl send_st_proto(int proto)
         p->back->forw = p->forw;
       else
         st_proto_list.head = p->forw;
-      ds_free_mem_low(p, "dsnetm.c", "send_st_proto");
+      ds_free(p);
     }
   }
 }
@@ -328,7 +328,7 @@ static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *rdb, DECI2_HDR *dh, i
     }
     else
     {
-      protos = (NETMP_PROTOS *)ds_alloc_mem_low("dsnetm.c", "recv_netmp", n);
+      protos = (NETMP_PROTOS *)ds_alloc(n);
       if ( protos )
       {
         memcpy(protos, &rp[1], n);
@@ -339,7 +339,7 @@ static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *rdb, DECI2_HDR *dh, i
           protos1->proto = protos1->proto;
           if ( ds_isbusy_desc(protos1->pri, protos1->proto) )
           {
-            ds_free_mem_low(protos, "dsnetm.c", "recv_netmp");
+            ds_free(protos);
             rp->result = 2;
             goto LABEL_54;
           }
@@ -381,12 +381,12 @@ LABEL_54:
         break;
       case 4u:
         rp->code = 5;
-        msg = (char *)ds_alloc_mem_low("dsnetm.c", "recv_netmp", n + 1);
+        msg = (char *)ds_alloc(n + 1);
         if ( msg )
         {
           memcpy(msg, &rp[1], n);
           msg[n] = 0;
-          ds_free_mem_low(desc->msg, "dsnetm.c", "recv_netmp");
+          ds_free(desc->msg);
           desc->msg = msg;
           rp->result = 0;
         }

@@ -47,7 +47,7 @@ static void __cdecl free_seq_time(SEQ_TIME *p)
     p->back->forw = p->forw;
   else
     seq_time_list.head = p->forw;
-  ds_free_mem_low(p, "dsping.c", "free_seq_time");
+  ds_free(p);
 }
 
 static void __cdecl send_echo()
@@ -58,7 +58,7 @@ static void __cdecl send_echo()
 
   if ( pkt_count <= 0 || send_count < pkt_count )
   {
-    v1 = (SEQ_TIME *)ds_alloc_mem_low("dsping.c", "send_echo", sizeof(SEQ_TIME));
+    v1 = (SEQ_TIME *)ds_alloc(sizeof(SEQ_TIME));
     if ( !v1 )
       ds_exit(135);
     v1->seq = seq_4++;
@@ -376,7 +376,7 @@ int __cdecl main(int ac, char **av)
   if ( ds_send_netmp1(target_desc, 0, 0, 128, 1) < 0 )
     ds_exit(135);
   dsm_waiting = 1;
-  data_buf = (unsigned __int8 *)ds_alloc_mem_low("dsping.c", "main", pkt_size);
+  data_buf = (unsigned __int8 *)ds_alloc(pkt_size);
   if ( !data_buf )
     ds_exit(135);
   ds_bzero(data_buf, pkt_size);
