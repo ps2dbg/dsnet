@@ -6,24 +6,24 @@ static int dev_desc_id = -1;
 
 static unsigned __int8 last_38 = 0u;
 
-static int __cdecl xrecv_common(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl xrecv_kbd(DS_DESC *desc);
-static int __cdecl xrecv_dev(DS_DESC *desc);
-static int __cdecl xsend_dev(DS_DESC *desc);
-static int __cdecl xrecv_net(DS_DESC *desc);
-static int __cdecl xrecv_comport(DS_DESC *desc);
-static int __cdecl xsend_net(DS_DESC *desc);
-static int __cdecl xsend_comport(DS_DESC *desc);
-static int __cdecl xsend_netdev(DS_DESC *desc);
-static int __cdecl xrecv_netdev(DS_DESC *desc);
-static void __cdecl ds_flush_tty(DS_DESC *dp, int proto);
-static int __cdecl isttyp(int proto);
+static int xrecv_common(DS_DESC *desc, DSP_BUF *db);
+static int xrecv_kbd(DS_DESC *desc);
+static int xrecv_dev(DS_DESC *desc);
+static int xsend_dev(DS_DESC *desc);
+static int xrecv_net(DS_DESC *desc);
+static int xrecv_comport(DS_DESC *desc);
+static int xsend_net(DS_DESC *desc);
+static int xsend_comport(DS_DESC *desc);
+static int xsend_netdev(DS_DESC *desc);
+static int xrecv_netdev(DS_DESC *desc);
+static void ds_flush_tty(DS_DESC *dp, int proto);
+static int isttyp(int proto);
 
-DS_DESC *__cdecl ds_add_select_list(
+DS_DESC *ds_add_select_list(
         int type,
         int fd,
         char *name,
-        int (__cdecl *accept_func)(DS_DESC *desc),
+        int (*accept_func)(DS_DESC *desc),
         DS_RECV_FUNC *recv_func)
 {
   DS_DESC *tail; // edx
@@ -107,7 +107,7 @@ DS_DESC *__cdecl ds_add_select_list(
   return desc;
 }
 
-DS_RECV_FUNC_DESC *__cdecl ds_add_recv_func(DS_DESC *desc, int proto, int type, int code, DS_RECV_FUNC *func)
+DS_RECV_FUNC_DESC *ds_add_recv_func(DS_DESC *desc, int proto, int type, int code, DS_RECV_FUNC *func)
 {
   DS_RECV_FUNC_DESC *tail; // ecx
   DS_RECV_FUNC_DESC *rf; // [esp+4h] [ebp-4h]
@@ -196,7 +196,7 @@ LABEL_39:
   return rf;
 }
 
-DS_RECV_FUNC_DESC *__cdecl ds_del_recv_func(DS_DESC *desc, DS_RECV_FUNC_DESC *rf)
+DS_RECV_FUNC_DESC *ds_del_recv_func(DS_DESC *desc, DS_RECV_FUNC_DESC *rf)
 {
   DS_RECV_FUNC_DESC *back; // ebx
   DS_RECV_FUNC_DESC *forw; // esi
@@ -214,7 +214,7 @@ DS_RECV_FUNC_DESC *__cdecl ds_del_recv_func(DS_DESC *desc, DS_RECV_FUNC_DESC *rf
   return (DS_RECV_FUNC_DESC *)ds_free(rf);
 }
 
-DS_DESC *__cdecl ds_close_desc(DS_DESC *desc)
+DS_DESC *ds_close_desc(DS_DESC *desc)
 {
   int type; // eax
   DS_RECV_FUNC_DESC *forw; // [esp+Ch] [ebp-10h]
@@ -272,7 +272,7 @@ LABEL_12:
   return (DS_DESC *)ds_free(desc);
 }
 
-static int __cdecl xrecv_common(DS_DESC *desc, DSP_BUF *db)
+static int xrecv_common(DS_DESC *desc, DSP_BUF *db)
 {
   int v3; // [esp+4h] [ebp-28h]
   int type; // [esp+8h] [ebp-24h]
@@ -396,7 +396,7 @@ LABEL_59:
   return -1;
 }
 
-static int __cdecl xrecv_kbd(DS_DESC *desc)
+static int xrecv_kbd(DS_DESC *desc)
 {
   int n; // [esp+0h] [ebp-10h]
   struct xrecv_kbd_dat_struct dat; // [esp+4h] [ebp-Ch] BYREF
@@ -477,7 +477,7 @@ LABEL_31:
     return -1;
 }
 
-static int __cdecl xrecv_dev(DS_DESC *desc)
+static int xrecv_dev(DS_DESC *desc)
 {
   int nbytes; // [esp+0h] [ebp-10h]
   int r; // [esp+4h] [ebp-Ch]
@@ -546,7 +546,7 @@ static int __cdecl xrecv_dev(DS_DESC *desc)
   }
 }
 
-int __cdecl ds_reset_info(DS_DESC *desc)
+int ds_reset_info(DS_DESC *desc)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -559,7 +559,7 @@ int __cdecl ds_reset_info(DS_DESC *desc)
     return ds_error("!ioctl(MRPIOC_RSTINFO)");
 }
 
-static int __cdecl xsend_dev(DS_DESC *desc)
+static int xsend_dev(DS_DESC *desc)
 {
   DSP_BUF *head; // ecx
   DSP_BUF *back; // ebx
@@ -611,7 +611,7 @@ static int __cdecl xsend_dev(DS_DESC *desc)
   return 0;
 }
 
-static int __cdecl xrecv_net(DS_DESC *desc)
+static int xrecv_net(DS_DESC *desc)
 {
   unsigned int v2; // edx
   int v3; // edx
@@ -693,7 +693,7 @@ static int __cdecl xrecv_net(DS_DESC *desc)
   return xrecv_common(desc, db);
 }
 
-static int __cdecl xrecv_comport(DS_DESC *desc)
+static int xrecv_comport(DS_DESC *desc)
 {
   int n; // [esp+0h] [ebp-110h]
   struct xrecv_comport_dat_struct dat; // [esp+4h] [ebp-10Ch] BYREF
@@ -727,7 +727,7 @@ static int __cdecl xrecv_comport(DS_DESC *desc)
   }
 }
 
-static int __cdecl xsend_net(DS_DESC *desc)
+static int xsend_net(DS_DESC *desc)
 {
   DSP_BUF *head; // ecx
   DSP_BUF *back; // ebx
@@ -797,7 +797,7 @@ static int __cdecl xsend_net(DS_DESC *desc)
   }
 }
 
-static int __cdecl xsend_comport(DS_DESC *desc)
+static int xsend_comport(DS_DESC *desc)
 {
   DSP_BUF *head; // ecx
   DSP_BUF *back; // ebx
@@ -859,7 +859,7 @@ LABEL_20:
     return -1;
 }
 
-static int __cdecl xsend_netdev(DS_DESC *desc)
+static int xsend_netdev(DS_DESC *desc)
 {
   DSP_BUF *head; // ecx
   DSP_BUF *back; // ebx
@@ -914,7 +914,7 @@ static int __cdecl xsend_netdev(DS_DESC *desc)
   return 0;
 }
 
-static int __cdecl xrecv_netdev(DS_DESC *desc)
+static int xrecv_netdev(DS_DESC *desc)
 {
   int n; // [esp+0h] [ebp-Ch]
   DECI2_HDR *dh; // [esp+4h] [ebp-8h]
@@ -942,7 +942,7 @@ static int __cdecl xrecv_netdev(DS_DESC *desc)
   }
 }
 
-int __cdecl ds_select_desc(int sec, int usec)
+int ds_select_desc(int sec, int usec)
 {
   int r; // [esp+10h] [ebp-118h]
   struct timeval *tv; // [esp+14h] [ebp-114h]
@@ -1053,7 +1053,7 @@ int __cdecl ds_select_desc(int sec, int usec)
   return 1;
 }
 
-DS_DESC *__cdecl ds_desc_by_proto(int proto)
+DS_DESC *ds_desc_by_proto(int proto)
 {
   int i_3; // [esp+0h] [ebp-14h]
   int cpri; // [esp+4h] [ebp-10h]
@@ -1085,7 +1085,7 @@ DS_DESC *__cdecl ds_desc_by_proto(int proto)
   return pri_dp;
 }
 
-int __cdecl ds_isbusy_desc(int pri, int proto)
+int ds_isbusy_desc(int pri, int proto)
 {
   int i_3; // [esp+8h] [ebp-10h]
   NETMP_PROTOS *protos; // [esp+Ch] [ebp-Ch]
@@ -1109,7 +1109,7 @@ int __cdecl ds_isbusy_desc(int pri, int proto)
   return 0;
 }
 
-static void __cdecl ds_flush_tty(DS_DESC *dp, int proto)
+static void ds_flush_tty(DS_DESC *dp, int proto)
 {
   DSP_BUF *v2; // ebx
   DSP_BUF *tail; // ecx
@@ -1151,7 +1151,7 @@ static void __cdecl ds_flush_tty(DS_DESC *dp, int proto)
   }
 }
 
-DSP_BUF *__cdecl ds_send_net(int proto, DSP_BUF *db)
+DSP_BUF *ds_send_net(int proto, DSP_BUF *db)
 {
   DSP_BUF *tail; // ecx
   DSP_BUF *v3; // ecx
@@ -1237,7 +1237,7 @@ DSP_BUF *__cdecl ds_send_net(int proto, DSP_BUF *db)
   return 0;
 }
 
-DSP_BUF *__cdecl ds_send_desc(DS_DESC *desc, DSP_BUF *db)
+DSP_BUF *ds_send_desc(DS_DESC *desc, DSP_BUF *db)
 {
   DSP_BUF *tail; // ebx
 
@@ -1252,7 +1252,7 @@ DSP_BUF *__cdecl ds_send_desc(DS_DESC *desc, DSP_BUF *db)
   return 0;
 }
 
-void __cdecl ds_flush_desc_by_proto(int proto)
+void ds_flush_desc_by_proto(int proto)
 {
   DSP_BUF *back; // ebx
   DSP_BUF *v2; // esi
@@ -1291,7 +1291,7 @@ void __cdecl ds_flush_desc_by_proto(int proto)
   }
 }
 
-void __cdecl ds_status_desc()
+void ds_status_desc()
 {
   int psec; // [esp+Ch] [ebp-24h]
   int64_t usec; // [esp+14h] [ebp-1Ch] BYREF
@@ -1387,7 +1387,7 @@ LABEL_39:
   }
 }
 
-static int __cdecl isttyp(int proto)
+static int isttyp(int proto)
 {
   if ( proto > 271 && proto <= 281 )
     return 1;

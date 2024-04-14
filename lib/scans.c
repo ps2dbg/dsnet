@@ -4,10 +4,10 @@ static int char_value_map[256];
 
 static int once_34 = 0;
 
-static void __cdecl build_char_value_map();
-static int __cdecl ds_scan_num_quad(char *s, quad *pv, int base);
+static void build_char_value_map();
+static int ds_scan_num_quad(char *s, quad *pv, int base);
 
-int __cdecl ds_scan_proto(char *str, int *pv)
+int ds_scan_proto(char *str, int *pv)
 {
   if ( !strcmp("ANY", str) )
   {
@@ -184,7 +184,7 @@ int __cdecl ds_scan_proto(char *str, int *pv)
   return 0;
 }
 
-int __cdecl ds_scan_nid(char *str, int *pv)
+int ds_scan_nid(char *str, int *pv)
 {
   if ( !strcmp("EE", str) || !strcmp("E", str) )
   {
@@ -205,7 +205,7 @@ int __cdecl ds_scan_nid(char *str, int *pv)
   return 0;
 }
 
-int __cdecl ds_scan_string(char *buf, char *str)
+int ds_scan_string(char *buf, char *str)
 {
   int ch; // [esp+4h] [ebp-14h]
   int i_3; // [esp+8h] [ebp-10h]
@@ -295,7 +295,7 @@ int __cdecl ds_scan_string(char *buf, char *str)
     return ds_error("invalid string (end) - %s", str);
 }
 
-char *__cdecl ds_decode_args(int ac, char **av)
+char *ds_decode_args(int ac, char **av)
 {
   int quote; // [esp+8h] [ebp-24h]
   int ch; // [esp+Ch] [ebp-20h]
@@ -426,7 +426,7 @@ char *__cdecl ds_decode_args(int ac, char **av)
   return buf;
 }
 
-static void __cdecl build_char_value_map()
+static void build_char_value_map()
 {
   int i; // [esp+0h] [ebp-4h]
   int i_1; // [esp+0h] [ebp-4h]
@@ -446,7 +446,7 @@ static void __cdecl build_char_value_map()
   }
 }
 
-int __cdecl ds_scan_digit_word(char *s, unsigned int *pv)
+int ds_scan_digit_word(char *s, unsigned int *pv)
 {
   int v3; // eax
   int v; // [esp+0h] [ebp-Ch]
@@ -489,7 +489,7 @@ int __cdecl ds_scan_digit_word(char *s, unsigned int *pv)
   return 0;
 }
 
-static int __cdecl ds_scan_num_quad(char *s, quad *pv, int base)
+static int ds_scan_num_quad(char *s, quad *pv, int base)
 {
   quad v4; // [esp-10h] [ebp-80h]
   quad v5; // [esp-10h] [ebp-80h]
@@ -542,7 +542,7 @@ static int __cdecl ds_scan_num_quad(char *s, quad *pv, int base)
   return 0;
 }
 
-int __cdecl ds_scan_digit_quad(char *s, quad *pv)
+int ds_scan_digit_quad(char *s, quad *pv)
 {
   int v3; // eax
 
@@ -571,7 +571,7 @@ int __cdecl ds_scan_digit_quad(char *s, quad *pv)
     return -1;
 }
 
-int __cdecl ds_scan_hex_quad(char *str, quad *pv)
+int ds_scan_hex_quad(char *str, quad *pv)
 {
   char *s; // [esp+0h] [ebp-4h]
 
@@ -590,7 +590,7 @@ int __cdecl ds_scan_hex_quad(char *str, quad *pv)
   return 0;
 }
 
-int __cdecl ds_scan_hex_word(char *str, unsigned int *pv)
+int ds_scan_hex_word(char *str, unsigned int *pv)
 {
   int v; // [esp+0h] [ebp-Ch]
   int value; // [esp+4h] [ebp-8h]
@@ -620,7 +620,7 @@ int __cdecl ds_scan_hex_word(char *str, unsigned int *pv)
   return 0;
 }
 
-int __cdecl ds_scan_symbol_or_hex_quad(char *str, quad *pq)
+int ds_scan_symbol_or_hex_quad(char *str, quad *pq)
 {
   quad v3; // [esp+0h] [ebp-18h] BYREF
   char *p; // [esp+10h] [ebp-8h]
@@ -663,7 +663,7 @@ LABEL_12:
   return -1;
 }
 
-int __cdecl ds_scan_esc(char *p, int *pv)
+int ds_scan_esc(char *p, int *pv)
 {
   if ( p && *p )
   {
@@ -687,7 +687,7 @@ int __cdecl ds_scan_esc(char *p, int *pv)
   return 0;
 }
 
-char *__cdecl ds_scan_args(char *s, int *pac, char **av, int max_args)
+char *ds_scan_args(char *s, int *pac, char **av, int max_args)
 {
   int quote; // [esp+4h] [ebp-Ch]
   int par; // [esp+8h] [ebp-8h]

@@ -3,13 +3,13 @@
 typedef struct {unsigned int sdram_data1; unsigned int sdram_data2; unsigned int sdram_data3; unsigned int sdram_data4;} MM;
 typedef struct {unsigned char gif_data[32];} NN;
 
-extern int __cdecl DataConv(NN *nn, unsigned __int8 *dat);
-extern int __cdecl GIF_SDRAMCheck(MM *mm, MM *end, int opt);
-extern int __cdecl GIF_EXAMPLECheck(NN *nn, NN *end);
-extern int __cdecl GIF_GINTCheck(NN *nn, NN *end, int value);
-extern int __cdecl GIF_TEXSWAPCheck(NN *nn, NN *end);
+extern int DataConv(NN *nn, unsigned __int8 *dat);
+extern int GIF_SDRAMCheck(MM *mm, MM *end, int opt);
+extern int GIF_EXAMPLECheck(NN *nn, NN *end);
+extern int GIF_GINTCheck(NN *nn, NN *end, int value);
+extern int GIF_TEXSWAPCheck(NN *nn, NN *end);
 
-int __cdecl DataConv(NN *nn, unsigned __int8 *dat)
+int DataConv(NN *nn, unsigned __int8 *dat)
 {
   memcpy(dat, &nn->gif_data[5], 0xAu);
   memcpy(dat + 10, &nn->gif_data[26], 5u);
@@ -18,7 +18,7 @@ int __cdecl DataConv(NN *nn, unsigned __int8 *dat)
   return 1;
 }
 
-int __cdecl DataFileRead1()
+int DataFileRead1()
 {
   FILE *fp; // [esp+0h] [ebp-4h]
 
@@ -51,7 +51,7 @@ int __cdecl DataFileRead1()
   }
 }
 
-int __cdecl DataFileRead2()
+int DataFileRead2()
 {
   FILE *fp4; // [esp+0h] [ebp-10h]
   FILE *fp3; // [esp+4h] [ebp-Ch]
@@ -165,13 +165,13 @@ int __cdecl DataFileRead2()
   }
 }
 
-int __cdecl MemoryFree1()
+int MemoryFree1()
 {
   free(gif.m_buff1);
   return 1;
 }
 
-int __cdecl MemoryFree2()
+int MemoryFree2()
 {
   free(gif.m_buff1);
   free(gif.m_buff2);
@@ -180,7 +180,7 @@ int __cdecl MemoryFree2()
   return 1;
 }
 
-int __cdecl GIF_SDRAMCheck(MM *mm, MM *end, int opt)
+int GIF_SDRAMCheck(MM *mm, MM *end, int opt)
 {
   unsigned int v3; // edx
   unsigned int v4; // edx
@@ -360,7 +360,7 @@ int __cdecl GIF_SDRAMCheck(MM *mm, MM *end, int opt)
   return test;
 }
 
-int __cdecl GIF_EXAMPLECheck(NN *nn, NN *end)
+int GIF_EXAMPLECheck(NN *nn, NN *end)
 {
   int dat2; // [esp+4h] [ebp-2Ch]
   int dat1; // [esp+8h] [ebp-28h]
@@ -408,7 +408,7 @@ int __cdecl GIF_EXAMPLECheck(NN *nn, NN *end)
   return 0;
 }
 
-int __cdecl GIF_GINTCheck(NN *nn, NN *end, int value)
+int GIF_GINTCheck(NN *nn, NN *end, int value)
 {
   int ci; // [esp+0h] [ebp-24h]
   unsigned __int8 dat[30]; // [esp+4h] [ebp-20h] BYREF
@@ -429,7 +429,7 @@ int __cdecl GIF_GINTCheck(NN *nn, NN *end, int value)
   return 0;
 }
 
-int __cdecl GIF_TEXSWAPCheck(NN *nn, NN *end)
+int GIF_TEXSWAPCheck(NN *nn, NN *end)
 {
   int offset; // [esp+4h] [ebp-34h]
   int dat2; // [esp+8h] [ebp-30h]
@@ -644,7 +644,7 @@ int __cdecl GIF_TEXSWAPCheck(NN *nn, NN *end)
   return 0;
 }
 
-int __cdecl check_gif(char *p, int mode, int size, char *checkStr)
+int check_gif(char *p, int mode, int size, char *checkStr)
 {
   NN *v5; // [esp+4h] [ebp-14h]
   int qword; // [esp+14h] [ebp-4h]

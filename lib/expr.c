@@ -1,17 +1,17 @@
 #include "dsnet_prototypes.h"
 
-static char *__cdecl skipsp(char *s);
-static char *__cdecl expr(int prio, char *str, quad *pval);
-static char *__cdecl fexpr(int prio, char *str, float *pval);
+static char *skipsp(char *s);
+static char *expr(int prio, char *str, quad *pval);
+static char *fexpr(int prio, char *str, float *pval);
 
-static char *__cdecl skipsp(char *s)
+static char *skipsp(char *s)
 {
   while ( *s && (isspace(*s)) != 0 )
     ++s;
   return s;
 }
 
-static char *__cdecl expr(int prio, char *str, quad *pval)
+static char *expr(int prio, char *str, quad *pval)
 {
   char *v4; // eax
   int v5; // eax
@@ -498,7 +498,7 @@ LABEL_188:
   }
 }
 
-int __cdecl ds_eval_quad(char *str, quad *pv)
+int ds_eval_quad(char *str, quad *pv)
 {
   char *s; // [esp+8h] [ebp+8h]
 
@@ -512,7 +512,7 @@ int __cdecl ds_eval_quad(char *str, quad *pv)
   return 0;
 }
 
-int __cdecl ds_eval_twin(char *str, twin *pv)
+int ds_eval_twin(char *str, twin *pv)
 {
   quad v3; // [esp-14h] [ebp-2Ch]
   _QWORD x[3]; // [esp+0h] [ebp-18h] BYREF
@@ -532,7 +532,7 @@ int __cdecl ds_eval_twin(char *str, twin *pv)
   return 0;
 }
 
-int __cdecl ds_eval_word(char *str, unsigned int *pv)
+int ds_eval_word(char *str, unsigned int *pv)
 {
   quad val; // [esp+0h] [ebp-10h] BYREF
 
@@ -542,7 +542,7 @@ int __cdecl ds_eval_word(char *str, unsigned int *pv)
   return 0;
 }
 
-int __cdecl ds_eval_word_ex(char *str, unsigned int *pv)
+int ds_eval_word_ex(char *str, unsigned int *pv)
 {
   quad val; // [esp+0h] [ebp-10h] BYREF
 
@@ -552,7 +552,7 @@ int __cdecl ds_eval_word_ex(char *str, unsigned int *pv)
   return 0;
 }
 
-static char *__cdecl fexpr(int prio, char *str, float *pval)
+static char *fexpr(int prio, char *str, float *pval)
 {
   char *v4; // eax
   size_t v5; // eax
@@ -746,7 +746,7 @@ LABEL_55:
   }
 }
 
-int __cdecl ds_eval_float(char *str, float *pv)
+int ds_eval_float(char *str, float *pv)
 {
   char *s; // [esp+8h] [ebp+8h]
 

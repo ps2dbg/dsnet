@@ -16,7 +16,7 @@ static struct __anon_struct_137 {ALIAS *head; ALIAS *tail;} aliases;
 
 char path_46[1025] = {0};
 char show_arg_77[1024] = {0};
-static int (__cdecl *last_func_88)() = &ds_help_cmd;
+static int (*last_func_88)() = &ds_help_cmd;
 
 static int cmd_max_na = 0;
 DS_OPTION *ds_opt_hex_radix = NULL;
@@ -32,24 +32,24 @@ int ds_cmd_executing = 0;
 static struct __anon_struct_131 {SHOW_ARG *head; SHOW_ARG *tail;} show_arg_list = { NULL, NULL };
 static struct __anon_struct_133 {HELP_ARG *head; HELP_ARG *tail;} help_arg_list = { NULL, NULL };
 
-static void __cdecl show_option(char *name, int f_force);
-static int __cdecl is_reserved_name(char *name);
-static int __cdecl read_option(char *fname);
-static int __cdecl scan_digit_with_dot(char *str, int *psec, int *pusec);
-static int __cdecl ds_status_cmd(int ac, char **av);
-static int __cdecl ds_history_cmd(int ac, char **av);
-static int __cdecl ds_enable_cmd(int ac, char **av);
-static int __cdecl ds_disable_cmd(int ac, char **av);
-static ALIAS *__cdecl alias(char *buf, int nbuf, int ac, char **av);
-static int __cdecl ds_cmd_execute_internal(char *s, int f_repeat);
-static int __cdecl ds_path_completion(DS_HISTBUF *hb, char *path);
-static int __cdecl ds_symbol_completion(DS_HISTBUF *hb, char *name);
-static int __cdecl ds_get_last_keyword(char *buf, char *str);
-static int __cdecl ds_set_completion(DS_HISTBUF *hb, char *str);
-static int __cdecl ds_help_completion(DS_HISTBUF *hb, char *str);
-static int __cdecl ds_path_or_symbol_completion(DS_HISTBUF *hb, char *str);
+static void show_option(char *name, int f_force);
+static int is_reserved_name(char *name);
+static int read_option(char *fname);
+static int scan_digit_with_dot(char *str, int *psec, int *pusec);
+static int ds_status_cmd(int ac, char **av);
+static int ds_history_cmd(int ac, char **av);
+static int ds_enable_cmd(int ac, char **av);
+static int ds_disable_cmd(int ac, char **av);
+static ALIAS *alias(char *buf, int nbuf, int ac, char **av);
+static int ds_cmd_execute_internal(char *s, int f_repeat);
+static int ds_path_completion(DS_HISTBUF *hb, char *path);
+static int ds_symbol_completion(DS_HISTBUF *hb, char *name);
+static int ds_get_last_keyword(char *buf, char *str);
+static int ds_set_completion(DS_HISTBUF *hb, char *str);
+static int ds_help_completion(DS_HISTBUF *hb, char *str);
+static int ds_path_or_symbol_completion(DS_HISTBUF *hb, char *str);
 
-int __cdecl ds_shell_cmd(int ac, char **av)
+int ds_shell_cmd(int ac, char **av)
 {
   char *v4; // eax
   char *v5; // eax
@@ -140,7 +140,7 @@ LABEL_30:
   return r;
 }
 
-char *__cdecl ds_ref_option_str(char *name)
+char *ds_ref_option_str(char *name)
 {
   DS_OPTION *p; // [esp+0h] [ebp-4h]
 
@@ -152,7 +152,7 @@ char *__cdecl ds_ref_option_str(char *name)
   return 0;
 }
 
-int __cdecl ds_ref_user_variable(char *name, unsigned int *wp)
+int ds_ref_user_variable(char *name, unsigned int *wp)
 {
   DS_OPTION *p; // [esp+0h] [ebp-4h]
 
@@ -167,7 +167,7 @@ int __cdecl ds_ref_user_variable(char *name, unsigned int *wp)
   return 0;
 }
 
-DS_OPTION *__cdecl ds_set_option(char *name, int type, char *str, int val, int f_def)
+DS_OPTION *ds_set_option(char *name, int type, char *str, int val, int f_def)
 {
   size_t v5; // eax
   char *v6; // eax
@@ -266,7 +266,7 @@ DS_OPTION *__cdecl ds_set_option(char *name, int type, char *str, int val, int f
   }
 }
 
-static void __cdecl show_option(char *name, int f_force)
+static void show_option(char *name, int f_force)
 {
   int v2; // eax
   char *v3; // eax
@@ -323,7 +323,7 @@ static void __cdecl show_option(char *name, int f_force)
   }
 }
 
-static int __cdecl is_reserved_name(char *name)
+static int is_reserved_name(char *name)
 {
   if ( (isalpha(*name)) == 0 )
     return 1;
@@ -332,7 +332,7 @@ static int __cdecl is_reserved_name(char *name)
   return 0;
 }
 
-int __cdecl ds_set_cmd(int ac, char **av)
+int ds_set_cmd(int ac, char **av)
 {
   char *v3; // eax
   int v4; // eax
@@ -457,7 +457,7 @@ int __cdecl ds_set_cmd(int ac, char **av)
   }
 }
 
-static int __cdecl read_option(char *fname)
+static int read_option(char *fname)
 {
   char *v2; // eax
   char *av[101]; // [esp+4h] [ebp-1C4h] BYREF
@@ -537,7 +537,7 @@ static int __cdecl read_option(char *fname)
   return 0;
 }
 
-int __cdecl ds_read_option_file()
+int ds_read_option_file()
 {
   char cwd[1025]; // [esp+0h] [ebp-80Ch] BYREF
   char fname[1025]; // [esp+404h] [ebp-408h] BYREF
@@ -565,7 +565,7 @@ LABEL_11:
     return read_option(fname);
 }
 
-int __cdecl ds_read_startup_file()
+int ds_read_startup_file()
 {
   char line[1125]; // [esp+0h] [ebp-C74h] BYREF
   char cwd[1025]; // [esp+468h] [ebp-80Ch] BYREF
@@ -596,7 +596,7 @@ LABEL_9:
   return 0;
 }
 
-int __cdecl ds_source_cmd(int ac, char **av)
+int ds_source_cmd(int ac, char **av)
 {
   char *v3; // eax
   int cl; // [esp+4h] [ebp-2Ch]
@@ -698,7 +698,7 @@ int __cdecl ds_source_cmd(int ac, char **av)
   return r;
 }
 
-int __cdecl ds_cd_cmd(int ac, char **av)
+int ds_cd_cmd(int ac, char **av)
 {
   char *v3; // eax
   char path[1025]; // [esp+0h] [ebp-408h] BYREF
@@ -725,7 +725,7 @@ int __cdecl ds_cd_cmd(int ac, char **av)
     return ds_error("!chdir(%s)", path);
 }
 
-static int __cdecl scan_digit_with_dot(char *str, int *psec, int *pusec)
+static int scan_digit_with_dot(char *str, int *psec, int *pusec)
 {
   int base; // [esp+4h] [ebp-10h]
   int usec; // [esp+8h] [ebp-Ch]
@@ -756,7 +756,7 @@ static int __cdecl scan_digit_with_dot(char *str, int *psec, int *pusec)
   return 0;
 }
 
-int __cdecl ds_if_cmd(int ac, char **av)
+int ds_if_cmd(int ac, char **av)
 {
   char *v3; // eax
   char v4; // dl
@@ -827,7 +827,7 @@ int __cdecl ds_if_cmd(int ac, char **av)
   return v9;
 }
 
-int __cdecl ds_repeat_cmd(int ac, char **av)
+int ds_repeat_cmd(int ac, char **av)
 {
   int v3; // ebx
   char *v4; // eax
@@ -1009,7 +1009,7 @@ int __cdecl ds_repeat_cmd(int ac, char **av)
   return v11;
 }
 
-static int __cdecl ds_status_cmd(int ac, char **av)
+static int ds_status_cmd(int ac, char **av)
 {
   int f_mem; // [esp+0h] [ebp-8h]
   int f_desc; // [esp+4h] [ebp-4h]
@@ -1047,7 +1047,7 @@ static int __cdecl ds_status_cmd(int ac, char **av)
   return 0;
 }
 
-static int __cdecl ds_history_cmd(int ac, char **av)
+static int ds_history_cmd(int ac, char **av)
 {
   DS_HIST *hp; // [esp+0h] [ebp-4h]
   char **ava; // [esp+10h] [ebp+Ch]
@@ -1062,7 +1062,7 @@ static int __cdecl ds_history_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl ds_add_show_arg(char *name, int (__cdecl *func)(int ac, char **av))
+int ds_add_show_arg(char *name, int (*func)(int ac, char **av))
 {
   SHOW_ARG *tail; // edx
   SHOW_ARG *sa; // [esp+4h] [ebp-4h]
@@ -1083,7 +1083,7 @@ int __cdecl ds_add_show_arg(char *name, int (__cdecl *func)(int ac, char **av))
   return 0;
 }
 
-int __cdecl ds_show_cmd(int ac, char **av)
+int ds_show_cmd(int ac, char **av)
 {
   SHOW_ARG *sa; // [esp+4h] [ebp-Ch]
   SHOW_ARG *sa_1; // [esp+4h] [ebp-Ch]
@@ -1115,7 +1115,7 @@ int __cdecl ds_show_cmd(int ac, char **av)
   return -1;
 }
 
-int __cdecl ds_quit_cmd(int ac, char **av)
+int ds_quit_cmd(int ac, char **av)
 {
   if ( ac <= 0 )
     return 0;
@@ -1124,7 +1124,7 @@ int __cdecl ds_quit_cmd(int ac, char **av)
   return ds_error("Usage: quit");
 }
 
-int __cdecl ds_add_help(char *name, int (__cdecl *func)(char *name))
+int ds_add_help(char *name, int (*func)(char *name))
 {
   HELP_ARG *tail; // edx
   HELP_ARG *ha; // [esp+4h] [ebp-4h]
@@ -1145,7 +1145,7 @@ int __cdecl ds_add_help(char *name, int (__cdecl *func)(char *name))
   return 0;
 }
 
-int __cdecl ds_help_cmd(int ac, char **av)
+int ds_help_cmd(int ac, char **av)
 {
   size_t v3; // [esp-Ch] [ebp-30h]
   char *arg; // [esp-8h] [ebp-2Ch]
@@ -1249,7 +1249,7 @@ LABEL_65:
   return 0;
 }
 
-void __cdecl ds_cmd_install(char *name, char *arg, char *help, int (__cdecl *func)(int ac, char **av))
+void ds_cmd_install(char *name, char *arg, char *help, int (*func)(int ac, char **av))
 {
   CMD_ENTRY *tail; // edx
   size_t v5; // esi
@@ -1278,7 +1278,7 @@ void __cdecl ds_cmd_install(char *name, char *arg, char *help, int (__cdecl *fun
     cmd_max_na = na;
 }
 
-void __cdecl ds_cmd_control(char *name, int f_enable)
+void ds_cmd_control(char *name, int f_enable)
 {
   CMD_ENTRY *p; // [esp+0h] [ebp-4h]
 
@@ -1289,7 +1289,7 @@ void __cdecl ds_cmd_control(char *name, int f_enable)
   }
 }
 
-void __cdecl ds_opt_standard_init()
+void ds_opt_standard_init()
 {
   char tmp[1024]; // [esp+0h] [ebp-400h] BYREF
 
@@ -1305,7 +1305,7 @@ void __cdecl ds_opt_standard_init()
   ds_opt_tty_max_size = ds_set_option("tty_max_size", 2, 0, 0x800000, 1);
 }
 
-void __cdecl ds_cmd_standard_install(int f_shell)
+void ds_cmd_standard_install(int f_shell)
 {
   SHOW_ARG *sa; // [esp+0h] [ebp-4h]
 
@@ -1332,7 +1332,7 @@ void __cdecl ds_cmd_standard_install(int f_shell)
   ds_cmd_install("help", "[<cmd>]...", "print help", ds_help_cmd);
 }
 
-static int __cdecl ds_enable_cmd(int ac, char **av)
+static int ds_enable_cmd(int ac, char **av)
 {
   CMD_ENTRY *p; // [esp+0h] [ebp-4h]
   int aca; // [esp+Ch] [ebp+8h]
@@ -1362,7 +1362,7 @@ static int __cdecl ds_enable_cmd(int ac, char **av)
   return 0;
 }
 
-static int __cdecl ds_disable_cmd(int ac, char **av)
+static int ds_disable_cmd(int ac, char **av)
 {
   CMD_ENTRY *p; // [esp+0h] [ebp-4h]
   int aca; // [esp+Ch] [ebp+8h]
@@ -1392,13 +1392,13 @@ static int __cdecl ds_disable_cmd(int ac, char **av)
   return 0;
 }
 
-void __cdecl ds_cmd_xxxable_install()
+void ds_cmd_xxxable_install()
 {
   ds_cmd_install("enable", "[cmds]...", "enable commands", ds_enable_cmd);
   ds_cmd_install("disable", "[cmds]...", "disable commands", ds_disable_cmd);
 }
 
-int __cdecl ds_alias_cmd(int ac, char **av)
+int ds_alias_cmd(int ac, char **av)
 {
   size_t v3; // eax
   char *v4; // eax
@@ -1554,9 +1554,9 @@ int __cdecl ds_alias_cmd(int ac, char **av)
   }
 }
 
-int __cdecl ds_cmd_call(int ac, char **av, int f_repeat)
+int ds_cmd_call(int ac, char **av, int f_repeat)
 {
-  int (__cdecl *func)(int, char **); // eax
+  int (*func)(int, char **); // eax
   size_t v5; // [esp-4h] [ebp-10h]
   size_t v6; // [esp-4h] [ebp-10h]
   int r; // [esp+4h] [ebp-8h]
@@ -1623,7 +1623,7 @@ int __cdecl ds_cmd_call(int ac, char **av, int f_repeat)
   }
 }
 
-static ALIAS *__cdecl alias(char *buf, int nbuf, int ac, char **av)
+static ALIAS *alias(char *buf, int nbuf, int ac, char **av)
 {
   char *v5; // eax
   int v6; // ebx
@@ -1702,7 +1702,7 @@ static ALIAS *__cdecl alias(char *buf, int nbuf, int ac, char **av)
   return 0;
 }
 
-static int __cdecl ds_cmd_execute_internal(char *s, int f_repeat)
+static int ds_cmd_execute_internal(char *s, int f_repeat)
 {
   char v3; // al
   size_t v4; // eax
@@ -1803,7 +1803,7 @@ LABEL_20:
     return 0;
 }
 
-int __cdecl ds_cmd_execute(char *s, int f_repeat)
+int ds_cmd_execute(char *s, int f_repeat)
 {
   ALIAS *p; // [esp+0h] [ebp-4h]
 
@@ -1812,7 +1812,7 @@ int __cdecl ds_cmd_execute(char *s, int f_repeat)
   return ds_cmd_execute_internal(s, f_repeat);
 }
 
-static int __cdecl ds_path_completion(DS_HISTBUF *hb, char *path)
+static int ds_path_completion(DS_HISTBUF *hb, char *path)
 {
   char *v2; // eax
   struct stat stbuf; // [esp+4h] [ebp-C8Ch] BYREF
@@ -1914,7 +1914,7 @@ static int __cdecl ds_path_completion(DS_HISTBUF *hb, char *path)
   return r;
 }
 
-static int __cdecl ds_symbol_completion(DS_HISTBUF *hb, char *name)
+static int ds_symbol_completion(DS_HISTBUF *hb, char *name)
 {
   if ( ds_symbol_completion_func )
     return ds_symbol_completion_func(hb, name);
@@ -1922,7 +1922,7 @@ static int __cdecl ds_symbol_completion(DS_HISTBUF *hb, char *name)
     return 0;
 }
 
-static int __cdecl ds_get_last_keyword(char *buf, char *str)
+static int ds_get_last_keyword(char *buf, char *str)
 {
   char *p; // [esp+4h] [ebp-8h]
   char *s; // [esp+8h] [ebp-4h]
@@ -1941,7 +1941,7 @@ static int __cdecl ds_get_last_keyword(char *buf, char *str)
     return strlen(buf);
 }
 
-static int __cdecl ds_set_completion(DS_HISTBUF *hb, char *str)
+static int ds_set_completion(DS_HISTBUF *hb, char *str)
 {
   int col; // [esp+0h] [ebp-420h]
   int col_1; // [esp+0h] [ebp-420h]
@@ -2031,7 +2031,7 @@ static int __cdecl ds_set_completion(DS_HISTBUF *hb, char *str)
   }
 }
 
-static int __cdecl ds_help_completion(DS_HISTBUF *hb, char *str)
+static int ds_help_completion(DS_HISTBUF *hb, char *str)
 {
   int col; // [esp+4h] [ebp-420h]
   int col_1; // [esp+4h] [ebp-420h]
@@ -2123,7 +2123,7 @@ static int __cdecl ds_help_completion(DS_HISTBUF *hb, char *str)
   }
 }
 
-static int __cdecl ds_path_or_symbol_completion(DS_HISTBUF *hb, char *str)
+static int ds_path_or_symbol_completion(DS_HISTBUF *hb, char *str)
 {
   char v2; // al
   int f_path; // [esp+4h] [ebp-40Ch]
@@ -2152,7 +2152,7 @@ static int __cdecl ds_path_or_symbol_completion(DS_HISTBUF *hb, char *str)
   return ds_symbol_completion(hb, name);
 }
 
-int __cdecl ds_cmd_completion(DS_HISTBUF *hb, char *s)
+int ds_cmd_completion(DS_HISTBUF *hb, char *s)
 {
   int col; // [esp+4h] [ebp-420h]
   int col_1; // [esp+4h] [ebp-420h]
@@ -2259,7 +2259,7 @@ LABEL_62:
   }
 }
 
-DSP_BUF *__cdecl ds_cmd_input(DS_DESC *desc, DSP_BUF *db)
+DSP_BUF *ds_cmd_input(DS_DESC *desc, DSP_BUF *db)
 {
   int v3; // eax
   char *p; // [esp+0h] [ebp-414h]

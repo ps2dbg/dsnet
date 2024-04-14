@@ -1,12 +1,12 @@
 #include "dsnet_prototypes.h"
 
-static int __cdecl set_deci1_hdr(DS_PSNETD_PRIV *priv, DS_DECI1 *p, unsigned int req, int len);
-static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc);
-static int __cdecl recv_deci1_hook(DS_PSNETD_PRIV *p, DS_DECI1 *deci1, void *ptr, int len);
-static int __cdecl send_treset(DS_PSNETD_PRIV *p);
-static int __cdecl send_deci2_hook(DS_PSNETD_PRIV *p, DECI2_HDR *dh, int len);
+static int set_deci1_hdr(DS_PSNETD_PRIV *priv, DS_DECI1 *p, unsigned int req, int len);
+static DS_PSNETD_PRIV *init_psnet(DS_DESC *desc);
+static int recv_deci1_hook(DS_PSNETD_PRIV *p, DS_DECI1 *deci1, void *ptr, int len);
+static int send_treset(DS_PSNETD_PRIV *p);
+static int send_deci2_hook(DS_PSNETD_PRIV *p, DECI2_HDR *dh, int len);
 
-static int __cdecl set_deci1_hdr(DS_PSNETD_PRIV *priv, DS_DECI1 *p, unsigned int req, int len)
+static int set_deci1_hdr(DS_PSNETD_PRIV *priv, DS_DECI1 *p, unsigned int req, int len)
 {
   int i; // [esp+4h] [ebp-Ch]
   unsigned int *wp; // [esp+8h] [ebp-8h]
@@ -41,7 +41,7 @@ static int __cdecl set_deci1_hdr(DS_PSNETD_PRIV *priv, DS_DECI1 *p, unsigned int
   return sizeof(DS_DECI1);
 }
 
-static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
+static DS_PSNETD_PRIV *init_psnet(DS_DESC *desc)
 {
   pid_t v2; // ebx
   char *v3; // eax
@@ -94,7 +94,7 @@ static DS_PSNETD_PRIV *__cdecl init_psnet(DS_DESC *desc)
   return p;
 }
 
-void __cdecl ds_free_psnet(DS_DESC *desc)
+void ds_free_psnet(DS_DESC *desc)
 {
   DS_PSNETD_PRIV *p; // [esp+0h] [ebp-4h]
 
@@ -106,7 +106,7 @@ void __cdecl ds_free_psnet(DS_DESC *desc)
   }
 }
 
-static int __cdecl recv_deci1_hook(DS_PSNETD_PRIV *p, DS_DECI1 *deci1, void *ptr, int len)
+static int recv_deci1_hook(DS_PSNETD_PRIV *p, DS_DECI1 *deci1, void *ptr, int len)
 {
   char *v5; // eax
   char *rcv_buf; // ebx
@@ -160,7 +160,7 @@ static int __cdecl recv_deci1_hook(DS_PSNETD_PRIV *p, DS_DECI1 *deci1, void *ptr
   }
 }
 
-int __cdecl ds_read_psnet(DS_DESC *desc, char *buf, int len)
+int ds_read_psnet(DS_DESC *desc, char *buf, int len)
 {
   unsigned int v4; // edx
   char *v5; // eax
@@ -287,7 +287,7 @@ LABEL_12:
   return r_2;
 }
 
-static int __cdecl send_treset(DS_PSNETD_PRIV *p)
+static int send_treset(DS_PSNETD_PRIV *p)
 {
   char *v1; // eax
   char *cp; // [esp+0h] [ebp-4h]
@@ -304,7 +304,7 @@ static int __cdecl send_treset(DS_PSNETD_PRIV *p)
   return 0;
 }
 
-static int __cdecl send_deci2_hook(DS_PSNETD_PRIV *p, DECI2_HDR *dh, int len)
+static int send_deci2_hook(DS_PSNETD_PRIV *p, DECI2_HDR *dh, int len)
 {
   int lena; // [esp+14h] [ebp+10h]
 
@@ -320,7 +320,7 @@ static int __cdecl send_deci2_hook(DS_PSNETD_PRIV *p, DECI2_HDR *dh, int len)
   return 1;
 }
 
-int __cdecl ds_write_psnet(DS_DESC *desc, char *buf, int len)
+int ds_write_psnet(DS_DESC *desc, char *buf, int len)
 {
   int v4; // ebx
   int v5; // edx

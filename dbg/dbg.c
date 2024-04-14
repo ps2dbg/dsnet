@@ -127,62 +127,62 @@ unsigned int regbuf_vals[10][32];
 unsigned int regbuf_mask[10];
 #endif /* DSNET_COMPILING_I */
 
-static void __cdecl ntoh_word_copy(unsigned int *dest, unsigned int *src, int len);
-static DSP_BUF *__cdecl alloc_dbgp(int id, int group, int type, int code, int result, int count, void **pp, int len);
-static void __cdecl print_prompt();
-static void __cdecl erase_input_line();
-static void __cdecl redraw_input_line(int f_force);
-static void __cdecl display_ttyq();
-static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db);
-static void __cdecl flush_tty_buf();
-static void __cdecl abort_input(int code);
-static void __cdecl normal_input(int code);
-static DSP_BUF *__cdecl recv_kbd(DS_DESC *desc, DSP_BUF *db);
+static void ntoh_word_copy(unsigned int *dest, unsigned int *src, int len);
+static DSP_BUF *alloc_dbgp(int id, int group, int type, int code, int result, int count, void **pp, int len);
+static void print_prompt();
+static void erase_input_line();
+static void redraw_input_line(int f_force);
+static void display_ttyq();
+static DSP_BUF *recv_ttyp(DS_DESC *desc, DSP_BUF *db);
+static void flush_tty_buf();
+static void abort_input(int code);
+static void normal_input(int code);
+static DSP_BUF *recv_kbd(DS_DESC *desc, DSP_BUF *db);
 #ifdef DSNET_COMPILING_E
-static int __cdecl setup_xgkt(char *fname, unsigned int cnt, unsigned int off);
-static DSP_BUF *__cdecl recv_xgkt(DSP_BUF *db);
-static DSP_BUF *__cdecl recv_rdimg(DSP_BUF *db);
+static int setup_xgkt(char *fname, unsigned int cnt, unsigned int off);
+static DSP_BUF *recv_xgkt(DSP_BUF *db);
+static DSP_BUF *recv_rdimg(DSP_BUF *db);
 #endif /* DSNET_COMPILING_E */
-static DSP_BUF *__cdecl unexpected_reply(DSP_BUF *db, DBGP_HDR *ch);
-static DSP_BUF *__cdecl recv_dbgp(DS_DESC *desc, DSP_BUF *db);
-static void __cdecl print_state_errors(char *fmt);
-static int __cdecl send_and_wait(DSP_BUF *db, int stype, void *ptr, int len, int wresult);
-static int __cdecl get_conf(DBGP_CONF_DATA *conf);
-static void __cdecl send_dbconf();
-static int __cdecl rdwr_mem_align(int code, int align, int cpuid, int space, unsigned int adr, void *ptr, int len);
-static int __cdecl rdwr_mem(int code, unsigned int adr, void *ptr, int len);
-static int __cdecl load_mem(unsigned int adr, void *ptr, int len);
-static int __cdecl store_mem(unsigned int adr, void *ptr, int len);
+static DSP_BUF *unexpected_reply(DSP_BUF *db, DBGP_HDR *ch);
+static DSP_BUF *recv_dbgp(DS_DESC *desc, DSP_BUF *db);
+static void print_state_errors(char *fmt);
+static int send_and_wait(DSP_BUF *db, int stype, void *ptr, int len, int wresult);
+static int get_conf(DBGP_CONF_DATA *conf);
+static void send_dbconf();
+static int rdwr_mem_align(int code, int align, int cpuid, int space, unsigned int adr, void *ptr, int len);
+static int rdwr_mem(int code, unsigned int adr, void *ptr, int len);
+static int load_mem(unsigned int adr, void *ptr, int len);
+static int store_mem(unsigned int adr, void *ptr, int len);
 #ifdef DSNET_COMPILING_E
-static int __cdecl load_quad_registers_id(int id, unsigned int *masks, quad *pv, int n);
-static int __cdecl store_quad_registers_id(int id, unsigned int *masks, quad *pv, int n);
-static int __cdecl access_quad_registers(int (__cdecl *func)(), unsigned int *masks, quad *pv, int n);
+static int load_quad_registers_id(int id, unsigned int *masks, quad *pv, int n);
+static int store_quad_registers_id(int id, unsigned int *masks, quad *pv, int n);
+static int access_quad_registers(int (*func)(), unsigned int *masks, quad *pv, int n);
 #endif /* DSNET_COMPILING_E */
-static DSP_BUF *__cdecl recv_loadp(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl get_and_check_config();
-static void __cdecl print_size(unsigned int size);
-static void __cdecl print_align_list(unsigned int align);
-static int __cdecl show_dbconf(int ac, char **av);
-static int __cdecl reset_cmd(int ac, char **av);
+static DSP_BUF *recv_loadp(DS_DESC *desc, DSP_BUF *db);
+static int get_and_check_config();
+static void print_size(unsigned int size);
+static void print_align_list(unsigned int align);
+static int show_dbconf(int ac, char **av);
+static int reset_cmd(int ac, char **av);
 #ifdef DSNET_COMPILING_E
-static int __cdecl dbgctl(int id, int flag);
-static int __cdecl dbgctl_cmd(int ac, char **av);
-static int __cdecl xgkt_cmd(int ac, char **av);
-static int __cdecl storeimage_cmd(int ac, char **av);
+static int dbgctl(int id, int flag);
+static int dbgctl_cmd(int ac, char **av);
+static int xgkt_cmd(int ac, char **av);
+static int storeimage_cmd(int ac, char **av);
 #endif /* DSNET_COMPILING_E */
-static int __cdecl bpfunc_cmd(int ac, char **av);
-static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db);
-static void __cdecl batch(int ac, char **av);
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl send_netmp_connect_request();
-static DSP_BUF *__cdecl recv_console(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl start_console(DS_DESC *desc);
-static void __cdecl drfp_error(DSP_BUF *db);
-static int __cdecl usage(int f_true);
-static void __cdecl dup_and_exe(char *cmd);
-static void __cdecl set_options_to_default();
+static int bpfunc_cmd(int ac, char **av);
+static DSP_BUF *recv_dcmp(DS_DESC *desc, DSP_BUF *db);
+static void batch(int ac, char **av);
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db);
+static int send_netmp_connect_request();
+static DSP_BUF *recv_console(DS_DESC *desc, DSP_BUF *db);
+static int start_console(DS_DESC *desc);
+static void drfp_error(DSP_BUF *db);
+static int usage(int f_true);
+static void dup_and_exe(char *cmd);
+static void set_options_to_default();
 
-static void __cdecl ntoh_word_copy(unsigned int *dest, unsigned int *src, int len)
+static void ntoh_word_copy(unsigned int *dest, unsigned int *src, int len)
 {
   int i; // [esp+0h] [ebp-4h]
   signed int lena; // [esp+14h] [ebp+10h]
@@ -192,7 +192,7 @@ static void __cdecl ntoh_word_copy(unsigned int *dest, unsigned int *src, int le
     *dest++ = *src++;
 }
 
-static DSP_BUF *__cdecl alloc_dbgp(int id, int group, int type, int code, int result, int count, void **pp, int len)
+static DSP_BUF *alloc_dbgp(int id, int group, int type, int code, int result, int count, void **pp, int len)
 {
   DSP_BUF *db; // [esp+1Ch] [ebp-Ch]
 
@@ -212,7 +212,7 @@ static DSP_BUF *__cdecl alloc_dbgp(int id, int group, int type, int code, int re
   return db;
 }
 
-static void __cdecl print_prompt()
+static void print_prompt()
 {
   char *str; // [esp+0h] [ebp-4h]
 
@@ -235,7 +235,7 @@ static void __cdecl print_prompt()
   }
 }
 
-static void __cdecl erase_input_line()
+static void erase_input_line()
 {
   int n; // [esp+0h] [ebp-Ch]
   int n_1; // [esp+0h] [ebp-Ch]
@@ -257,7 +257,7 @@ static void __cdecl erase_input_line()
   }
 }
 
-static void __cdecl redraw_input_line(int f_force)
+static void redraw_input_line(int f_force)
 {
   char *p; // [esp+0h] [ebp-8h]
 
@@ -272,7 +272,7 @@ static void __cdecl redraw_input_line(int f_force)
   }
 }
 
-static void __cdecl display_ttyq()
+static void display_ttyq()
 {
   int ch; // [esp+0h] [ebp-4h]
 
@@ -290,7 +290,7 @@ static void __cdecl display_ttyq()
   redraw_input_line(0);
 }
 
-static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_ttyp(DS_DESC *desc, DSP_BUF *db)
 {
   char v3; // cl
   char *bp; // [esp+8h] [ebp-14h]
@@ -321,7 +321,7 @@ static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static void __cdecl flush_tty_buf()
+static void flush_tty_buf()
 {
   unsigned int wv; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
@@ -335,7 +335,7 @@ static void __cdecl flush_tty_buf()
     ds_send_desc(target_desc, db);
 }
 
-static void __cdecl abort_input(int code)
+static void abort_input(int code)
 {
   DSP_BUF *db; // [esp+4h] [ebp-8h]
 
@@ -359,7 +359,7 @@ LABEL_7:
   }
 }
 
-static void __cdecl normal_input(int code)
+static void normal_input(int code)
 {
   struct {
     unsigned int zero;
@@ -379,7 +379,7 @@ static void __cdecl normal_input(int code)
   }
 }
 
-static DSP_BUF *__cdecl recv_kbd(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_kbd(DS_DESC *desc, DSP_BUF *db)
 {
   int v3; // eax
   int v4; // eax
@@ -464,7 +464,7 @@ static DSP_BUF *__cdecl recv_kbd(DS_DESC *desc, DSP_BUF *db)
 }
 
 #ifdef DSNET_COMPILING_E
-static int __cdecl setup_xgkt(char *fname, unsigned int cnt, unsigned int off)
+static int setup_xgkt(char *fname, unsigned int cnt, unsigned int off)
 {
   if ( xgkt_stream )
     return ds_error("XGKICK Trace - busy");
@@ -479,7 +479,7 @@ static int __cdecl setup_xgkt(char *fname, unsigned int cnt, unsigned int off)
   return 0;
 }
 
-static DSP_BUF *__cdecl recv_xgkt(DSP_BUF *db)
+static DSP_BUF *recv_xgkt(DSP_BUF *db)
 {
   int flag; // [esp+0h] [ebp-14h]
   int len; // [esp+4h] [ebp-10h]
@@ -522,7 +522,7 @@ static DSP_BUF *__cdecl recv_xgkt(DSP_BUF *db)
   return db;
 }
 
-static DSP_BUF *__cdecl recv_rdimg(DSP_BUF *db)
+static DSP_BUF *recv_rdimg(DSP_BUF *db)
 {
   int len; // [esp+0h] [ebp-10h]
 
@@ -548,7 +548,7 @@ static DSP_BUF *__cdecl recv_rdimg(DSP_BUF *db)
 }
 #endif /* DSNET_COMPILING_E */
 
-static DSP_BUF *__cdecl unexpected_reply(DSP_BUF *db, DBGP_HDR *ch)
+static DSP_BUF *unexpected_reply(DSP_BUF *db, DBGP_HDR *ch)
 {
   int v2; // eax
   unsigned int *wp; // [esp+4h] [ebp-10h]
@@ -591,7 +591,7 @@ static DSP_BUF *__cdecl unexpected_reply(DSP_BUF *db, DBGP_HDR *ch)
   return db;
 }
 
-static DSP_BUF *__cdecl recv_dbgp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_dbgp(DS_DESC *desc, DSP_BUF *db)
 {
   DSP_BUF *result;
   regtype* rp;
@@ -819,7 +819,7 @@ static DSP_BUF *__cdecl recv_dbgp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static void __cdecl print_state_errors(char *fmt)
+static void print_state_errors(char *fmt)
 {
   const char *v1; // [esp+0h] [ebp-4h]
 
@@ -870,7 +870,7 @@ static void __cdecl print_state_errors(char *fmt)
   ds_printf("\n");
 }
 
-static int __cdecl send_and_wait(DSP_BUF *db, int stype, void *ptr, int len, int wresult)
+static int send_and_wait(DSP_BUF *db, int stype, void *ptr, int len, int wresult)
 {
   unsigned __int8 wtype; // [esp+7h] [ebp-Dh]
   int sec; // [esp+8h] [ebp-Ch]
@@ -967,7 +967,7 @@ LABEL_11:
 #endif /* DSNET_COMPILING_E */
 }
 
-static int __cdecl get_conf(DBGP_CONF_DATA *conf)
+static int get_conf(DBGP_CONF_DATA *conf)
 {
   int r; // [esp+0h] [ebp-Ch]
   DBGP_CONF_DATA *p; // [esp+4h] [ebp-8h] BYREF
@@ -998,7 +998,7 @@ LABEL_1:
   return r;
 }
 
-static void __cdecl send_dbconf()
+static void send_dbconf()
 {
   DBGP_CONF_DATA *p; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
@@ -1011,7 +1011,7 @@ static void __cdecl send_dbconf()
   }
 }
 
-static int __cdecl rdwr_mem_align(int code, int align, int cpuid, int space, unsigned int adr, void *ptr, int len)
+static int rdwr_mem_align(int code, int align, int cpuid, int space, unsigned int adr, void *ptr, int len)
 {
   int v8; // eax
   int nw; // [esp+14h] [ebp-28h]
@@ -1085,7 +1085,7 @@ static int __cdecl rdwr_mem_align(int code, int align, int cpuid, int space, uns
   return 0;
 }
 
-static int __cdecl rdwr_mem(int code, unsigned int adr, void *ptr, int len)
+static int rdwr_mem(int code, unsigned int adr, void *ptr, int len)
 {
   int n; // [esp+8h] [ebp-14h]
   int n_1; // [esp+8h] [ebp-14h]
@@ -1122,17 +1122,17 @@ static int __cdecl rdwr_mem(int code, unsigned int adr, void *ptr, int len)
     return -1;
 }
 
-static int __cdecl load_mem(unsigned int adr, void *ptr, int len)
+static int load_mem(unsigned int adr, void *ptr, int len)
 {
   return rdwr_mem(8, adr, ptr, len);
 }
 
-static int __cdecl store_mem(unsigned int adr, void *ptr, int len)
+static int store_mem(unsigned int adr, void *ptr, int len)
 {
   return rdwr_mem(10, adr, ptr, len);
 }
 
-int __cdecl get_handlerlist(DBGP_HDR *phdr)
+int get_handlerlist(DBGP_HDR *phdr)
 {
   DSP_BUF *db; // [esp+0h] [ebp-8h]
 
@@ -1144,7 +1144,7 @@ int __cdecl get_handlerlist(DBGP_HDR *phdr)
   return 0;
 }
 
-int __cdecl get_tcb(DBGP_HDR *phdr, int tid)
+int get_tcb(DBGP_HDR *phdr, int tid)
 {
   int *ptid; // [esp+0h] [ebp-Ch] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-8h]
@@ -1161,7 +1161,7 @@ int __cdecl get_tcb(DBGP_HDR *phdr, int tid)
     return 0;
 }
 
-int __cdecl get_thread_list(DBGP_HDR *phdr)
+int get_thread_list(DBGP_HDR *phdr)
 {
   DSP_BUF *db; // [esp+0h] [ebp-8h]
 
@@ -1173,7 +1173,7 @@ int __cdecl get_thread_list(DBGP_HDR *phdr)
   return 0;
 }
 
-int __cdecl get_semablock(DBGP_HDR *phdr, int sid)
+int get_semablock(DBGP_HDR *phdr, int sid)
 {
   int *psid; // [esp+0h] [ebp-Ch] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-8h]
@@ -1190,7 +1190,7 @@ int __cdecl get_semablock(DBGP_HDR *phdr, int sid)
     return 0;
 }
 
-int __cdecl load_word_registers(unsigned int *masks, unsigned int *pv, int n)
+int load_word_registers(unsigned int *masks, unsigned int *pv, int n)
 {
   int nr; // [esp+Ch] [ebp-20h]
   int k; // [esp+10h] [ebp-1Ch]
@@ -1254,7 +1254,7 @@ int __cdecl load_word_registers(unsigned int *masks, unsigned int *pv, int n)
 }
 
 
-int __cdecl store_word_registers(unsigned int *masks, unsigned int *pv, int n)
+int store_word_registers(unsigned int *masks, unsigned int *pv, int n)
 {
   int nr; // [esp+Ch] [ebp-20h]
   int k; // [esp+10h] [ebp-1Ch]
@@ -1316,7 +1316,7 @@ int __cdecl store_word_registers(unsigned int *masks, unsigned int *pv, int n)
   return ds_error("internal error %s:%s", "dbg.c", "store_word_registers");
 }
 
-static int __cdecl load_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
+static int load_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
 {
   int nr; // [esp+Ch] [ebp-1Ch]
   int k; // [esp+10h] [ebp-18h]
@@ -1377,7 +1377,7 @@ static int __cdecl load_quad_registers_id(int id, unsigned int *masks, quad *pv,
   return ds_error("internal error %s:%s", "dbg.c", "load_quad_registers_id");
 }
 
-static int __cdecl store_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
+static int store_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
 {
   DBGP_REG *v5; // eax
   int nr; // [esp+Ch] [ebp-1Ch]
@@ -1443,7 +1443,7 @@ static int __cdecl store_quad_registers_id(int id, unsigned int *masks, quad *pv
   return ds_error("internal error %s:%s", "dbg.c", "store_quad_registers_id");
 }
 
-static int __cdecl access_quad_registers(int (__cdecl *func)(), unsigned int *masks, quad *pv, int n)
+static int access_quad_registers(int (*func)(), unsigned int *masks, quad *pv, int n)
 {
   int nvu1; // [esp+Ch] [ebp-40h]
   int nvu0; // [esp+10h] [ebp-3Ch]
@@ -1483,7 +1483,7 @@ static int __cdecl access_quad_registers(int (__cdecl *func)(), unsigned int *ma
   {
     memcpy(rmasks, masks, sizeof(rmasks));
     memset(&rmasks[7], 0, 16);
-    if ( ((int (__cdecl *)(_DWORD, unsigned int *, quad *, int))func)(0, rmasks, pv, ncpu) )
+    if ( ((int (*)(_DWORD, unsigned int *, quad *, int))func)(0, rmasks, pv, ncpu) )
       return -1;
     pv += ncpu;
   }
@@ -1492,7 +1492,7 @@ static int __cdecl access_quad_registers(int (__cdecl *func)(), unsigned int *ma
     ds_bzero(rmasks, sizeof(rmasks));
     rmasks[7] = masks[7];
     rmasks[8] = masks[8];
-    if ( ((int (__cdecl *)(int, unsigned int *, quad *, int))func)(1, rmasks, pv, nvu0) )
+    if ( ((int (*)(int, unsigned int *, quad *, int))func)(1, rmasks, pv, nvu0) )
       return -1;
     pv += nvu0;
   }
@@ -1500,7 +1500,7 @@ static int __cdecl access_quad_registers(int (__cdecl *func)(), unsigned int *ma
     && (ds_bzero(rmasks, sizeof(rmasks)),
         rmasks[9] = masks[9],
         rmasks[10] = masks[10],
-        ((int (__cdecl *)(int, unsigned int *, quad *, int))func)(2, rmasks, pv, nvu1)) )
+        ((int (*)(int, unsigned int *, quad *, int))func)(2, rmasks, pv, nvu1)) )
   {
     return -1;
   }
@@ -1510,17 +1510,17 @@ static int __cdecl access_quad_registers(int (__cdecl *func)(), unsigned int *ma
   }
 }
 
-int __cdecl load_quad_registers(unsigned int *masks, quad *pv, int n)
+int load_quad_registers(unsigned int *masks, quad *pv, int n)
 {
-  return access_quad_registers((int (__cdecl *)())load_quad_registers_id, masks, pv, n);
+  return access_quad_registers((int (*)())load_quad_registers_id, masks, pv, n);
 }
 
-int __cdecl store_quad_registers(unsigned int *masks, quad *pv, int n)
+int store_quad_registers(unsigned int *masks, quad *pv, int n)
 {
-  return access_quad_registers((int (__cdecl *)())store_quad_registers_id, masks, pv, n);
+  return access_quad_registers((int (*)())store_quad_registers_id, masks, pv, n);
 }
 
-int __cdecl cont_and_wait_halt(int code, int cnt)
+int cont_and_wait_halt(int code, int cnt)
 {
   DSP_BUF *db; // [esp+8h] [ebp-8h]
 
@@ -1531,7 +1531,7 @@ int __cdecl cont_and_wait_halt(int code, int cnt)
     return -1;
 }
 
-int __cdecl run_and_wait_halt(unsigned int entry_point, unsigned int gp_value, int argc, char *args, int args_len)
+int run_and_wait_halt(unsigned int entry_point, unsigned int gp_value, int argc, char *args, int args_len)
 {
   DBGP_EERUN *er; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
@@ -1551,7 +1551,7 @@ int __cdecl run_and_wait_halt(unsigned int entry_point, unsigned int gp_value, i
   return send_and_wait(db, 24, 0, 0, 36);
 }
 
-int __cdecl break_and_wait_halt()
+int break_and_wait_halt()
 {
   DSP_BUF *db; // [esp+0h] [ebp-4h]
 
@@ -1562,12 +1562,12 @@ int __cdecl break_and_wait_halt()
     return -1;
 }
 
-int __cdecl wait_halt()
+int wait_halt()
 {
   return send_and_wait(0, 255, 0, 0, 0);
 }
 
-int __cdecl get_brkpt(DBGP_BRKPT_DATA *bps, int *pn)
+int get_brkpt(DBGP_BRKPT_DATA *bps, int *pn)
 {
   DSP_BUF *db; // [esp+0h] [ebp-4h]
 
@@ -1581,7 +1581,7 @@ int __cdecl get_brkpt(DBGP_BRKPT_DATA *bps, int *pn)
     return 0;
 }
 
-int __cdecl put_brkpt(DBGP_BRKPT_DATA *bps, int n)
+int put_brkpt(DBGP_BRKPT_DATA *bps, int n)
 {
   int i; // [esp+0h] [ebp-Ch]
   DBGP_BRKPT_DATA *dp; // [esp+4h] [ebp-8h] BYREF
@@ -1604,7 +1604,7 @@ int __cdecl put_brkpt(DBGP_BRKPT_DATA *bps, int n)
     return 0;
 }
 
-int __cdecl is_target_is_running()
+int is_target_is_running()
 {
   if ( dbconf.run_stop_state == 1 )
     return 1;
@@ -1613,7 +1613,7 @@ int __cdecl is_target_is_running()
   return -1;
 }
 
-static DSP_BUF *__cdecl recv_loadp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_loadp(DS_DESC *desc, DSP_BUF *db)
 {
   DSP_BUF *result; // eax
   unsigned int vals[2]; // [esp+8h] [ebp-2Ch] BYREF
@@ -1745,7 +1745,7 @@ LABEL_38:
   return result;
 }
 
-int __cdecl send_iload_and_wait(int cmd, int action, unsigned int id, void *ptr, int len, int nodisp)
+int send_iload_and_wait(int cmd, int action, unsigned int id, void *ptr, int len, int nodisp)
 {
   unsigned int *wp; // [esp+8h] [ebp-20h] BYREF
   int n; // [esp+Ch] [ebp-1Ch]
@@ -1885,7 +1885,7 @@ LABEL_20:
   }
 }
 
-static int __cdecl get_and_check_config()
+static int get_and_check_config()
 {
   int n; // [esp+4h] [ebp-4h]
 
@@ -1958,7 +1958,7 @@ static int __cdecl get_and_check_config()
   }
 }
 
-static void __cdecl print_size(unsigned int size)
+static void print_size(unsigned int size)
 {
   const char *v1; // eax
   int v2; // [esp+0h] [ebp-4h]
@@ -1974,7 +1974,7 @@ static void __cdecl print_size(unsigned int size)
   }
 }
 
-static void __cdecl print_align_list(unsigned int align)
+static void print_align_list(unsigned int align)
 {
   const char *v1; // eax
   int following; // [esp+0h] [ebp-8h]
@@ -2018,7 +2018,7 @@ static void __cdecl print_align_list(unsigned int align)
   }
 }
 
-static int __cdecl show_dbconf(int ac, char **av)
+static int show_dbconf(int ac, char **av)
 {
   const char *v3; // eax
   unsigned int run_stop_state; // eax
@@ -2073,7 +2073,7 @@ static int __cdecl show_dbconf(int ac, char **av)
   return 0;
 }
 
-int __cdecl is_target_exec_ctl()
+int is_target_exec_ctl()
 {
   if ( opt_target_exec_ctl_override->val < 0 )
     return opt_target_exec_ctl_config->val;
@@ -2081,22 +2081,22 @@ int __cdecl is_target_exec_ctl()
     return opt_target_exec_ctl_override->val;
 }
 
-int __cdecl is_automatic_prefix_breakpoint()
+int is_automatic_prefix_breakpoint()
 {
   return opt_automatic_prefix_breakpoint->val;
 }
 
-int __cdecl is_describe_ub_all()
+int is_describe_ub_all()
 {
   return opt_describe_ub_all->val;
 }
 
-int __cdecl is_lstep_stop_at_no_line()
+int is_lstep_stop_at_no_line()
 {
   return opt_lstep_stop_at_no_line->val;
 }
 
-void __cdecl di_format(int *f_adr, int *f_iw, int *f_ba, int *f_ma)
+void di_format(int *f_adr, int *f_iw, int *f_ba, int *f_ma)
 {
   if ( f_adr )
     *f_adr = opt_di_address->val;
@@ -2108,17 +2108,17 @@ void __cdecl di_format(int *f_adr, int *f_iw, int *f_ba, int *f_ma)
     *f_ma = opt_di_macro->val;
 }
 
-char *__cdecl dr_format_str()
+char *dr_format_str()
 {
   return opt_dr_default_format->str;
 }
 
-char *__cdecl source_directories_str()
+char *source_directories_str()
 {
   return opt_source_directories->str;
 }
 
-int __cdecl get_help_lang()
+int get_help_lang()
 {
   char *lang; // [esp+0h] [ebp-4h]
 
@@ -2132,12 +2132,12 @@ int __cdecl get_help_lang()
   return 0;
 }
 
-char *__cdecl get_help_pager()
+char *get_help_pager()
 {
   return opt_help_pager->str;
 }
 
-static int __cdecl reset_cmd(int ac, char **av)
+static int reset_cmd(int ac, char **av)
 {
   unsigned int wv; // [esp+0h] [ebp-48h] BYREF
   quad pv; // [esp+4h] [ebp-44h] BYREF
@@ -2220,7 +2220,7 @@ static int __cdecl reset_cmd(int ac, char **av)
 }
 
 #ifdef DSNET_COMPILING_E
-static int __cdecl dbgctl(int id, int flag)
+static int dbgctl(int id, int flag)
 {
   unsigned int *wp; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
@@ -2232,7 +2232,7 @@ static int __cdecl dbgctl(int id, int flag)
   return send_and_wait(db, 36, 0, 0, 0);
 }
 
-static int __cdecl dbgctl_cmd(int ac, char **av)
+static int dbgctl_cmd(int ac, char **av)
 {
   int flag; // [esp+0h] [ebp-8h]
   int id; // [esp+4h] [ebp-4h]
@@ -2269,7 +2269,7 @@ LABEL_15:
   return dbgctl(id, flag);
 }
 
-static int __cdecl xgkt_cmd(int ac, char **av)
+static int xgkt_cmd(int ac, char **av)
 {
   DBGP_XGKT_CTL *xc; // [esp+0h] [ebp-14h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-10h]
@@ -2310,7 +2310,7 @@ static int __cdecl xgkt_cmd(int ac, char **av)
   return 0;
 }
 
-static int __cdecl storeimage_cmd(int ac, char **av)
+static int storeimage_cmd(int ac, char **av)
 {
   DBGP_RDIMG *pp; // [esp+0h] [ebp-2Ch] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-28h]
@@ -2372,7 +2372,7 @@ static int __cdecl storeimage_cmd(int ac, char **av)
 }
 #endif /* DSNET_COMPILING_E */
 
-static int __cdecl bpfunc_cmd(int ac, char **av)
+static int bpfunc_cmd(int ac, char **av)
 {
   DSP_BUF *db; // [esp+0h] [ebp-Ch]
   unsigned int *wp; // [esp+4h] [ebp-8h] BYREF
@@ -2398,7 +2398,7 @@ static int __cdecl bpfunc_cmd(int ac, char **av)
     return 0;
 }
 
-static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_dcmp(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   DCMP_ERROR_DATA *ed; // [esp+8h] [ebp-Ch]
@@ -2469,7 +2469,7 @@ static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static void __cdecl batch(int ac, char **av)
+static void batch(int ac, char **av)
 {
   int r; // [esp+4h] [ebp-40Ch]
   char *v3; // [esp+8h] [ebp-408h]
@@ -2493,7 +2493,7 @@ static void __cdecl batch(int ac, char **av)
   ++f_batch;
 }
 
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   int n; // [esp+0h] [ebp-Ch]
@@ -2612,7 +2612,7 @@ static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static int __cdecl send_netmp_connect_request()
+static int send_netmp_connect_request()
 {
   NETMP_PROTOS *_p; // [esp+4h] [ebp-78h]
   NETMP_PROTOS *_p_3; // [esp+4h] [ebp-78h]
@@ -2688,7 +2688,7 @@ static int __cdecl send_netmp_connect_request()
   return 0;
 }
 
-static DSP_BUF *__cdecl recv_console(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_console(DS_DESC *desc, DSP_BUF *db)
 {
   if ( db )
   {
@@ -2721,7 +2721,7 @@ static DSP_BUF *__cdecl recv_console(DS_DESC *desc, DSP_BUF *db)
   }
 }
 
-static int __cdecl start_console(DS_DESC *desc)
+static int start_console(DS_DESC *desc)
 {
   if ( !ds_add_recv_func(desc, -1, -1, -1, recv_console) )
     return -1;
@@ -2732,7 +2732,7 @@ static int __cdecl start_console(DS_DESC *desc)
   return 0;
 }
 
-static void __cdecl drfp_error(DSP_BUF *db)
+static void drfp_error(DSP_BUF *db)
 {
   if ( target_desc )
     ds_send_desc(target_desc, db);
@@ -2740,7 +2740,7 @@ static void __cdecl drfp_error(DSP_BUF *db)
     ds_free_buf(db);
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -2765,7 +2765,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-static void __cdecl dup_and_exe(char *cmd)
+static void dup_and_exe(char *cmd)
 {
   size_t v1; // eax
   char *v2; // eax
@@ -2784,44 +2784,44 @@ static void __cdecl dup_and_exe(char *cmd)
   }
 }
 
-void __cdecl dr_default_di()
+void dr_default_di()
 {
   dup_and_exe(opt_dr_default_di->str);
 }
 
-void __cdecl ex_default_dr()
+void ex_default_dr()
 {
   dup_and_exe(opt_ex_default_dr->str);
 }
 
 #ifdef DSNET_COMPILING_E
-void __cdecl dr0_default_di()
+void dr0_default_di()
 {
   dup_and_exe(opt_dr0_default_di->str);
 }
 
-void __cdecl ex0_default_dr()
+void ex0_default_dr()
 {
   dup_and_exe(opt_ex0_default_dr->str);
 }
 
-void __cdecl dr1_default_di()
+void dr1_default_di()
 {
   dup_and_exe(opt_dr1_default_di->str);
 }
 
-void __cdecl ex1_default_dr()
+void ex1_default_dr()
 {
   dup_and_exe(opt_ex1_default_dr->str);
 }
 #endif /* DSNET_COMPILING_E */
 
-void __cdecl lstep_default_list()
+void lstep_default_list()
 {
   dup_and_exe(opt_lstep_default_list->str);
 }
 
-static void __cdecl set_options_to_default()
+static void set_options_to_default()
 {
   char *langenv; // [esp+0h] [ebp-10h]
   char *target_name; // [esp+Ch] [ebp-4h]
@@ -2888,7 +2888,7 @@ static void __cdecl set_options_to_default()
   opt_iopmodules = ds_set_option("IOPMODULES", 3, "/usr/local/sce/iop/modules", 0, 1);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int type; // ebx
   int v3; // ebx
@@ -3105,19 +3105,19 @@ int __cdecl main(int ac, char **av)
 #endif /* DSNET_COMPILING_E */
   ds_cmd_install("bpfunc", "<adr>", "set break point function", bpfunc_cmd);
   ds_add_help(0, dbg_help);
-  ds_help_completion_func = (int (__cdecl *)())dbg_help_completion;
+  ds_help_completion_func = (int (*)())dbg_help_completion;
   ds_add_show_arg("dbconf", show_dbconf);
   ds_add_show_arg("symbol", show_symbol);
   ds_add_show_arg("mdebug", show_mdebug);
   ds_cmd_standard_install(1);
-  ds_rdwr_mem_align_func = (int (__cdecl *)())rdwr_mem_align;
-  ds_load_mem_func = (int (__cdecl *)())load_mem;
-  ds_store_mem_func = (int (__cdecl *)())store_mem;
-  ds_load_quad_reg_func = (int (__cdecl *)())load_quad_reg;
-  ds_store_quad_reg_func = (int (__cdecl *)())store_quad_reg;
-  ds_symbol_to_value_func = (int (__cdecl *)())symbol_to_value;
-  ds_symbol_completion_func = (int (__cdecl *)())symbol_completion;
-  ds_check_reserved_name_func = (int (__cdecl *)())check_reserved_name;
+  ds_rdwr_mem_align_func = (int (*)())rdwr_mem_align;
+  ds_load_mem_func = (int (*)())load_mem;
+  ds_store_mem_func = (int (*)())store_mem;
+  ds_load_quad_reg_func = (int (*)())load_quad_reg;
+  ds_store_quad_reg_func = (int (*)())store_quad_reg;
+  ds_symbol_to_value_func = (int (*)())symbol_to_value;
+  ds_symbol_completion_func = (int (*)())symbol_completion;
+  ds_check_reserved_name_func = (int (*)())check_reserved_name;
   if ( port_name )
   {
     if ( !ds_listen_net(port_name, start_console) )
@@ -3128,7 +3128,7 @@ int __cdecl main(int ac, char **av)
   dsm_waiting = 1;
   to_sec = 120;
   to_usec = 0;
-  ds_drfp_err_func = (void (__cdecl *)())drfp_error;
+  ds_drfp_err_func = (void (*)())drfp_error;
   while ( 1 )
   {
     r = ds_select_desc(to_sec, to_usec);
@@ -3157,7 +3157,7 @@ LABEL_77:
   }
 }
 
-int __cdecl IsSupported(int MajorVersion, int MinorVersion)
+int IsSupported(int MajorVersion, int MinorVersion)
 {
   return MajorVersion == dbconf.major_ver && MinorVersion <= dbconf.minor_ver || MajorVersion < dbconf.major_ver;
 }

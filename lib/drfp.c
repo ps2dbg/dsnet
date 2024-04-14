@@ -7,19 +7,19 @@ static int once_28 = 0;
 int ds_drfp_opened_files = 0;
 void (*ds_drfp_err_func)(DSP_BUF *db);
 
-static void __cdecl drfp_errmsg(int proto, char *tag, char *fname, char *err);
-static void __cdecl init_handle_map();
-static int __cdecl alloc_handle();
-static void __cdecl free_handle(int handle);
-static int __cdecl get_ino(char *name);
-static int __cdecl is_found(char *name);
-static int __cdecl is_dir(char *name);
-static int __cdecl is_file(char *name);
-static int __cdecl is_opened_ino(int ino);
-static int __cdecl handle_to_fd(int handle);
-static DIR *__cdecl handle_to_dir(int handle);
-static int __cdecl drfp_recv_reset();
-static DSP_BUF *__cdecl send_drfp(
+static void drfp_errmsg(int proto, char *tag, char *fname, char *err);
+static void init_handle_map();
+static int alloc_handle();
+static void free_handle(int handle);
+static int get_ino(char *name);
+static int is_found(char *name);
+static int is_dir(char *name);
+static int is_file(char *name);
+static int is_opened_ino(int ino);
+static int handle_to_fd(int handle);
+static DIR *handle_to_dir(int handle);
+static int drfp_recv_reset();
+static DSP_BUF *send_drfp(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *rdh,
@@ -28,37 +28,37 @@ static DSP_BUF *__cdecl send_drfp(
         unsigned int result,
         void *data,
         unsigned int addlen);
-static unsigned int __cdecl drfp_flag(unsigned int flag, unsigned int *pmode);
-static unsigned int __cdecl drfp_err(unsigned int err);
-static unsigned int __cdecl drfp_base(unsigned int base);
-static void __cdecl ds_option_expand(char *path, char *name);
-static DSP_BUF *__cdecl recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static void __cdecl set_scestat_time(unsigned __int8 *st_time, int *time);
-static void __cdecl set_stat_time(int *time, unsigned __int8 *st_time);
-static unsigned int __cdecl sce_mode2st_mode(unsigned int sce_mode);
-static unsigned int __cdecl st_mode2sce_mode(unsigned int st_mode);
-static void __cdecl sce_stat2stat(struct stat *to, struct sce_stat *from);
-static void __cdecl stat2sce_stat(struct sce_stat *to, struct stat *from);
-static int __cdecl getsce_stat(char *name, struct sce_stat *data);
-static DSP_BUF *__cdecl recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_rename(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_chdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_rmdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_mkdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_dclose(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_close(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_seek64(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static DSP_BUF *__cdecl recv_drfp_chstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static unsigned int drfp_flag(unsigned int flag, unsigned int *pmode);
+static unsigned int drfp_err(unsigned int err);
+static unsigned int drfp_base(unsigned int base);
+static void ds_option_expand(char *path, char *name);
+static DSP_BUF *recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static void set_scestat_time(unsigned __int8 *st_time, int *time);
+static void set_stat_time(int *time, unsigned __int8 *st_time);
+static unsigned int sce_mode2st_mode(unsigned int sce_mode);
+static unsigned int st_mode2sce_mode(unsigned int st_mode);
+static void sce_stat2stat(struct stat *to, struct sce_stat *from);
+static void stat2sce_stat(struct sce_stat *to, struct stat *from);
+static int getsce_stat(char *name, struct sce_stat *data);
+static DSP_BUF *recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_rename(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_chdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_rmdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_mkdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_dclose(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_close(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_seek64(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
+static DSP_BUF *recv_drfp_chstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
 
-static void __cdecl drfp_errmsg(int proto, char *tag, char *fname, char *err)
+static void drfp_errmsg(int proto, char *tag, char *fname, char *err)
 {
   char *v4; // eax
   size_t v5; // ebx
@@ -119,7 +119,7 @@ static void __cdecl drfp_errmsg(int proto, char *tag, char *fname, char *err)
   }
 }
 
-static void __cdecl init_handle_map()
+static void init_handle_map()
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -137,7 +137,7 @@ static void __cdecl init_handle_map()
   }
 }
 
-static int __cdecl alloc_handle()
+static int alloc_handle()
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -153,7 +153,7 @@ static int __cdecl alloc_handle()
   return -1;
 }
 
-static void __cdecl free_handle(int handle)
+static void free_handle(int handle)
 {
   handle_map[handle].fd = -1;
   handle_map[handle].dir = 0;
@@ -164,7 +164,7 @@ static void __cdecl free_handle(int handle)
   --ds_drfp_opened_files;
 }
 
-static int __cdecl get_ino(char *name)
+static int get_ino(char *name)
 {
 #ifndef _WIN32
   struct stat stat; // [esp+0h] [ebp-58h] BYREF
@@ -176,7 +176,7 @@ static int __cdecl get_ino(char *name)
 #endif
 }
 
-static int __cdecl is_found(char *name)
+static int is_found(char *name)
 {
 #ifndef _WIN32
   struct stat stat; // [esp+0h] [ebp-58h] BYREF
@@ -187,7 +187,7 @@ static int __cdecl is_found(char *name)
 #endif
 }
 
-static int __cdecl is_dir(char *name)
+static int is_dir(char *name)
 {
 #ifndef _WIN32
   struct stat stat; // [esp+0h] [ebp-58h] BYREF
@@ -198,7 +198,7 @@ static int __cdecl is_dir(char *name)
 #endif
 }
 
-static int __cdecl is_file(char *name)
+static int is_file(char *name)
 {
 #ifndef _WIN32
   struct stat stat; // [esp+0h] [ebp-58h] BYREF
@@ -209,7 +209,7 @@ static int __cdecl is_file(char *name)
 #endif
 }
 
-static int __cdecl is_opened_ino(int ino)
+static int is_opened_ino(int ino)
 {
   int i; // [esp+0h] [ebp-4h]
 
@@ -221,7 +221,7 @@ static int __cdecl is_opened_ino(int ino)
   return 0;
 }
 
-static int __cdecl handle_to_fd(int handle)
+static int handle_to_fd(int handle)
 {
   init_handle_map();
   if ( handle >= 0 && handle <= 255 )
@@ -230,7 +230,7 @@ static int __cdecl handle_to_fd(int handle)
     return -1;
 }
 
-static DIR *__cdecl handle_to_dir(int handle)
+static DIR *handle_to_dir(int handle)
 {
   init_handle_map();
   if ( handle >= 0 && handle <= 255 && handle_map[handle].dir )
@@ -239,7 +239,7 @@ static DIR *__cdecl handle_to_dir(int handle)
     return 0;
 }
 
-static int __cdecl drfp_recv_reset()
+static int drfp_recv_reset()
 {
   int handle; // [esp+0h] [ebp-8h]
   int r; // [esp+4h] [ebp-4h]
@@ -262,7 +262,7 @@ static int __cdecl drfp_recv_reset()
   return r;
 }
 
-static DSP_BUF *__cdecl send_drfp(
+static DSP_BUF *send_drfp(
         DS_DESC *desc,
         DSP_BUF *rdb,
         DECI2_HDR *rdh,
@@ -286,7 +286,7 @@ static DSP_BUF *__cdecl send_drfp(
   return ds_free_buf(rdb);
 }
 
-static unsigned int __cdecl drfp_flag(unsigned int flag, unsigned int *pmode)
+static unsigned int drfp_flag(unsigned int flag, unsigned int *pmode)
 {
   unsigned int v2; // eax
   unsigned int r; // [esp+0h] [ebp-4h]
@@ -320,7 +320,7 @@ static unsigned int __cdecl drfp_flag(unsigned int flag, unsigned int *pmode)
   return r;
 }
 
-static unsigned int __cdecl drfp_err(unsigned int err)
+static unsigned int drfp_err(unsigned int err)
 {
   unsigned int r; // [esp+0h] [ebp-4h]
 
@@ -390,7 +390,7 @@ static unsigned int __cdecl drfp_err(unsigned int err)
   return r;
 }
 
-static unsigned int __cdecl drfp_base(unsigned int base)
+static unsigned int drfp_base(unsigned int base)
 {
   switch ( base )
   {
@@ -404,7 +404,7 @@ static unsigned int __cdecl drfp_base(unsigned int base)
   return 0;
 }
 
-static void __cdecl ds_option_expand(char *path, char *name)
+static void ds_option_expand(char *path, char *name)
 {
   size_t v2; // [esp-4h] [ebp-410h]
   size_t v3; // [esp-4h] [ebp-410h]
@@ -436,7 +436,7 @@ static void __cdecl ds_option_expand(char *path, char *name)
   ds_tilde_expand(path, buf);
 }
 
-static DSP_BUF *__cdecl recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   size_t v9; // eax
   char *v10; // eax
@@ -518,7 +518,7 @@ static DSP_BUF *__cdecl recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
   return send_drfp(desc, db, dh, 1u, seq, v18, &fd, 4u);
 }
 
-static DSP_BUF *__cdecl recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   size_t v8; // eax
   char *v9; // eax
@@ -587,7 +587,7 @@ static DSP_BUF *__cdecl recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   return send_drfp(desc, db, dh, 0x13u, seq, result, &fd, 4u);
 }
 
-static void __cdecl set_scestat_time(unsigned __int8 *st_time, int *time)
+static void set_scestat_time(unsigned __int8 *st_time, int *time)
 {
   struct tm *v2; // eax
 
@@ -603,7 +603,7 @@ static void __cdecl set_scestat_time(unsigned __int8 *st_time, int *time)
   *((_WORD *)st_time + 3) = __PAIR16__(BYTE1(v2->tm_year), v2->tm_year);
 }
 
-static void __cdecl set_stat_time(int *time, unsigned __int8 *st_time)
+static void set_stat_time(int *time, unsigned __int8 *st_time)
 {
   struct tm tm; // [esp+4h] [ebp-2Ch] BYREF
 
@@ -617,7 +617,7 @@ static void __cdecl set_stat_time(int *time, unsigned __int8 *st_time)
   *time = mktime(&tm);
 }
 
-static unsigned int __cdecl sce_mode2st_mode(unsigned int sce_mode)
+static unsigned int sce_mode2st_mode(unsigned int sce_mode)
 {
   unsigned int st_mode; // [esp+0h] [ebp-4h]
 
@@ -649,7 +649,7 @@ static unsigned int __cdecl sce_mode2st_mode(unsigned int sce_mode)
   return st_mode;
 }
 
-static unsigned int __cdecl st_mode2sce_mode(unsigned int st_mode)
+static unsigned int st_mode2sce_mode(unsigned int st_mode)
 {
   unsigned int sce_mode; // [esp+0h] [ebp-4h]
 
@@ -681,7 +681,7 @@ static unsigned int __cdecl st_mode2sce_mode(unsigned int st_mode)
   return sce_mode;
 }
 
-static void __cdecl sce_stat2stat(struct stat *to, struct sce_stat *from)
+static void sce_stat2stat(struct stat *to, struct sce_stat *from)
 {
   to->st_mode = sce_mode2st_mode(from->mode);
   set_stat_time(&to->st_atime, from->atime);
@@ -690,7 +690,7 @@ static void __cdecl sce_stat2stat(struct stat *to, struct sce_stat *from)
   to->st_size = from->size;
 }
 
-static void __cdecl stat2sce_stat(struct sce_stat *to, struct stat *from)
+static void stat2sce_stat(struct sce_stat *to, struct stat *from)
 {
   to->mode = st_mode2sce_mode(from->st_mode);
   set_scestat_time(to->atime, &from->st_atime);
@@ -703,7 +703,7 @@ static void __cdecl stat2sce_stat(struct sce_stat *to, struct stat *from)
   memset(to->private_, 0, sizeof(to->private_));
 }
 
-static int __cdecl getsce_stat(char *name, struct sce_stat *data)
+static int getsce_stat(char *name, struct sce_stat *data)
 {
   unsigned int v3; // [esp+4h] [ebp-5Ch]
   struct stat stbuf; // [esp+8h] [ebp-58h] BYREF
@@ -715,7 +715,7 @@ static int __cdecl getsce_stat(char *name, struct sce_stat *data)
   return v3;
 }
 
-static DSP_BUF *__cdecl recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   char *v8; // [esp-4h] [ebp-45Ch]
   struct sce_stat data; // [esp+0h] [ebp-458h] BYREF
@@ -748,7 +748,7 @@ static DSP_BUF *__cdecl recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR 
   return 0;
 }
 
-static DSP_BUF *__cdecl recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int ino; // eax
   char path[1025]; // [esp+0h] [ebp-414h] BYREF
@@ -781,7 +781,7 @@ static DSP_BUF *__cdecl recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
   return send_drfp(desc, db, dh, 0xDu, seq, result, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_drfp_rename(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_rename(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int ino; // eax
   char newpath[1025]; // [esp+0h] [ebp-81Ch] BYREF
@@ -831,7 +831,7 @@ static DSP_BUF *__cdecl recv_drfp_rename(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
   return send_drfp(desc, db, dh, 0x1Fu, seq, result, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_drfp_chdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_chdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   unsigned int v6; // [esp-Ch] [ebp-18h]
   unsigned int seq; // [esp+8h] [ebp-4h]
@@ -843,7 +843,7 @@ static DSP_BUF *__cdecl recv_drfp_chdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   return send_drfp(desc, db, dh, 0x21u, seq, v6, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_drfp_rmdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_rmdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int ino; // eax
   char *v9; // [esp-4h] [ebp-418h]
@@ -877,7 +877,7 @@ LABEL_8:
   return send_drfp(desc, db, dh, 0x21u, seq, result, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_drfp_mkdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_mkdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   char *v8; // [esp-4h] [ebp-41Ch]
   char path[1025]; // [esp+0h] [ebp-418h] BYREF
@@ -911,7 +911,7 @@ static DSP_BUF *__cdecl recv_drfp_mkdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   return send_drfp(desc, db, dh, 0xFu, seq, result, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_drfp_dclose(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_dclose(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   DIR *dirent; // [esp+0h] [ebp-14h]
   int handle; // [esp+8h] [ebp-Ch]
@@ -942,7 +942,7 @@ static DSP_BUF *__cdecl recv_drfp_dclose(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
   return send_drfp(desc, db, dh, 0x15u, seq, v9, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_drfp_close(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_close(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int fd; // [esp+0h] [ebp-10h]
   int handle; // [esp+4h] [ebp-Ch]
@@ -973,7 +973,7 @@ static DSP_BUF *__cdecl recv_drfp_close(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   return send_drfp(desc, db, dh, 3u, seq, v9, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int fd; // [esp+0h] [ebp-20h]
   int r; // [esp+8h] [ebp-18h]
@@ -1023,7 +1023,7 @@ static DSP_BUF *__cdecl recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
   return 0;
 }
 
-static DSP_BUF *__cdecl recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int fd; // [esp+0h] [ebp-1Ch]
   int handle; // [esp+4h] [ebp-18h]
@@ -1065,7 +1065,7 @@ static DSP_BUF *__cdecl recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
   return send_drfp(desc, db, dh, 7u, seq, v10, &len, 4u);
 }
 
-static DSP_BUF *__cdecl recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int v8; // [esp+0h] [ebp-24h]
   int newpos; // [esp+4h] [ebp-20h]
@@ -1115,7 +1115,7 @@ static DSP_BUF *__cdecl recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
   return send_drfp(desc, db, dh, 9u, seq, result, &pos, 4u);
 }
 
-static DSP_BUF *__cdecl recv_drfp_seek64(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_seek64(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int curpos; // [esp+0h] [ebp-34h]
   int newpos; // [esp+4h] [ebp-30h]
@@ -1174,7 +1174,7 @@ static DSP_BUF *__cdecl recv_drfp_seek64(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
   return send_drfp(desc, db, dh, 0x29u, seq, result, pos, 8u);
 }
 
-static DSP_BUF *__cdecl recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   size_t v6; // ebx
   size_t v7; // eax
@@ -1243,7 +1243,7 @@ LABEL_15:
   return 0;
 }
 
-static DSP_BUF *__cdecl recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   char *v8; // [esp-4h] [ebp-81Ch]
   unsigned int result; // [esp+0h] [ebp-818h]
@@ -1275,7 +1275,7 @@ static DSP_BUF *__cdecl recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR 
   return send_drfp(desc, db, dh, 0x2Du, seq, result, 0, 0);
 }
 
-static DSP_BUF *__cdecl recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   unsigned int len; // [esp+0h] [ebp-81Ch]
   unsigned int len_1; // [esp+0h] [ebp-81Ch]
@@ -1314,7 +1314,7 @@ static DSP_BUF *__cdecl recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR
   return send_drfp(desc, db, dh, 0x2Fu, seq, result, newname, len_1);
 }
 
-static DSP_BUF *__cdecl recv_drfp_chstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
+static DSP_BUF *recv_drfp_chstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   char *v8; // [esp-4h] [ebp-474h]
   struct stat data; // [esp+4h] [ebp-46Ch] BYREF
@@ -1351,7 +1351,7 @@ static DSP_BUF *__cdecl recv_drfp_chstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *
   return send_drfp(desc, db, dh, 0x1Bu, seq, result, 0, 0);
 }
 
-DSP_BUF *__cdecl ds_recv_drfp(DS_DESC *desc, DSP_BUF *db)
+DSP_BUF *ds_recv_drfp(DS_DESC *desc, DSP_BUF *db)
 {
   unsigned int *args; // [esp+0h] [ebp-Ch]
   int len; // [esp+4h] [ebp-8h]

@@ -12,12 +12,12 @@ static char *next_obj_path_30 = NULL;
 
 static char path_22[1024];
 
-static void __cdecl print_sym(SYM *p, char *strs);
-static char *__cdecl set_abs_path(char *fname);
-static void __cdecl clear_source_line_buffer();
-static char *__cdecl search_source_file(char *fname, char *obj_path, char *src_dirs);
+static void print_sym(SYM *p, char *strs);
+static char *set_abs_path(char *fname);
+static void clear_source_line_buffer();
+static char *search_source_file(char *fname, char *obj_path, char *src_dirs);
 
-void __cdecl clear_mdebug()
+void clear_mdebug()
 {
   MDEBUG *q; // [esp+0h] [ebp-8h]
   MDEBUG *p; // [esp+4h] [ebp-4h]
@@ -36,7 +36,7 @@ void __cdecl clear_mdebug()
   clear_source_line_buffer();
 }
 
-void __cdecl clear_mdebug_with_id(int id)
+void clear_mdebug_with_id(int id)
 {
   MDEBUG *q; // [esp+8h] [ebp-8h]
   MDEBUG *p; // [esp+Ch] [ebp-4h]
@@ -64,7 +64,7 @@ void __cdecl clear_mdebug_with_id(int id)
   clear_source_line_buffer();
 }
 
-static void __cdecl print_sym(SYM *p, char *strs)
+static void print_sym(SYM *p, char *strs)
 {
   char *s; // [esp+0h] [ebp-4h]
   char *s_1; // [esp+0h] [ebp-4h]
@@ -355,7 +355,7 @@ static void __cdecl print_sym(SYM *p, char *strs)
   ds_printf(" %s\n", &strs[p->iss]);
 }
 
-int __cdecl show_mdebug(int ac, char **av)
+int show_mdebug(int ac, char **av)
 {
   int n; // [esp+0h] [ebp-14h]
   char *str; // [esp+4h] [ebp-10h]
@@ -402,7 +402,7 @@ int __cdecl show_mdebug(int ac, char **av)
   return 0;
 }
 
-static char *__cdecl set_abs_path(char *fname)
+static char *set_abs_path(char *fname)
 {
   size_t v2; // eax
   char *r; // [esp+0h] [ebp-404h]
@@ -418,7 +418,7 @@ static char *__cdecl set_abs_path(char *fname)
     return 0;
 }
 
-int __cdecl load_mdebug(
+int load_mdebug(
         void *stream,
         DS_ELF_EHDR *elf_header,
         DS_ELF_SHDR *section_header,
@@ -687,7 +687,7 @@ error:
   return -1;
 }
 
-unsigned int __cdecl file_and_line_to_address(int line, char *path)
+unsigned int file_and_line_to_address(int line, char *path)
 {
   int base; // [esp+Ch] [ebp-20h]
   SYM *sym; // [esp+14h] [ebp-18h]
@@ -734,7 +734,7 @@ unsigned int __cdecl file_and_line_to_address(int line, char *path)
   return 0;
 }
 
-char *__cdecl address_to_file_and_line(unsigned int loc, int *pline, int *f_has, int *pdelta, char **ppath)
+char *address_to_file_and_line(unsigned int loc, int *pline, int *f_has, int *pdelta, char **ppath)
 {
   unsigned int value; // [esp+4h] [ebp-44h]
   unsigned int pdt_eadr; // [esp+Ch] [ebp-3Ch]
@@ -822,7 +822,7 @@ LABEL_35:
   return &md->lstrs[fdt->issBase + fdt->rss];
 }
 
-int __cdecl symbol_to_value_by_mdebug(char *file, char *name, unsigned int *pv)
+int symbol_to_value_by_mdebug(char *file, char *name, unsigned int *pv)
 {
   int v4; // eax
   unsigned int rpc; // [esp+8h] [ebp-20h] BYREF
@@ -889,14 +889,14 @@ LABEL_25:
   return -1;
 }
 
-static void __cdecl clear_source_line_buffer()
+static void clear_source_line_buffer()
 {
   cur_fname = (char *)ds_free(cur_fname);
   cur_buf = (char *)ds_free(cur_buf);
   cur_size = 0;
 }
 
-static char *__cdecl search_source_file(char *fname, char *obj_path, char *src_dirs)
+static char *search_source_file(char *fname, char *obj_path, char *src_dirs)
 {
   char *q; // [esp+8h] [ebp-808h]
   char *q_1; // [esp+8h] [ebp-808h]
@@ -944,7 +944,7 @@ LABEL_25:
   return 0;
 }
 
-char *__cdecl string_by_file_and_line(char *fname, int line, char *obj_path)
+char *string_by_file_and_line(char *fname, int line, char *obj_path)
 {
   size_t v4; // eax
   char *v5; // eax
@@ -1007,7 +1007,7 @@ LABEL_17:
   return r;
 }
 
-int __cdecl list_cmd(int ac, char **av)
+int list_cmd(int ac, char **av)
 {
   int v3; // eax
   const char *v4; // eax

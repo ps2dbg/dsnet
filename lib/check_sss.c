@@ -3,17 +3,17 @@
 typedef struct {long unsigned int Amd; unsigned int Ama; unsigned int Amras_x; unsigned int Amcas_x0; unsigned int Amcas_x1; unsigned int Amcas_x2; unsigned int Amcas_x3; unsigned int Arow_adrs; unsigned int Asmem_ref; unsigned int Amwe_x; unsigned int Abyte_acc; unsigned int Asmem_wr; unsigned int Asmem_acc; unsigned int Assrst_x; unsigned int Await_x; unsigned int Aube_x; unsigned int Aswr_x; unsigned int Asrd_x; unsigned int Art_x; unsigned int Adack_ex; unsigned int Adack9; unsigned int Adack8; unsigned int Adack5; unsigned int Adack4; unsigned int Adreq_ex; unsigned int Adreq9; unsigned int Adreq8; unsigned int Adreq5; unsigned int Adreq4; unsigned int Aint_ex; unsigned int Aint_x9; unsigned int Aint_x8; unsigned int Aint_x5; unsigned int Aint_x4; unsigned int Aextr_x; unsigned int Acs9c_x; unsigned int Acs_x9; unsigned int Acs_x8; unsigned int Acs_x5; unsigned int Acs_x4; unsigned int Acs_x1; unsigned int Acs_x2; unsigned int Aiois16_x; unsigned int Ass_wr; unsigned int Ass_acc; unsigned int Asrst_x; unsigned int Asint_x; unsigned int Agint_x; unsigned int Adack; unsigned int Adreq_x0; unsigned int Adreq_x1; unsigned int Abgnt_x; unsigned int Abreq_x; unsigned int Ardy_x; unsigned int Awrac_x; unsigned int Ardac_x; unsigned int Abe_x0; unsigned int Abe_x1; unsigned int Abe_x2; unsigned int Abe_x3; unsigned int Areserv0; unsigned int Ahblk1; unsigned int Avblk1; unsigned int Acycle_end; unsigned int Acycle_start; unsigned int Adma_pio0; unsigned int Adma_pio1; unsigned int Adirection; unsigned int Asif_acc; unsigned int Apage_end; unsigned int Apage_start; unsigned int Areserv1; unsigned int Aoffset; unsigned int AtriggerB; unsigned int AtriggerA; unsigned int Areserv2; unsigned int Amaster_trig;} MM;
 typedef struct {unsigned int sdram_data1; unsigned int sdram_data2; unsigned int sdram_data3; unsigned int sdram_data4;} NN;
 
-extern int __cdecl SmemDataCheck(VERIFY_SSS *verify, MM *mm);
-extern int __cdecl SmemSequenceCheck(VERIFY_SSS *verify, MM *mm);
-extern int __cdecl SifSequenceCheck(VERIFY_SSS *verify, MM *mm);
-extern int __cdecl SsbusSequenceCheckExt(VERIFY_SSS *verify, MM *mm, int xr_w);
-extern int __cdecl SsbusSequenceCheck(VERIFY_SSS *verify, MM *mm);
-extern int __cdecl SmemCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end);
-extern int __cdecl SifCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end);
-extern int __cdecl SsbusCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end);
-extern int __cdecl SMEM_SDRAMCheck(VERIFY_SSS *verify, NN *nn, NN *end);
+extern int SmemDataCheck(VERIFY_SSS *verify, MM *mm);
+extern int SmemSequenceCheck(VERIFY_SSS *verify, MM *mm);
+extern int SifSequenceCheck(VERIFY_SSS *verify, MM *mm);
+extern int SsbusSequenceCheckExt(VERIFY_SSS *verify, MM *mm, int xr_w);
+extern int SsbusSequenceCheck(VERIFY_SSS *verify, MM *mm);
+extern int SmemCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end);
+extern int SifCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end);
+extern int SsbusCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end);
+extern int SMEM_SDRAMCheck(VERIFY_SSS *verify, NN *nn, NN *end);
 
-int __cdecl SmemDataCheck(VERIFY_SSS *verify, MM *mm)
+int SmemDataCheck(VERIFY_SSS *verify, MM *mm)
 {
   int i; // [esp+4h] [ebp-1Ch]
   unsigned int ref_DATA; // [esp+8h] [ebp-18h]
@@ -84,7 +84,7 @@ int __cdecl SmemDataCheck(VERIFY_SSS *verify, MM *mm)
   return 0;
 }
 
-int __cdecl SmemSequenceCheck(VERIFY_SSS *verify, MM *mm)
+int SmemSequenceCheck(VERIFY_SSS *verify, MM *mm)
 {
   int type; // eax
   unsigned int ROW; // [esp+8h] [ebp-Ch]
@@ -142,7 +142,7 @@ int __cdecl SmemSequenceCheck(VERIFY_SSS *verify, MM *mm)
   return verify->status;
 }
 
-int __cdecl SifSequenceCheck(VERIFY_SSS *verify, MM *mm)
+int SifSequenceCheck(VERIFY_SSS *verify, MM *mm)
 {
   int status; // eax
   int v3; // eax
@@ -264,7 +264,7 @@ int __cdecl SifSequenceCheck(VERIFY_SSS *verify, MM *mm)
   return verify->status;
 }
 
-int __cdecl SsbusSequenceCheckExt(VERIFY_SSS *verify, MM *mm, int xr_w)
+int SsbusSequenceCheckExt(VERIFY_SSS *verify, MM *mm, int xr_w)
 {
   int status; // eax
   unsigned int SRD; // [esp+8h] [ebp-10h]
@@ -309,7 +309,7 @@ int __cdecl SsbusSequenceCheckExt(VERIFY_SSS *verify, MM *mm, int xr_w)
   return verify->status;
 }
 
-int __cdecl SsbusSequenceCheck(VERIFY_SSS *verify, MM *mm)
+int SsbusSequenceCheck(VERIFY_SSS *verify, MM *mm)
 {
   int dev; // eax
   int sta_int; // eax
@@ -707,7 +707,7 @@ int __cdecl SsbusSequenceCheck(VERIFY_SSS *verify, MM *mm)
   return v14;
 }
 
-int __cdecl SmemCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end)
+int SmemCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end)
 {
   while ( end > mm )
   {
@@ -726,7 +726,7 @@ int __cdecl SmemCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end)
       && verify->COL_flag1[3];
 }
 
-int __cdecl SifCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end)
+int SifCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end)
 {
   int step; // eax
 
@@ -829,7 +829,7 @@ int __cdecl SifCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end)
   return 0;
 }
 
-int __cdecl SsbusCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end)
+int SsbusCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end)
 {
   while ( end > mm )
   {
@@ -841,7 +841,7 @@ int __cdecl SsbusCheckStrict(VERIFY_SSS *verify, MM *mm, MM *end)
   return 0;
 }
 
-int __cdecl SMEM_SDRAMCheck(VERIFY_SSS *verify, NN *nn, NN *end)
+int SMEM_SDRAMCheck(VERIFY_SSS *verify, NN *nn, NN *end)
 {
   int dev; // eax
   int status; // [esp+0h] [ebp-4h]
@@ -1028,7 +1028,7 @@ int __cdecl SMEM_SDRAMCheck(VERIFY_SSS *verify, NN *nn, NN *end)
   return 0;
 }
 
-int __cdecl check_sss(VERIFY_SSS *verify, char *p, int size, char **av)
+int check_sss(VERIFY_SSS *verify, char *p, int size, char **av)
 {
   MM *end; // [esp+8h] [ebp-Ch]
   int qword; // [esp+10h] [ebp-4h]
@@ -1050,7 +1050,7 @@ int __cdecl check_sss(VERIFY_SSS *verify, char *p, int size, char **av)
   return qword;
 }
 
-int __cdecl SetBusType(VERIFY_SSS *verify, char **av)
+int SetBusType(VERIFY_SSS *verify, char **av)
 {
   int bus_type; // eax
   int i; // [esp+0h] [ebp-4h]
@@ -1143,7 +1143,7 @@ int __cdecl SetBusType(VERIFY_SSS *verify, char **av)
   return 0;
 }
 
-int __cdecl result_sss(VERIFY_SSS *verify)
+int result_sss(VERIFY_SSS *verify)
 {
   int bus_type; // eax
   int cnt_ng; // [esp+0h] [ebp-4h]

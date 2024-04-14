@@ -3,9 +3,9 @@
 static struct __anon_struct_122 {LOG_DATA *head; LOG_DATA *tail;} log_data_list = { NULL, NULL };
 static int ds_log_cur_size = 0;
 
-static LOG_DATA *__cdecl print_log(LOG_DATA *p, LOG_DATA *last, int f_l, int f_n);
+static LOG_DATA *print_log(LOG_DATA *p, LOG_DATA *last, int f_l, int f_n);
 
-void __cdecl ds_add_log(DS_DESC *desc, char *msg, DECI2_HDR *dh)
+void ds_add_log(DS_DESC *desc, char *msg, DECI2_HDR *dh)
 {
   int val; // eax
   int v4; // eax
@@ -107,7 +107,7 @@ void __cdecl ds_add_log(DS_DESC *desc, char *msg, DECI2_HDR *dh)
   }
 }
 
-static LOG_DATA *__cdecl print_log(LOG_DATA *p, LOG_DATA *last, int f_l, int f_n)
+static LOG_DATA *print_log(LOG_DATA *p, LOG_DATA *last, int f_l, int f_n)
 {
   unsigned __int8 *bp; // [esp+0h] [ebp-20h]
   int v6; // [esp+4h] [ebp-1Ch]
@@ -156,7 +156,7 @@ LABEL_23:
   return p;
 }
 
-int __cdecl ds_log_cmd(int ac, char **av)
+int ds_log_cmd(int ac, char **av)
 {
   DECI2_HDR *v3; // eax
   DECI2_HDR *v4; // eax

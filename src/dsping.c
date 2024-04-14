@@ -27,17 +27,17 @@ static int seq_4 = 0;
 static DS_DESC *target_desc;
 static unsigned __int8 *data_buf;
 
-static void __cdecl free_seq_time(SEQ_TIME *p);
-static void __cdecl send_echo();
-static void __cdecl statics();
-static void __cdecl check_timeout();
-static DSP_BUF *__cdecl recv_echor(DSP_BUF *db, DECI2_HDR *dh, DCMP_HDR *ch);
-static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db);
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db);
-static DSP_BUF *__cdecl recv_kbd(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl usage(int f_true);
+static void free_seq_time(SEQ_TIME *p);
+static void send_echo();
+static void statics();
+static void check_timeout();
+static DSP_BUF *recv_echor(DSP_BUF *db, DECI2_HDR *dh, DCMP_HDR *ch);
+static DSP_BUF *recv_dcmp(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *recv_kbd(DS_DESC *desc, DSP_BUF *db);
+static int usage(int f_true);
 
-static void __cdecl free_seq_time(SEQ_TIME *p)
+static void free_seq_time(SEQ_TIME *p)
 {
   if ( p->forw )
     p->forw->back = p->back;
@@ -50,7 +50,7 @@ static void __cdecl free_seq_time(SEQ_TIME *p)
   ds_free(p);
 }
 
-static void __cdecl send_echo()
+static void send_echo()
 {
   SEQ_TIME *tail; // edx
   SEQ_TIME *v1; // [esp+8h] [ebp-14h]
@@ -95,7 +95,7 @@ static void __cdecl send_echo()
   }
 }
 
-static void __cdecl statics()
+static void statics()
 {
   ds_printf("\n");
   ds_printf("%d packets transmitted,", send_count);
@@ -121,7 +121,7 @@ static void __cdecl statics()
   ds_exit(send_count > recv_count);
 }
 
-static void __cdecl check_timeout()
+static void check_timeout()
 {
 #ifdef DSNET_COMPILING_E
   int v0; // [esp+4h] [ebp-14h]
@@ -154,7 +154,7 @@ static void __cdecl check_timeout()
   }
 }
 
-static DSP_BUF *__cdecl recv_echor(DSP_BUF *db, DECI2_HDR *dh, DCMP_HDR *ch)
+static DSP_BUF *recv_echor(DSP_BUF *db, DECI2_HDR *dh, DCMP_HDR *ch)
 {
   SEQ_TIME *p; // [esp+4h] [ebp-20h]
   int64_t s; // [esp+Ch] [ebp-18h]
@@ -199,7 +199,7 @@ LABEL_12:
   return ds_free_buf(db);
 }
 
-static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_dcmp(DS_DESC *desc, DSP_BUF *db)
 {
   DCMP_HDR *ch; // [esp+0h] [ebp-8h]
 
@@ -211,7 +211,7 @@ static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
   return db;
 }
 
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   int n; // [esp+0h] [ebp-Ch]
@@ -265,7 +265,7 @@ static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static DSP_BUF *__cdecl recv_kbd(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_kbd(DS_DESC *desc, DSP_BUF *db)
 {
   int v3; // eax
   unsigned __int8 *bp; // [esp+0h] [ebp-Ch]
@@ -289,7 +289,7 @@ static DSP_BUF *__cdecl recv_kbd(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -306,7 +306,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int v2; // eax
   int v3; // eax

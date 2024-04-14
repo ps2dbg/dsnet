@@ -5,15 +5,15 @@ static char *tage[9];
 
 static struct __anon_struct_141 {RERP *head; RERP *tail;} rerps = { NULL, NULL };
 
-static void *__cdecl ds_new(int size);
-static void *__cdecl ds_free_re(RE *re);
-static void *__cdecl ds_free_rerp(RERP *rerp);
-static char *__cdecl ds_alloc_rp(int ac, char **av);
-static char *__cdecl ds_alloc_str(char *str);
-static RE *__cdecl ds_compile_re(char *str);
-static char *__cdecl ds_match_re(RE *re, char *str);
+static void *ds_new(int size);
+static void *ds_free_re(RE *re);
+static void *ds_free_rerp(RERP *rerp);
+static char *ds_alloc_rp(int ac, char **av);
+static char *ds_alloc_str(char *str);
+static RE *ds_compile_re(char *str);
+static char *ds_match_re(RE *re, char *str);
 
-static void *__cdecl ds_new(int size)
+static void *ds_new(int size)
 {
   void *r; // [esp+0h] [ebp-4h]
 
@@ -24,7 +24,7 @@ static void *__cdecl ds_new(int size)
   return r;
 }
 
-static void *__cdecl ds_free_re(RE *re)
+static void *ds_free_re(RE *re)
 {
   if ( re )
   {
@@ -36,7 +36,7 @@ static void *__cdecl ds_free_re(RE *re)
   return 0;
 }
 
-static void *__cdecl ds_free_rerp(RERP *rerp)
+static void *ds_free_rerp(RERP *rerp)
 {
   ds_free_re(rerp->re);
   ds_free(rerp->re_str);
@@ -45,7 +45,7 @@ static void *__cdecl ds_free_rerp(RERP *rerp)
   return 0;
 }
 
-static char *__cdecl ds_alloc_rp(int ac, char **av)
+static char *ds_alloc_rp(int ac, char **av)
 {
   int v2; // eax
   char *v4; // eax
@@ -82,7 +82,7 @@ static char *__cdecl ds_alloc_rp(int ac, char **av)
   return p;
 }
 
-static char *__cdecl ds_alloc_str(char *str)
+static char *ds_alloc_str(char *str)
 {
   char *p; // [esp+0h] [ebp-8h]
   int n; // [esp+4h] [ebp-4h]
@@ -107,7 +107,7 @@ static char *__cdecl ds_alloc_str(char *str)
   return p;
 }
 
-static RE *__cdecl ds_compile_re(char *str)
+static RE *ds_compile_re(char *str)
 {
   CLASS *v2; // eax
   CLASS *v3; // eax
@@ -296,7 +296,7 @@ LABEL_56:
   return p;
 }
 
-static char *__cdecl ds_match_re(RE *re, char *str)
+static char *ds_match_re(RE *re, char *str)
 {
   int v2; // eax
   int _val; // [esp+8h] [ebp-14h]
@@ -361,7 +361,7 @@ LABEL_26:
   return 0;
 }
 
-char *__cdecl ds_subst(char *dst, int dst_siz, char *src)
+char *ds_subst(char *dst, int dst_siz, char *src)
 {
   int c; // [esp+4h] [ebp-424h]
   char tmp[1024]; // [esp+8h] [ebp-420h] BYREF
@@ -442,7 +442,7 @@ char *__cdecl ds_subst(char *dst, int dst_siz, char *src)
   return strcpy(dst, src);
 }
 
-int __cdecl ds_subst_cmd(int ac, char **av)
+int ds_subst_cmd(int ac, char **av)
 {
   RERP *tail; // edx
   char *rp; // [esp+Ch] [ebp-20h]

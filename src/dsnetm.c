@@ -22,28 +22,28 @@ static DS_OPTION *opt_iopmodules;
 static DS_OPTION *opt_netdev;
 static unsigned int param[4];
 
-static void __cdecl drfp_error(DSP_BUF *db);
-static void __cdecl clear_st_proto(int nid);
-static void __cdecl add_st_proto(DS_DESC *desc, int proto, int nid);
-static void __cdecl send_st_proto(int proto);
-static void __cdecl tty_flush_check(DSP_BUF *db);
-static DSP_BUF *__cdecl send_net(DS_DESC *desc, DSP_BUF *db, int proto);
-static DSP_BUF *__cdecl recv_dcmp_connect(DS_DESC *desc, DSP_BUF *db);
-static DSP_BUF *__cdecl recv_dcmp_error(DS_DESC *desc, DSP_BUF *db);
-static DSP_BUF *__cdecl recv_target(DS_DESC *desc, DSP_BUF *db);
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *rdb, DECI2_HDR *dh, int len);
-static DSP_BUF *__cdecl recv_client(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl start_client(DS_DESC *desc);
-static int __cdecl usage(int f_true);
-static void __cdecl connect_dev(char *device_name, int f_first);
-static void __cdecl idle_func();
+static void drfp_error(DSP_BUF *db);
+static void clear_st_proto(int nid);
+static void add_st_proto(DS_DESC *desc, int proto, int nid);
+static void send_st_proto(int proto);
+static void tty_flush_check(DSP_BUF *db);
+static DSP_BUF *send_net(DS_DESC *desc, DSP_BUF *db, int proto);
+static DSP_BUF *recv_dcmp_connect(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *recv_dcmp_error(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *recv_target(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *rdb, DECI2_HDR *dh, int len);
+static DSP_BUF *recv_client(DS_DESC *desc, DSP_BUF *db);
+static int start_client(DS_DESC *desc);
+static int usage(int f_true);
+static void connect_dev(char *device_name, int f_first);
+static void idle_func();
 
-static void __cdecl drfp_error(DSP_BUF *db)
+static void drfp_error(DSP_BUF *db)
 {
   ds_send_net(1043, db);
 }
 
-static void __cdecl clear_st_proto(int nid)
+static void clear_st_proto(int nid)
 {
   ST_PROTO *q; // [esp+Ch] [ebp-Ch]
   ST_PROTO *p; // [esp+10h] [ebp-8h]
@@ -66,7 +66,7 @@ static void __cdecl clear_st_proto(int nid)
   }
 }
 
-static void __cdecl add_st_proto(DS_DESC *desc, int proto, int nid)
+static void add_st_proto(DS_DESC *desc, int proto, int nid)
 {
   ST_PROTO *tail; // edx
   ST_PROTO *p; // [esp+Ch] [ebp-8h]
@@ -94,7 +94,7 @@ static void __cdecl add_st_proto(DS_DESC *desc, int proto, int nid)
   }
 }
 
-static void __cdecl send_st_proto(int proto)
+static void send_st_proto(int proto)
 {
   ST_PROTO *q; // [esp+Ch] [ebp-Ch]
   ST_PROTO *p; // [esp+10h] [ebp-8h]
@@ -118,13 +118,13 @@ static void __cdecl send_st_proto(int proto)
   }
 }
 
-static void __cdecl tty_flush_check(DSP_BUF *db)
+static void tty_flush_check(DSP_BUF *db)
 {
   if ( *(_WORD *)db->buf == 12 && (unsigned __int8)*(_DWORD *)&db->buf[8] == 1 )
     ds_flush_desc_by_proto(*(unsigned __int16 *)&db->buf[4]);
 }
 
-static DSP_BUF *__cdecl send_net(DS_DESC *desc, DSP_BUF *db, int proto)
+static DSP_BUF *send_net(DS_DESC *desc, DSP_BUF *db, int proto)
 {
   if ( proto > 527 && proto <= 543 || proto > 271 && proto <= 287 )
     tty_flush_check(db);
@@ -134,7 +134,7 @@ static DSP_BUF *__cdecl send_net(DS_DESC *desc, DSP_BUF *db, int proto)
   return ds_send_dcmp_error(desc, db, 1);
 }
 
-static DSP_BUF *__cdecl recv_dcmp_connect(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_dcmp_connect(DS_DESC *desc, DSP_BUF *db)
 {
   int v3; // eax
   DCMP_CONNECT_DATA *connect_data; // [esp+0h] [ebp-Ch]
@@ -189,7 +189,7 @@ LABEL_13:
   return ds_free_buf(db);
 }
 
-static DSP_BUF *__cdecl recv_dcmp_error(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_dcmp_error(DS_DESC *desc, DSP_BUF *db)
 {
   int proto; // [esp+0h] [ebp-14h]
 
@@ -214,7 +214,7 @@ static DSP_BUF *__cdecl recv_dcmp_error(DS_DESC *desc, DSP_BUF *db)
   return ds_send_net(proto, db);
 }
 
-static DSP_BUF *__cdecl recv_target(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_target(DS_DESC *desc, DSP_BUF *db)
 {
   int v3; // eax
   int v4; // eax
@@ -293,7 +293,7 @@ static DSP_BUF *__cdecl recv_target(DS_DESC *desc, DSP_BUF *db)
   return db;
 }
 
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *rdb, DECI2_HDR *dh, int len)
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *rdb, DECI2_HDR *dh, int len)
 {
   size_t v5; // eax
   int v6; // [esp-4h] [ebp-430h]
@@ -467,7 +467,7 @@ LABEL_54:
   return ds_free_buf(db);
 }
 
-static DSP_BUF *__cdecl recv_client(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_client(DS_DESC *desc, DSP_BUF *db)
 {
   DS_DESC *v2; // eax
   int proto; // [esp+0h] [ebp-Ch]
@@ -531,7 +531,7 @@ static DSP_BUF *__cdecl recv_client(DS_DESC *desc, DSP_BUF *db)
   return 0;
 }
 
-static int __cdecl start_client(DS_DESC *desc)
+static int start_client(DS_DESC *desc)
 {
   if ( ds_add_recv_func(desc, -1, -1, -1, recv_client) )
     return 0;
@@ -539,7 +539,7 @@ static int __cdecl start_client(DS_DESC *desc)
     return -1;
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -555,7 +555,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-static void __cdecl connect_dev(char *device_name, int f_first)
+static void connect_dev(char *device_name, int f_first)
 {
   if ( !ds_cmd_executing )
   {
@@ -582,13 +582,13 @@ static void __cdecl connect_dev(char *device_name, int f_first)
   }
 }
 
-static void __cdecl idle_func()
+static void idle_func()
 {
   if ( !dev_desc )
     connect_dev(device_name, 0);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int type; // ecx
   int v3; // ecx

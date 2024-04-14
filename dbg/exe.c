@@ -15,37 +15,37 @@ static int run_args_len = 0;
 
 static struct {BRKPT *head;BRKPT *tail;} bps;
 
-static int __cdecl get_target_brkpt(int flag);
-static int __cdecl put_target_brkpt(int flag);
-static int __cdecl store_breakpoints(int flag);
-static int __cdecl restore_breakpoints(int flag);
-static void __cdecl print_brkpt(BRKPT *bp, char *msg);
-static int __cdecl add_brkpt(int flag, unsigned int adr, unsigned int cnt);
-static int __cdecl del_brkpt(int flag, unsigned int adr);
-static void __cdecl automatic_prefix_breakpoint(char *dp, char *sp);
-static int __cdecl targ_cont_cmd(int ac, char **av);
-static int __cdecl targ_until_cmd(int ac, char **av);
-static int __cdecl targ_step_cmd(int ac, char **av);
-static int __cdecl targ_next_cmd(int ac, char **av);
-static int __cdecl targ_lstep_cmd(int ac, char **av);
-static int __cdecl targ_lnext_cmd(int ac, char **av);
-static int __cdecl targ_luntil_cmd(int ac, char **av);
-static unsigned int __cdecl get_pc(SCRS *scrs);
-static int __cdecl is_breakpoint(int flag, SCRS *scrs);
-static int __cdecl load_scrs(SCRS *scrs);
-static int __cdecl do_cont(int flag, SCRS *scrs);
-static int __cdecl host_do_step(int f_next, SCRS *scrs);
-static int __cdecl do_lstep(int f_next, SCRS *scrs);
-static int __cdecl host_cont_cmd(int ac, char **av);
-static int __cdecl host_until_cmd(int ac, char **av);
-static int __cdecl host_step_cmd(int ac, char **av);
-static int __cdecl host_next_cmd(int ac, char **av);
-static int __cdecl host_lstep_cmd(int ac, char **av);
-static int __cdecl host_lnext_cmd(int ac, char **av);
-static int __cdecl host_luntil_cmd(int ac, char **av);
-static int __cdecl exitc(int r);
+static int get_target_brkpt(int flag);
+static int put_target_brkpt(int flag);
+static int store_breakpoints(int flag);
+static int restore_breakpoints(int flag);
+static void print_brkpt(BRKPT *bp, char *msg);
+static int add_brkpt(int flag, unsigned int adr, unsigned int cnt);
+static int del_brkpt(int flag, unsigned int adr);
+static void automatic_prefix_breakpoint(char *dp, char *sp);
+static int targ_cont_cmd(int ac, char **av);
+static int targ_until_cmd(int ac, char **av);
+static int targ_step_cmd(int ac, char **av);
+static int targ_next_cmd(int ac, char **av);
+static int targ_lstep_cmd(int ac, char **av);
+static int targ_lnext_cmd(int ac, char **av);
+static int targ_luntil_cmd(int ac, char **av);
+static unsigned int get_pc(SCRS *scrs);
+static int is_breakpoint(int flag, SCRS *scrs);
+static int load_scrs(SCRS *scrs);
+static int do_cont(int flag, SCRS *scrs);
+static int host_do_step(int f_next, SCRS *scrs);
+static int do_lstep(int f_next, SCRS *scrs);
+static int host_cont_cmd(int ac, char **av);
+static int host_until_cmd(int ac, char **av);
+static int host_step_cmd(int ac, char **av);
+static int host_next_cmd(int ac, char **av);
+static int host_lstep_cmd(int ac, char **av);
+static int host_lnext_cmd(int ac, char **av);
+static int host_luntil_cmd(int ac, char **av);
+static int exitc(int r);
 
-static int __cdecl get_target_brkpt(int flag)
+static int get_target_brkpt(int flag)
 {
   int nc; // [esp+0h] [ebp-14h] BYREF
   int i; // [esp+4h] [ebp-10h]
@@ -80,7 +80,7 @@ static int __cdecl get_target_brkpt(int flag)
   return r;
 }
 
-static int __cdecl put_target_brkpt(int flag)
+static int put_target_brkpt(int flag)
 {
   int init_cnt; // ecx
   int nr; // [esp+4h] [ebp-14h]
@@ -150,7 +150,7 @@ LABEL_23:
   return r;
 }
 
-static int __cdecl store_breakpoints(int flag)
+static int store_breakpoints(int flag)
 {
   int v2; // ecx
   int v3; // ecx
@@ -179,7 +179,7 @@ static int __cdecl store_breakpoints(int flag)
   return 0;
 }
 
-static int __cdecl restore_breakpoints(int flag)
+static int restore_breakpoints(int flag)
 {
   int v2; // ecx
   unsigned int ins; // [esp+4h] [ebp-8h] BYREF
@@ -224,17 +224,17 @@ static int __cdecl restore_breakpoints(int flag)
   return 0;
 }
 
-int __cdecl store_user_breakpoints()
+int store_user_breakpoints()
 {
   return store_breakpoints(8);
 }
 
-int __cdecl restore_user_breakpoints()
+int restore_user_breakpoints()
 {
   return restore_breakpoints(8);
 }
 
-int __cdecl eval_bp_reg(char *name, unsigned int *padr)
+int eval_bp_reg(char *name, unsigned int *padr)
 {
   unsigned int wv; // [esp+0h] [ebp-8h] BYREF
   BRKPT *bp; // [esp+4h] [ebp-4h]
@@ -255,7 +255,7 @@ int __cdecl eval_bp_reg(char *name, unsigned int *padr)
   return ds_error("breakpoint not found - %s", name);
 }
 
-static void __cdecl print_brkpt(BRKPT *bp, char *msg)
+static void print_brkpt(BRKPT *bp, char *msg)
 {
   const char *v2; // eax
   char buf[1024]; // [esp+0h] [ebp-400h] BYREF
@@ -280,7 +280,7 @@ static void __cdecl print_brkpt(BRKPT *bp, char *msg)
   }
 }
 
-static int __cdecl add_brkpt(int flag, unsigned int adr, unsigned int cnt)
+static int add_brkpt(int flag, unsigned int adr, unsigned int cnt)
 {
   int v3; // ebx
   int v4; // esi
@@ -353,7 +353,7 @@ static int __cdecl add_brkpt(int flag, unsigned int adr, unsigned int cnt)
   return 0;
 }
 
-static int __cdecl del_brkpt(int flag, unsigned int adr)
+static int del_brkpt(int flag, unsigned int adr)
 {
   int r; // [esp+8h] [ebp-Ch]
   BRKPT *bq; // [esp+Ch] [ebp-8h]
@@ -380,7 +380,7 @@ static int __cdecl del_brkpt(int flag, unsigned int adr)
   return r;
 }
 
-int __cdecl remove_breakpoints()
+int remove_breakpoints()
 {
   int flag; // ecx
   BRKPT *bp; // [esp+0h] [ebp-4h]
@@ -399,7 +399,7 @@ int __cdecl remove_breakpoints()
   return 0;
 }
 
-int __cdecl bp_cmd(int ac, char **av)
+int bp_cmd(int ac, char **av)
 {
   const char *v3; // eax
   char *v4; // eax
@@ -475,7 +475,7 @@ int __cdecl bp_cmd(int ac, char **av)
   }
 }
 
-static void __cdecl automatic_prefix_breakpoint(char *dp, char *sp)
+static void automatic_prefix_breakpoint(char *dp, char *sp)
 {
   int v2; // eax
   char *p; // [esp+4h] [ebp-4h]
@@ -500,7 +500,7 @@ LABEL_8:
   }
 }
 
-int __cdecl ub_cmd(int ac, char **av)
+int ub_cmd(int ac, char **av)
 {
   int v3; // [esp+0h] [ebp-408h]
   char buf[1024]; // [esp+4h] [ebp-404h] BYREF
@@ -543,7 +543,7 @@ LABEL_10:
   }
 }
 
-int __cdecl be_cmd(int ac, char **av)
+int be_cmd(int ac, char **av)
 {
   const char *v3; // eax
   int v4; // ecx
@@ -632,12 +632,12 @@ int __cdecl be_cmd(int ac, char **av)
   }
 }
 
-int __cdecl bd_cmd(int ac, char **av)
+int bd_cmd(int ac, char **av)
 {
   return be_cmd(ac, av);
 }
 
-int __cdecl break_cmd(int ac, char **av)
+int break_cmd(int ac, char **av)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -651,7 +651,7 @@ int __cdecl break_cmd(int ac, char **av)
   return exitc(r);
 }
 
-int __cdecl wait_cmd(int ac, char **av)
+int wait_cmd(int ac, char **av)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -665,7 +665,7 @@ int __cdecl wait_cmd(int ac, char **av)
   return exitc(r);
 }
 
-static int __cdecl targ_cont_cmd(int ac, char **av)
+static int targ_cont_cmd(int ac, char **av)
 {
   int r; // [esp+0h] [ebp-4h]
   char **ava; // [esp+10h] [ebp+Ch]
@@ -690,7 +690,7 @@ static int __cdecl targ_cont_cmd(int ac, char **av)
   return exitc(r);
 }
 
-static int __cdecl targ_until_cmd(int ac, char **av)
+static int targ_until_cmd(int ac, char **av)
 {
   int i; // [esp+0h] [ebp-Ch]
   int r; // [esp+4h] [ebp-8h]
@@ -727,7 +727,7 @@ static int __cdecl targ_until_cmd(int ac, char **av)
   return exitc(r);
 }
 
-static int __cdecl targ_step_cmd(int ac, char **av)
+static int targ_step_cmd(int ac, char **av)
 {
   int v2; // eax
   int r; // [esp+0h] [ebp-Ch]
@@ -775,7 +775,7 @@ static int __cdecl targ_step_cmd(int ac, char **av)
   return exitc(r);
 }
 
-static int __cdecl targ_next_cmd(int ac, char **av)
+static int targ_next_cmd(int ac, char **av)
 {
   int v2; // eax
   int r; // [esp+0h] [ebp-Ch]
@@ -823,7 +823,7 @@ static int __cdecl targ_next_cmd(int ac, char **av)
   return exitc(r);
 }
 
-static int __cdecl targ_lstep_cmd(int ac, char **av)
+static int targ_lstep_cmd(int ac, char **av)
 {
   int v3; // eax
   char *s2; // [esp+0h] [ebp-28h]
@@ -916,7 +916,7 @@ LABEL_37:
   return exitc(r);
 }
 
-static int __cdecl targ_lnext_cmd(int ac, char **av)
+static int targ_lnext_cmd(int ac, char **av)
 {
   int v3; // eax
   char *s2; // [esp+0h] [ebp-28h]
@@ -1009,7 +1009,7 @@ LABEL_37:
   return exitc(r);
 }
 
-static int __cdecl targ_luntil_cmd(int ac, char **av)
+static int targ_luntil_cmd(int ac, char **av)
 {
   char *file0; // [esp+0h] [ebp-18h]
   unsigned int addr; // [esp+4h] [ebp-14h] BYREF
@@ -1053,7 +1053,7 @@ static int __cdecl targ_luntil_cmd(int ac, char **av)
   return exitc(r);
 }
 
-static unsigned int __cdecl get_pc(SCRS *scrs)
+static unsigned int get_pc(SCRS *scrs)
 {
   unsigned int result; // eax
 
@@ -1079,7 +1079,7 @@ static unsigned int __cdecl get_pc(SCRS *scrs)
   return result;
 }
 
-static int __cdecl is_breakpoint(int flag, SCRS *scrs)
+static int is_breakpoint(int flag, SCRS *scrs)
 {
   unsigned int adr; // [esp+0h] [ebp-8h]
   BRKPT *p; // [esp+4h] [ebp-4h]
@@ -1093,7 +1093,7 @@ static int __cdecl is_breakpoint(int flag, SCRS *scrs)
   return 0;
 }
 
-static int __cdecl load_scrs(SCRS *scrs)
+static int load_scrs(SCRS *scrs)
 {
 #ifdef DSNET_COMPILING_E
   quad pv[4]; // [esp+0h] [ebp-6Ch] BYREF
@@ -1126,7 +1126,7 @@ static int __cdecl load_scrs(SCRS *scrs)
   return 0;
 }
 
-static int __cdecl do_cont(int flag, SCRS *scrs)
+static int do_cont(int flag, SCRS *scrs)
 {
   int r; // [esp+0h] [ebp-4h]
 
@@ -1145,7 +1145,7 @@ static int __cdecl do_cont(int flag, SCRS *scrs)
   return -2;
 }
 
-static int __cdecl host_do_step(int f_next, SCRS *scrs)
+static int host_do_step(int f_next, SCRS *scrs)
 {
 #ifdef DSNET_COMPILING_E
   unsigned int errorepc; // eax
@@ -1258,13 +1258,13 @@ LABEL_32:
   return do_cont(4, scrs);
 }
 
-void __cdecl display_current_informations(int result)
+void display_current_informations(int result)
 {
   if ( result == 34 || result == 33 || result == 36 || result == 39 || result == -2 )
     ex_default_dr();
 }
 
-static int __cdecl do_lstep(int f_next, SCRS *scrs)
+static int do_lstep(int f_next, SCRS *scrs)
 {
   int delta1; // [esp+0h] [ebp-24h] BYREF
   int delta0; // [esp+4h] [ebp-20h] BYREF
@@ -1323,7 +1323,7 @@ LABEL_6:
   }
 }
 
-static int __cdecl host_cont_cmd(int ac, char **av)
+static int host_cont_cmd(int ac, char **av)
 {
   int v2; // eax
 #ifdef DSNET_COMPILING_E
@@ -1435,7 +1435,7 @@ LABEL_26:
   return exitc(r);
 }
 
-static int __cdecl host_until_cmd(int ac, char **av)
+static int host_until_cmd(int ac, char **av)
 {
 #ifdef DSNET_COMPILING_E
   signed int cause; // ebx
@@ -1550,7 +1550,7 @@ LABEL_30:
   return exitc(r);
 }
 
-static int __cdecl host_step_cmd(int ac, char **av)
+static int host_step_cmd(int ac, char **av)
 {
   int v2; // eax
 #ifdef DSNET_COMPILING_E
@@ -1606,7 +1606,7 @@ LABEL_15:
   return exitc(r);
 }
 
-static int __cdecl host_next_cmd(int ac, char **av)
+static int host_next_cmd(int ac, char **av)
 {
   int v2; // eax
 #ifdef DSNET_COMPILING_E
@@ -1662,7 +1662,7 @@ LABEL_15:
   return exitc(r);
 }
 
-static int __cdecl host_lstep_cmd(int ac, char **av)
+static int host_lstep_cmd(int ac, char **av)
 {
   int v2; // eax
 #ifdef DSNET_COMPILING_E
@@ -1721,7 +1721,7 @@ LABEL_15:
   return exitc(r);
 }
 
-static int __cdecl host_lnext_cmd(int ac, char **av)
+static int host_lnext_cmd(int ac, char **av)
 {
   int v2; // eax
 #ifdef DSNET_COMPILING_E
@@ -1780,7 +1780,7 @@ LABEL_15:
   return exitc(r);
 }
 
-static int __cdecl host_luntil_cmd(int ac, char **av)
+static int host_luntil_cmd(int ac, char **av)
 {
   int v2; // eax
   unsigned int pc; // eax
@@ -1937,7 +1937,7 @@ LABEL_28:
 }
 
 #ifdef DSNET_COMPILING_E
-int __cdecl set_runarg(int ac, char **av)
+int set_runarg(int ac, char **av)
 {
   int v3; // ebx
   char *v4; // ebx
@@ -1982,7 +1982,7 @@ int __cdecl set_runarg(int ac, char **av)
   return 0;
 }
 
-int __cdecl run_cmd(int ac, char **av)
+int run_cmd(int ac, char **av)
 {
   quad pv; // [esp+0h] [ebp-18h] BYREF
   int r; // [esp+10h] [ebp-8h]
@@ -2025,7 +2025,7 @@ int __cdecl run_cmd(int ac, char **av)
 }
 #endif /* DSNET_COMPILING_E */
 
-int __cdecl cont_cmd(int ac, char **av)
+int cont_cmd(int ac, char **av)
 {
   if ( is_target_exec_ctl() )
     return targ_cont_cmd(ac, av);
@@ -2033,7 +2033,7 @@ int __cdecl cont_cmd(int ac, char **av)
     return host_cont_cmd(ac, av);
 }
 
-int __cdecl until_cmd(int ac, char **av)
+int until_cmd(int ac, char **av)
 {
   if ( is_target_exec_ctl() )
     return targ_until_cmd(ac, av);
@@ -2041,7 +2041,7 @@ int __cdecl until_cmd(int ac, char **av)
     return host_until_cmd(ac, av);
 }
 
-int __cdecl step_cmd(int ac, char **av)
+int step_cmd(int ac, char **av)
 {
   if ( is_target_exec_ctl() )
     return targ_step_cmd(ac, av);
@@ -2049,7 +2049,7 @@ int __cdecl step_cmd(int ac, char **av)
     return host_step_cmd(ac, av);
 }
 
-int __cdecl next_cmd(int ac, char **av)
+int next_cmd(int ac, char **av)
 {
   if ( is_target_exec_ctl() )
     return targ_next_cmd(ac, av);
@@ -2057,7 +2057,7 @@ int __cdecl next_cmd(int ac, char **av)
     return host_next_cmd(ac, av);
 }
 
-int __cdecl lstep_cmd(int ac, char **av)
+int lstep_cmd(int ac, char **av)
 {
   if ( is_target_exec_ctl() )
     return targ_lstep_cmd(ac, av);
@@ -2065,7 +2065,7 @@ int __cdecl lstep_cmd(int ac, char **av)
     return host_lstep_cmd(ac, av);
 }
 
-int __cdecl lnext_cmd(int ac, char **av)
+int lnext_cmd(int ac, char **av)
 {
   if ( is_target_exec_ctl() )
     return targ_lnext_cmd(ac, av);
@@ -2073,7 +2073,7 @@ int __cdecl lnext_cmd(int ac, char **av)
     return host_lnext_cmd(ac, av);
 }
 
-int __cdecl luntil_cmd(int ac, char **av)
+int luntil_cmd(int ac, char **av)
 {
   if ( is_target_exec_ctl() )
     return targ_luntil_cmd(ac, av);
@@ -2081,7 +2081,7 @@ int __cdecl luntil_cmd(int ac, char **av)
     return host_luntil_cmd(ac, av);
 }
 
-static int __cdecl exitc(int r)
+static int exitc(int r)
 {
   int v1; // edx
 

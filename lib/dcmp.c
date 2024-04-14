@@ -1,6 +1,6 @@
 #include "dsnet_prototypes.h"
 
-int __cdecl ds_send_dcmp_connect(DS_DESC *desc, int did, int result, unsigned int *param)
+int ds_send_dcmp_connect(DS_DESC *desc, int did, int result, unsigned int *param)
 {
   unsigned __int8 v5; // al
   int v6; // eax
@@ -44,7 +44,7 @@ int __cdecl ds_send_dcmp_connect(DS_DESC *desc, int did, int result, unsigned in
   return 0;
 }
 
-int __cdecl ds_send_dcmp_status(DS_DESC *desc, int nid, int code, int proto)
+int ds_send_dcmp_status(DS_DESC *desc, int nid, int code, int proto)
 {
   DSP_BUF *db; // [esp+14h] [ebp-8h]
 
@@ -59,7 +59,7 @@ int __cdecl ds_send_dcmp_status(DS_DESC *desc, int nid, int code, int proto)
   return 0;
 }
 
-int __cdecl ds_send_dcmp_status_net(int code, int proto)
+int ds_send_dcmp_status_net(int code, int proto)
 {
   DSP_BUF *db; // [esp+10h] [ebp-8h]
 
@@ -74,7 +74,7 @@ int __cdecl ds_send_dcmp_status_net(int code, int proto)
   return 0;
 }
 
-DSP_BUF *__cdecl ds_send_dcmp_error(DS_DESC *desc, DSP_BUF *odb, int code)
+DSP_BUF *ds_send_dcmp_error(DS_DESC *desc, DSP_BUF *odb, int code)
 {
   int len; // [esp+4h] [ebp-34h]
   char data[28]; // [esp+10h] [ebp-28h] BYREF

@@ -6,9 +6,9 @@ DS_DESC *ds_disp_desc = NULL;
 int ds_disp_proto = 1040;
 
 static int doprnt(char *format, ...);
-static int __cdecl print_char_by_printable_char(int ch);
-static int __cdecl print_string_by_value(char *form, int sm, int value);
-static int __cdecl ds_vprintf(char *format, va_list ap);
+static int print_char_by_printable_char(int ch);
+static int print_string_by_value(char *form, int sm, int value);
+static int ds_vprintf(char *format, va_list ap);
 
 static int doprnt(char *format, ...)
 {
@@ -32,7 +32,7 @@ static int doprnt(char *format, ...)
   return r;
 }
 
-static int __cdecl print_char_by_printable_char(int ch)
+static int print_char_by_printable_char(int ch)
 {
   if ( ch == 10 )
     return doprnt("\\n");
@@ -66,7 +66,7 @@ static int __cdecl print_char_by_printable_char(int ch)
   return doprnt("\\x%02x", ch & 0x7F);
 }
 
-static int __cdecl print_string_by_value(char *form, int sm, int value)
+static int print_string_by_value(char *form, int sm, int value)
 {
   int ne; // [esp+0h] [ebp-18h]
   int r; // [esp+4h] [ebp-14h]
@@ -108,7 +108,7 @@ static int __cdecl print_string_by_value(char *form, int sm, int value)
   return r;
 }
 
-static int __cdecl ds_vprintf(char *format, va_list ap)
+static int ds_vprintf(char *format, va_list ap)
 {
   char v2; // cl
   int v3; // eax
@@ -438,7 +438,7 @@ int ds_error(char *fmt, ...)
   return -1;
 }
 
-int __cdecl ds_printf_cmd(int ac, char **av)
+int ds_printf_cmd(int ac, char **av)
 {
   int result; // eax
   char v3; // cl
@@ -688,7 +688,7 @@ LABEL_64:
   return result;
 }
 
-int __cdecl ds_record_cmd(int ac, char **av)
+int ds_record_cmd(int ac, char **av)
 {
   char *v3; // eax
   int f_append; // [esp+0h] [ebp-4h]

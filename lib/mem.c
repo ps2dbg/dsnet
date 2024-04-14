@@ -2,7 +2,7 @@
 
 static MEM_LIST mems;
 
-void __cdecl ds_status_mem()
+void ds_status_mem()
 {
   struct mem *back; // ecx
   int hsiz; // [esp+Ch] [ebp-28h]
@@ -75,7 +75,7 @@ void __cdecl ds_status_mem()
   ds_printf("  total %d bytes\n", tsiz);
 }
 
-void *__cdecl ds_alloc_mem_low(const char *file, const char *func, int size)
+void *ds_alloc_mem_low(const char *file, const char *func, int size)
 {
   MEM *tail; // edx
   MEM *p; // [esp+4h] [ebp-4h]
@@ -109,7 +109,7 @@ void *__cdecl ds_alloc_mem_low(const char *file, const char *func, int size)
   return &p[1];
 }
 
-void *__cdecl ds_free_mem_low(void *ptr, const char *file, const char *func)
+void *ds_free_mem_low(void *ptr, const char *file, const char *func)
 {
   MEM *p; // [esp+8h] [ebp-4h]
 

@@ -164,9 +164,9 @@ static int last_cpuid_4 = 0;
 static int last_space_5 = 0;
 static int last_cnt_6 = 20;
 
-static char *__cdecl vdisasm(char *buf, int cpuid, int space, unsigned int adr, unsigned int upper, unsigned int lower);
+static char *vdisasm(char *buf, int cpuid, int space, unsigned int adr, unsigned int upper, unsigned int lower);
 
-static char *__cdecl vdisasm(char *buf, int cpuid, int space, unsigned int adr, unsigned int upper, unsigned int lower)
+static char *vdisasm(char *buf, int cpuid, int space, unsigned int adr, unsigned int upper, unsigned int lower)
 {
   const char *v6; // eax
   VOPCODE *v7; // eax
@@ -420,7 +420,7 @@ static char *__cdecl vdisasm(char *buf, int cpuid, int space, unsigned int adr, 
   return buf;
 }
 
-int __cdecl vdi_cmd(int ac, char **av)
+int vdi_cmd(int ac, char **av)
 {
   const char *v3; // eax
   char *v4; // eax

@@ -12,13 +12,13 @@ static int prompt_len = 0;
 static int isearch_dir = 0;
 static int cbuf_len = 0;
 
-static void __cdecl flush_char();
-static int __cdecl ds_load_history();
-static void __cdecl replace(DS_HISTBUF *hb, char *buf, int off);
-static char *__cdecl isearch(DS_HISTBUF *hb, int f_force, int *ppos);
-static void __cdecl print_char(int ch);
+static void flush_char();
+static int ds_load_history();
+static void replace(DS_HISTBUF *hb, char *buf, int off);
+static char *isearch(DS_HISTBUF *hb, int f_force, int *ppos);
+static void print_char(int ch);
 
-static void __cdecl flush_char()
+static void flush_char()
 {
   if ( cbuf_len > 0 )
   {
@@ -28,7 +28,7 @@ static void __cdecl flush_char()
   cbuf_len = 0;
 }
 
-int __cdecl ds_prompt()
+int ds_prompt()
 {
   char *v0; // eax
 
@@ -52,7 +52,7 @@ int __cdecl ds_prompt()
   }
 }
 
-int __cdecl ds_save_history()
+int ds_save_history()
 {
   int v1; // eax
   int n; // [esp+0h] [ebp-10h]
@@ -84,7 +84,7 @@ int __cdecl ds_save_history()
   return 0;
 }
 
-static int __cdecl ds_load_history()
+static int ds_load_history()
 {
   char *v1; // eax
   DS_HISTBUF *v2; // edx
@@ -164,7 +164,7 @@ static int __cdecl ds_load_history()
   }
 }
 
-static void __cdecl replace(DS_HISTBUF *hb, char *buf, int off)
+static void replace(DS_HISTBUF *hb, char *buf, int off)
 {
   int v3; // eax
   int v4; // eax
@@ -213,7 +213,7 @@ static void __cdecl replace(DS_HISTBUF *hb, char *buf, int off)
   }
 }
 
-static char *__cdecl isearch(DS_HISTBUF *hb, int f_force, int *ppos)
+static char *isearch(DS_HISTBUF *hb, int f_force, int *ppos)
 {
   char *q; // [esp+4h] [ebp-14h]
   char *q_1; // [esp+4h] [ebp-14h]
@@ -296,7 +296,7 @@ LABEL_23:
   return hp->buf;
 }
 
-int __cdecl ds_editline(DS_HISTBUF *hb, int ch, char *rp)
+int ds_editline(DS_HISTBUF *hb, int ch, char *rp)
 {
   int result; // eax
   int v4; // eax
@@ -752,7 +752,7 @@ LABEL_117:
   return result;
 }
 
-static void __cdecl print_char(int ch)
+static void print_char(int ch)
 {
   if ( (unsigned int)cbuf_len > 0x400 )
     flush_char();

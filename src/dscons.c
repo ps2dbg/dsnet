@@ -34,20 +34,20 @@ static int kbd_proto = 1040;
 static DS_DESC *target_desc;
 
 #if defined(DSNET_COMPILING_D) || defined(DSNET_COMPILING_M)
-static void __cdecl send_char(int ch);
+static void send_char(int ch);
 #endif /* DSNET_COMPILING_D || DSNET_COMPILING_M */
-static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db);
-static void __cdecl start_cons();
+static DSP_BUF *recv_ttyp(DS_DESC *desc, DSP_BUF *db);
+static void start_cons();
 #if defined(DSNET_COMPILING_E) || defined(DSNET_COMPILING_I) || defined(DSNET_COMPILING_M)
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db);
 #if defined(DSNET_COMPILING_E) || defined(DSNET_COMPILING_I)
-static int __cdecl send_netmp_connect_request();
+static int send_netmp_connect_request();
 #endif /* DSNET_COMPILING_E || DSNET_COMPILING_I */
 #endif /* DSNET_COMPILING_E || DSNET_COMPILING_I || DSNET_COMPILING_M */
-static int __cdecl usage(int f_true);
+static int usage(int f_true);
 
 #if defined(DSNET_COMPILING_D) || defined(DSNET_COMPILING_M)
-static void __cdecl send_char(int ch)
+static void send_char(int ch)
 {
   struct dscons_send_char_struct dat; // [esp+0h] [ebp-Ch] BYREF
   DSP_BUF *db; // [esp+8h] [ebp-4h]
@@ -65,7 +65,7 @@ static void __cdecl send_char(int ch)
 }
 #endif /* DSNET_COMPILING_D || DSNET_COMPILING_M */
 
-static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_ttyp(DS_DESC *desc, DSP_BUF *db)
 {
   int len; // [esp+0h] [ebp-10h]
   int i; // [esp+4h] [ebp-Ch]
@@ -108,7 +108,7 @@ static DSP_BUF *__cdecl recv_ttyp(DS_DESC *desc, DSP_BUF *db)
   }
 }
 
-static void __cdecl start_cons()
+static void start_cons()
 {
 #if defined(DSNET_COMPILING_E) || defined(DSNET_COMPILING_I)
   const char *v0; // eax
@@ -224,7 +224,7 @@ static void __cdecl start_cons()
 }
 
 #if defined(DSNET_COMPILING_E) || defined(DSNET_COMPILING_I) || defined(DSNET_COMPILING_M)
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   int n; // [esp+0h] [ebp-Ch]
@@ -275,7 +275,7 @@ static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
 }
 
 #if defined(DSNET_COMPILING_E) || defined(DSNET_COMPILING_I)
-static int __cdecl send_netmp_connect_request()
+static int send_netmp_connect_request()
 {
   int i; // [esp+4h] [ebp-8Ch]
   NETMP_PROTOS *p; // [esp+8h] [ebp-88h]
@@ -316,7 +316,7 @@ static int __cdecl send_netmp_connect_request()
 #endif /* DSNET_COMPILING_E || DSNET_COMPILING_I */
 #endif /* DSNET_COMPILING_E || DSNET_COMPILING_I || DSNET_COMPILING_M */
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -335,7 +335,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int v2; // eax
 #if defined(DSNET_COMPILING_E) || defined(DSNET_COMPILING_I)

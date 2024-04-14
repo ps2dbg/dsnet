@@ -119,16 +119,16 @@ static IOP_REGS iop_regs[] =
 extern unsigned int regbuf_vals[10][32]; // defined in dbg.c
 extern unsigned int regbuf_mask[10]; // defined in dbg.c
 
-static void __cdecl print_symcr(unsigned int rcr);
-static void __cdecl print_rcr(unsigned int rcr);
-static void __cdecl print_symsr(unsigned int rsr);
-static void __cdecl print_rsr(unsigned int rsr);
-static void __cdecl print_dcic(unsigned int dcic);
-static int __cdecl set_regmasks(unsigned int *masks, char *name);
-static int __cdecl dr_default_setmask(unsigned int *masks, int off, int bit);
-static int __cdecl dr_default(char *fmt, unsigned int *masks, unsigned int *vals);
+static void print_symcr(unsigned int rcr);
+static void print_rcr(unsigned int rcr);
+static void print_symsr(unsigned int rsr);
+static void print_rsr(unsigned int rsr);
+static void print_dcic(unsigned int dcic);
+static int set_regmasks(unsigned int *masks, char *name);
+static int dr_default_setmask(unsigned int *masks, int off, int bit);
+static int dr_default(char *fmt, unsigned int *masks, unsigned int *vals);
 
-static void __cdecl print_symcr(unsigned int rcr)
+static void print_symcr(unsigned int rcr)
 {
   char *v1; // eax
   char *v2; // eax
@@ -251,14 +251,14 @@ static void __cdecl print_symcr(unsigned int rcr)
   ds_printf(" ");
 }
 
-static void __cdecl print_rcr(unsigned int rcr)
+static void print_rcr(unsigned int rcr)
 {
   ds_printf("$cr=0x%W [", rcr);
   print_symcr(rcr);
   ds_printf("]");
 }
 
-static void __cdecl print_symsr(unsigned int rsr)
+static void print_symsr(unsigned int rsr)
 {
   char *v1; // eax
   char *v2; // eax
@@ -448,14 +448,14 @@ static void __cdecl print_symsr(unsigned int rsr)
   ds_printf(" ");
 }
 
-static void __cdecl print_rsr(unsigned int rsr)
+static void print_rsr(unsigned int rsr)
 {
   ds_printf("$sr=0x%W [", rsr);
   print_symsr(rsr);
   ds_printf("]");
 }
 
-static void __cdecl print_dcic(unsigned int dcic)
+static void print_dcic(unsigned int dcic)
 {
   const char *v1; // eax
   const char *v2; // eax
@@ -552,7 +552,7 @@ static void __cdecl print_dcic(unsigned int dcic)
   ds_printf(" ]");
 }
 
-static int __cdecl set_regmasks(unsigned int *masks, char *name)
+static int set_regmasks(unsigned int *masks, char *name)
 {
   int v3; // eax
   int rf; // [esp+18h] [ebp-10h]
@@ -641,7 +641,7 @@ static int __cdecl set_regmasks(unsigned int *masks, char *name)
   }
 }
 
-int __cdecl check_reserved_name(char *name)
+int check_reserved_name(char *name)
 {
   IOP_REGS *reg; // [esp+0h] [ebp-4h]
 
@@ -665,7 +665,7 @@ int __cdecl check_reserved_name(char *name)
   return 0;
 }
 
-int __cdecl load_word_reg(char *name, unsigned int *pv)
+int load_word_reg(char *name, unsigned int *pv)
 {
   unsigned int v3; // edx
   int j; // [esp+8h] [ebp-38h]
@@ -735,7 +735,7 @@ int __cdecl load_word_reg(char *name, unsigned int *pv)
   }
 }
 
-int __cdecl store_word_reg(char *name, unsigned int val)
+int store_word_reg(char *name, unsigned int val)
 {
   int n; // [esp+0h] [ebp-530h]
   int i; // [esp+4h] [ebp-52Ch]
@@ -751,7 +751,7 @@ int __cdecl store_word_reg(char *name, unsigned int val)
   return store_word_registers(masks, vals, n);
 }
 
-int __cdecl load_quad_reg(char *name, quad *pv)
+int load_quad_reg(char *name, quad *pv)
 {
   quad v3; // [esp+0h] [ebp-14h] BYREF
   unsigned int wv; // [esp+10h] [ebp-4h] BYREF
@@ -763,7 +763,7 @@ int __cdecl load_quad_reg(char *name, quad *pv)
   return 0;
 }
 
-int __cdecl store_quad_reg(char *name, quad val)
+int store_quad_reg(char *name, quad val)
 {
   unsigned int v3; // [esp-4h] [ebp-4h]
 
@@ -771,7 +771,7 @@ int __cdecl store_quad_reg(char *name, quad val)
   return store_word_reg(name, v3);
 }
 
-static int __cdecl dr_default_setmask(unsigned int *masks, int off, int bit)
+static int dr_default_setmask(unsigned int *masks, int off, int bit)
 {
   if ( (masks[off] & (1 << bit)) != 0 )
     return 0;
@@ -779,7 +779,7 @@ static int __cdecl dr_default_setmask(unsigned int *masks, int off, int bit)
   return 1;
 }
 
-static int __cdecl dr_default(char *fmt, unsigned int *masks, unsigned int *vals)
+static int dr_default(char *fmt, unsigned int *masks, unsigned int *vals)
 {
   char *v3; // eax
   int v4; // eax
@@ -979,7 +979,7 @@ static int __cdecl dr_default(char *fmt, unsigned int *masks, unsigned int *vals
   return 0;
 }
 
-int __cdecl dreg_cmd(int ac, char **av)
+int dreg_cmd(int ac, char **av)
 {
   int v3; // eax
   int v4; // eax
@@ -1175,7 +1175,7 @@ int __cdecl dreg_cmd(int ac, char **av)
   }
 }
 
-int __cdecl sreg_cmd(int ac, char **av)
+int sreg_cmd(int ac, char **av)
 {
   int f_force; // [esp+0h] [ebp-8h]
   unsigned int wv; // [esp+4h] [ebp-4h] BYREF
@@ -1209,7 +1209,7 @@ int __cdecl sreg_cmd(int ac, char **av)
   return 0;
 }
 
-int __cdecl hbp_cmd(int ac, char **av)
+int hbp_cmd(int ac, char **av)
 {
   char *v3; // eax
   char *v4; // eax
@@ -1448,7 +1448,7 @@ LABEL_106:
   return 0;
 }
 
-int __cdecl rload_cmd(int ac, char **av)
+int rload_cmd(int ac, char **av)
 {
   int v3; // eax
   char *v4; // eax
@@ -1562,7 +1562,7 @@ LABEL_72:
   return r;
 }
 
-int __cdecl rsave_cmd(int ac, char **av)
+int rsave_cmd(int ac, char **av)
 {
   int v3; // eax
   int word_registers; // eax

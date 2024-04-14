@@ -1875,30 +1875,30 @@ static unsigned int iregs[10][32];
 static quad eregs[11][32];
 static DBGP_BRKPT_DATA bps[32];
 
-static int __cdecl send_cmd(int ac, char **av);
-static int __cdecl breakr_cmd(int ac, char **av);
-static int __cdecl connectr_cmd(int ac, char **av);
-static int __cdecl tty_cmd(int ac, char **av);
-static int __cdecl send_dsdb_getconf(DS_DESC *desc, int proto);
-static int __cdecl send_dsdb_readmem(DS_DESC *desc, int proto, int id, DBGP_MEM *mh);
-static int __cdecl send_dsdb_writemem(DS_DESC *desc, int proto, int id, DBGP_MEM *mh);
-static int __cdecl send_dsdb_getreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, int n);
-static int __cdecl send_dsdb_putreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, int n);
-static int __cdecl send_getbrkptr(DS_DESC *desc, int proto, unsigned int *rp);
-static int __cdecl send_putbrkptr(DS_DESC *desc, int proto, unsigned int *rp, int n);
-static int __cdecl send_xgktctlr(DS_DESC *desc, DBGP_XGKT_CTL *xc);
-static int __cdecl send_dbgctlr(DS_DESC *desc, int id, int flag);
-static int __cdecl send_setbpfuncr(DS_DESC *desc, int proto, int adr);
-static int __cdecl send_rdimgr(DS_DESC *desc);
-static int __cdecl send_iloadp_reply(DS_DESC *desc, ILOADP_HDR *dsip, void *ptr, int len);
-static int __cdecl ireport_cmd(int ac, char **av);
-static int __cdecl terror_cmd(int ac, char **av);
-static DSP_BUF *__cdecl recv_as_target(DS_DESC *desc, DSP_BUF *db);
-static DSP_BUF *__cdecl recv_func(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl accept_func(DS_DESC *desc);
-static int __cdecl usage(int f_true);
+static int send_cmd(int ac, char **av);
+static int breakr_cmd(int ac, char **av);
+static int connectr_cmd(int ac, char **av);
+static int tty_cmd(int ac, char **av);
+static int send_dsdb_getconf(DS_DESC *desc, int proto);
+static int send_dsdb_readmem(DS_DESC *desc, int proto, int id, DBGP_MEM *mh);
+static int send_dsdb_writemem(DS_DESC *desc, int proto, int id, DBGP_MEM *mh);
+static int send_dsdb_getreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, int n);
+static int send_dsdb_putreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, int n);
+static int send_getbrkptr(DS_DESC *desc, int proto, unsigned int *rp);
+static int send_putbrkptr(DS_DESC *desc, int proto, unsigned int *rp, int n);
+static int send_xgktctlr(DS_DESC *desc, DBGP_XGKT_CTL *xc);
+static int send_dbgctlr(DS_DESC *desc, int id, int flag);
+static int send_setbpfuncr(DS_DESC *desc, int proto, int adr);
+static int send_rdimgr(DS_DESC *desc);
+static int send_iloadp_reply(DS_DESC *desc, ILOADP_HDR *dsip, void *ptr, int len);
+static int ireport_cmd(int ac, char **av);
+static int terror_cmd(int ac, char **av);
+static DSP_BUF *recv_as_target(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *recv_func(DS_DESC *desc, DSP_BUF *db);
+static int accept_func(DS_DESC *desc);
+static int usage(int f_true);
 
-static int __cdecl send_cmd(int ac, char **av)
+static int send_cmd(int ac, char **av)
 {
   unsigned int val; // [esp+0h] [ebp-18h] BYREF
   int n; // [esp+4h] [ebp-14h]
@@ -1977,7 +1977,7 @@ LABEL_36:
   return 0;
 }
 
-static int __cdecl breakr_cmd(int ac, char **av)
+static int breakr_cmd(int ac, char **av)
 {
   int id; // [esp+0h] [ebp-18h] BYREF
   int v4; // [esp+4h] [ebp-14h]
@@ -2020,7 +2020,7 @@ static int __cdecl breakr_cmd(int ac, char **av)
   return 0;
 }
 
-static int __cdecl connectr_cmd(int ac, char **av)
+static int connectr_cmd(int ac, char **av)
 {
   unsigned __int8 v3; // al
 
@@ -2037,7 +2037,7 @@ static int __cdecl connectr_cmd(int ac, char **av)
   return 0;
 }
 
-static int __cdecl tty_cmd(int ac, char **av)
+static int tty_cmd(int ac, char **av)
 {
   unsigned __int8 v3; // al
   int v4; // [esp+4h] [ebp-414h]
@@ -2125,7 +2125,7 @@ static int __cdecl tty_cmd(int ac, char **av)
   return 0;
 }
 
-static int __cdecl send_dsdb_getconf(DS_DESC *desc, int proto)
+static int send_dsdb_getconf(DS_DESC *desc, int proto)
 {
   int v3; // ecx
   DSP_BUF *db; // [esp+Ch] [ebp-4h]
@@ -2178,7 +2178,7 @@ LABEL_12:
   return 0;
 }
 
-static int __cdecl send_dsdb_readmem(DS_DESC *desc, int proto, int id, DBGP_MEM *mh)
+static int send_dsdb_readmem(DS_DESC *desc, int proto, int id, DBGP_MEM *mh)
 {
   unsigned __int8 v5; // [esp+7h] [ebp-21h]
   int npad; // [esp+Ch] [ebp-1Ch]
@@ -2216,7 +2216,7 @@ static int __cdecl send_dsdb_readmem(DS_DESC *desc, int proto, int id, DBGP_MEM 
   return 0;
 }
 
-static int __cdecl send_dsdb_writemem(DS_DESC *desc, int proto, int id, DBGP_MEM *mh)
+static int send_dsdb_writemem(DS_DESC *desc, int proto, int id, DBGP_MEM *mh)
 {
   unsigned __int8 v5; // [esp+7h] [ebp-21h]
   unsigned int len; // [esp+14h] [ebp-14h]
@@ -2244,7 +2244,7 @@ static int __cdecl send_dsdb_writemem(DS_DESC *desc, int proto, int id, DBGP_MEM
   return 0;
 }
 
-static int __cdecl send_dsdb_getreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, int n)
+static int send_dsdb_getreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, int n)
 {
   int i; // [esp+4h] [ebp-1Ch]
   int i_1; // [esp+4h] [ebp-1Ch]
@@ -2283,7 +2283,7 @@ static int __cdecl send_dsdb_getreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, i
   return 0;
 }
 
-static int __cdecl send_dsdb_putreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, int n)
+static int send_dsdb_putreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, int n)
 {
   int i; // [esp+4h] [ebp-1Ch]
   int i_1; // [esp+4h] [ebp-1Ch]
@@ -2322,7 +2322,7 @@ static int __cdecl send_dsdb_putreg(DS_DESC *desc, DSP_BUF *sdb, int reg_size, i
   return 0;
 }
 
-static int __cdecl send_getbrkptr(DS_DESC *desc, int proto, unsigned int *rp)
+static int send_getbrkptr(DS_DESC *desc, int proto, unsigned int *rp)
 {
   int n; // [esp+0h] [ebp-10h]
   DSP_BUF *db; // [esp+Ch] [ebp-4h]
@@ -2342,7 +2342,7 @@ static int __cdecl send_getbrkptr(DS_DESC *desc, int proto, unsigned int *rp)
   return 0;
 }
 
-static int __cdecl send_putbrkptr(DS_DESC *desc, int proto, unsigned int *rp, int n)
+static int send_putbrkptr(DS_DESC *desc, int proto, unsigned int *rp, int n)
 {
   DSP_BUF *db; // [esp+Ch] [ebp-4h]
 
@@ -2364,7 +2364,7 @@ static int __cdecl send_putbrkptr(DS_DESC *desc, int proto, unsigned int *rp, in
   return 0;
 }
 
-static int __cdecl send_xgktctlr(DS_DESC *desc, DBGP_XGKT_CTL *xc)
+static int send_xgktctlr(DS_DESC *desc, DBGP_XGKT_CTL *xc)
 {
   DSP_BUF *db; // [esp+8h] [ebp-4h]
 
@@ -2382,7 +2382,7 @@ static int __cdecl send_xgktctlr(DS_DESC *desc, DBGP_XGKT_CTL *xc)
   return 0;
 }
 
-static int __cdecl send_dbgctlr(DS_DESC *desc, int id, int flag)
+static int send_dbgctlr(DS_DESC *desc, int id, int flag)
 {
   DSP_BUF *db; // [esp+Ch] [ebp-4h]
 
@@ -2400,7 +2400,7 @@ static int __cdecl send_dbgctlr(DS_DESC *desc, int id, int flag)
   return 0;
 }
 
-static int __cdecl send_setbpfuncr(DS_DESC *desc, int proto, int adr)
+static int send_setbpfuncr(DS_DESC *desc, int proto, int adr)
 {
   DSP_BUF *db; // [esp+Ch] [ebp-4h]
 
@@ -2418,7 +2418,7 @@ static int __cdecl send_setbpfuncr(DS_DESC *desc, int proto, int adr)
   return 0;
 }
 
-static int __cdecl send_rdimgr(DS_DESC *desc)
+static int send_rdimgr(DS_DESC *desc)
 {
   int i; // [esp+0h] [ebp-14h]
   int i_1; // [esp+0h] [ebp-14h]
@@ -2459,7 +2459,7 @@ static int __cdecl send_rdimgr(DS_DESC *desc)
   return 0;
 }
 
-static int __cdecl send_iloadp_reply(DS_DESC *desc, ILOADP_HDR *dsip, void *ptr, int len)
+static int send_iloadp_reply(DS_DESC *desc, ILOADP_HDR *dsip, void *ptr, int len)
 {
   int v4; // edx
   unsigned int list[40]; // [esp+4h] [ebp-C8h] BYREF
@@ -2590,7 +2590,7 @@ LABEL_28:
   return 0;
 }
 
-static int __cdecl ireport_cmd(int ac, char **av)
+static int ireport_cmd(int ac, char **av)
 {
   unsigned int ret; // [esp+0h] [ebp-18h] BYREF
   unsigned int v4; // [esp+4h] [ebp-14h] BYREF
@@ -2623,7 +2623,7 @@ static int __cdecl ireport_cmd(int ac, char **av)
   return 0;
 }
 
-static int __cdecl terror_cmd(int ac, char **av)
+static int terror_cmd(int ac, char **av)
 {
   if ( ac != 2 )
     return ds_error("invalid argument");
@@ -2664,7 +2664,7 @@ static int __cdecl terror_cmd(int ac, char **av)
   return 0;
 }
 
-static DSP_BUF *__cdecl recv_as_target(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_as_target(DS_DESC *desc, DSP_BUF *db)
 {
   int v3; // eax
   DSP_BUF *sdb; // [esp+8h] [ebp-30h]
@@ -2860,7 +2860,7 @@ LABEL_38:
   return db;
 }
 
-static DSP_BUF *__cdecl recv_func(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_func(DS_DESC *desc, DSP_BUF *db)
 {
   if ( db )
   {
@@ -2884,7 +2884,7 @@ static DSP_BUF *__cdecl recv_func(DS_DESC *desc, DSP_BUF *db)
   }
 }
 
-static int __cdecl accept_func(DS_DESC *desc)
+static int accept_func(DS_DESC *desc)
 {
   if ( ds_add_recv_func(desc, -1, -1, -1, recv_func) )
     return 0;
@@ -2892,7 +2892,7 @@ static int __cdecl accept_func(DS_DESC *desc)
     return -1;
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -2908,7 +2908,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int v2; // eax
   int v3; // eax

@@ -1,6 +1,6 @@
 #include "dsnet_prototypes.h"
 
-int __cdecl ds_send_netmp(DS_DESC *desc, int code, int result, void *ptr, int len)
+int ds_send_netmp(DS_DESC *desc, int code, int result, void *ptr, int len)
 {
   DSP_BUF *db; // [esp+10h] [ebp-8h]
 
@@ -18,7 +18,7 @@ int __cdecl ds_send_netmp(DS_DESC *desc, int code, int result, void *ptr, int le
   return 0;
 }
 
-int __cdecl ds_send_netmp1(DS_DESC *desc, int code, int result, int pri, int proto)
+int ds_send_netmp1(DS_DESC *desc, int code, int result, int pri, int proto)
 {
   NETMP_PROTOS protos; // [esp+10h] [ebp-Ch] BYREF
   unsigned __int16 v7; // [esp+16h] [ebp-6h]
@@ -36,7 +36,7 @@ int __cdecl ds_send_netmp1(DS_DESC *desc, int code, int result, int pri, int pro
   return ds_send_netmp(desc, (unsigned __int8)code, (unsigned __int8)result, &protos, 4);
 }
 
-int __cdecl ds_reset(DS_DESC *desc, void *ptr, int len)
+int ds_reset(DS_DESC *desc, void *ptr, int len)
 {
   if ( !desc )
     return -1;
@@ -47,7 +47,7 @@ int __cdecl ds_reset(DS_DESC *desc, void *ptr, int len)
   return ds_error("!ioctl(MRPIOC_RESET)");
 }
 
-int __cdecl ds_poweroff(DS_DESC *desc)
+int ds_poweroff(DS_DESC *desc)
 {
   if ( !desc )
     return -1;
@@ -58,7 +58,7 @@ int __cdecl ds_poweroff(DS_DESC *desc)
   return ds_error("!ioctl(MRPIOC_POWEROFF)");
 }
 
-int __cdecl ds_send_netmp_msg(DS_DESC *desc, char *msg)
+int ds_send_netmp_msg(DS_DESC *desc, char *msg)
 {
   int v3; // [esp-4h] [ebp-4h]
 
@@ -66,7 +66,7 @@ int __cdecl ds_send_netmp_msg(DS_DESC *desc, char *msg)
   return ds_send_netmp(desc, 4, 0, msg, v3);
 }
 
-int __cdecl ds_send_netmp_default_msg(DS_DESC *desc)
+int ds_send_netmp_default_msg(DS_DESC *desc)
 {
   char *pw_name; // eax
   char *v2; // eax
@@ -131,7 +131,7 @@ int __cdecl ds_send_netmp_default_msg(DS_DESC *desc)
   return r;
 }
 
-int __cdecl ds_send_netmp_status_reply(DS_DESC *desc)
+int ds_send_netmp_status_reply(DS_DESC *desc)
 {
   int sec; // [esp+8h] [ebp-34h]
   uint64_t cusec; // [esp+Ch] [ebp-30h] BYREF

@@ -3549,17 +3549,17 @@ int current_col = 0;
 
 static int first_18 = 0;
 
-static void __cdecl print_char(void *stream, int ch);
-static void __cdecl print_str(void *stream, char *str);
-static void __cdecl print_nl(void *stream);
-static void __cdecl print_jis(void *stream, char *s);
-static void __cdecl print_sjis(void *stream, char *s);
-static int __cdecl add_help_map(int ej, int level, char *key, char **pl);
-static void __cdecl build_help_map(int lang);
-static int __cdecl valid_delim(int lang, char *p);
-static int __cdecl valid_lang(int lang, HELP_MAP *hm);
+static void print_char(void *stream, int ch);
+static void print_str(void *stream, char *str);
+static void print_nl(void *stream);
+static void print_jis(void *stream, char *s);
+static void print_sjis(void *stream, char *s);
+static int add_help_map(int ej, int level, char *key, char **pl);
+static void build_help_map(int lang);
+static int valid_delim(int lang, char *p);
+static int valid_lang(int lang, HELP_MAP *hm);
 
-static void __cdecl print_char(void *stream, int ch)
+static void print_char(void *stream, int ch)
 {
   char s[1]; // [esp+3h] [ebp-1h] BYREF
 
@@ -3575,7 +3575,7 @@ static void __cdecl print_char(void *stream, int ch)
   ++current_col;
 }
 
-static void __cdecl print_str(void *stream, char *str)
+static void print_str(void *stream, char *str)
 {
   int n; // [esp+0h] [ebp-4h]
 
@@ -3587,7 +3587,7 @@ static void __cdecl print_str(void *stream, char *str)
   current_col += n;
 }
 
-static void __cdecl print_nl(void *stream)
+static void print_nl(void *stream)
 {
   char s[1]; // [esp+3h] [ebp-1h] BYREF
 
@@ -3599,7 +3599,7 @@ static void __cdecl print_nl(void *stream)
   current_col = 0;
 }
 
-static void __cdecl print_jis(void *stream, char *s)
+static void print_jis(void *stream, char *s)
 {
   int v2; // eax
   int v3; // eax
@@ -3647,7 +3647,7 @@ static void __cdecl print_jis(void *stream, char *s)
     print_str(stream, "\x1B(B");
 }
 
-static void __cdecl print_sjis(void *stream, char *s)
+static void print_sjis(void *stream, char *s)
 {
   int v2; // eax
   int v3; // eax
@@ -3690,7 +3690,7 @@ static void __cdecl print_sjis(void *stream, char *s)
   }
 }
 
-static int __cdecl add_help_map(int ej, int level, char *key, char **pl)
+static int add_help_map(int ej, int level, char *key, char **pl)
 {
   size_t v4; // eax
   HELP_MAP *tail; // edx
@@ -3716,7 +3716,7 @@ static int __cdecl add_help_map(int ej, int level, char *key, char **pl)
   return 0;
 }
 
-static void __cdecl build_help_map(int lang)
+static void build_help_map(int lang)
 {
   int level; // [esp+4h] [ebp-414h]
   char buf[1024]; // [esp+8h] [ebp-410h] BYREF
@@ -3764,7 +3764,7 @@ static void __cdecl build_help_map(int lang)
   }
 }
 
-int __cdecl dbg_help(char *name)
+int dbg_help(char *name)
 {
   int v1; // eax
   HELP_MAP *hm; // [esp+0h] [ebp-24h]
@@ -3853,7 +3853,7 @@ int __cdecl dbg_help(char *name)
   }
 }
 
-int __cdecl dbg_help_completion(DS_HISTBUF *hb, char *name)
+int dbg_help_completion(DS_HISTBUF *hb, char *name)
 {
   HELP_MAP *hm; // [esp+0h] [ebp-20h]
   HELP_MAP *hm_1; // [esp+0h] [ebp-20h]
@@ -3933,7 +3933,7 @@ int __cdecl dbg_help_completion(DS_HISTBUF *hb, char *name)
   }
 }
 
-static int __cdecl valid_delim(int lang, char *p)
+static int valid_delim(int lang, char *p)
 {
   if ( *p != 45 )
     return 0;
@@ -3941,7 +3941,7 @@ static int __cdecl valid_delim(int lang, char *p)
   return p[1] == 45 || p[1] == TARGET_DID;
 }
 
-static int __cdecl valid_lang(int lang, HELP_MAP *hm)
+static int valid_lang(int lang, HELP_MAP *hm)
 {
   if ( hm->ej != 45 )
   {

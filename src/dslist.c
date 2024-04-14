@@ -17,14 +17,14 @@ static unsigned int *ide_7 = NULL;
 
 static DS_DESC *target_desc;
 
-static void __cdecl send_xload(int cmd, int action, int id, void *ptr, int len);
-static void __cdecl show_info(ELOADP_HDR *lp);
-static DSP_BUF *__cdecl recv_xloadp(DS_DESC *desc, DSP_BUF *db);
-static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db);
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db);
-static int __cdecl usage(int f_true);
+static void send_xload(int cmd, int action, int id, void *ptr, int len);
+static void show_info(ELOADP_HDR *lp);
+static DSP_BUF *recv_xloadp(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *recv_dcmp(DS_DESC *desc, DSP_BUF *db);
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db);
+static int usage(int f_true);
 
-static void __cdecl send_xload(int cmd, int action, int id, void *ptr, int len)
+static void send_xload(int cmd, int action, int id, void *ptr, int len)
 {
   DSP_BUF *db; // [esp+8h] [ebp-4h]
 
@@ -43,7 +43,7 @@ static void __cdecl send_xload(int cmd, int action, int id, void *ptr, int len)
   ds_send_desc(target_desc, db);
 }
 
-static void __cdecl show_info(ELOADP_HDR *lp)
+static void show_info(ELOADP_HDR *lp)
 {
   const char *v1; // eax
   const char *v2; // eax
@@ -144,7 +144,7 @@ static void __cdecl show_info(ELOADP_HDR *lp)
   }
 }
 
-static DSP_BUF *__cdecl recv_xloadp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_xloadp(DS_DESC *desc, DSP_BUF *db)
 {
   int len; // [esp+4h] [ebp-14h]
   int r; // [esp+8h] [ebp-10h]
@@ -209,7 +209,7 @@ LABEL_29:
   return db;
 }
 
-static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_dcmp(DS_DESC *desc, DSP_BUF *db)
 {
   DCMP_HDR *ch; // [esp+8h] [ebp-8h]
 
@@ -228,7 +228,7 @@ static DSP_BUF *__cdecl recv_dcmp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
+static DSP_BUF *recv_netmp(DS_DESC *desc, DSP_BUF *db)
 {
   int v2; // eax
   int n; // [esp+0h] [ebp-Ch]
@@ -287,7 +287,7 @@ static DSP_BUF *__cdecl recv_netmp(DS_DESC *desc, DSP_BUF *db)
   return ds_free_buf(db);
 }
 
-static int __cdecl usage(int f_true)
+static int usage(int f_true)
 {
   if ( !f_true )
     return 0;
@@ -304,7 +304,7 @@ static int __cdecl usage(int f_true)
   return ds_exit(129);
 }
 
-int __cdecl main(int ac, char **av)
+int main(int ac, char **av)
 {
   int r; // [esp+0h] [ebp-Ch]
   NETMP_PROTOS protos; // [esp+4h] [ebp-8h] BYREF
