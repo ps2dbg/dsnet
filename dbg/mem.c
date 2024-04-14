@@ -4,11 +4,6 @@
 unsigned int dot = 1048576u;
 unsigned int current_entry_point = 0u;
 unsigned int current_gp_value = 0u;
-static int last_sz_2 = -1;
-static int last_cnt_3 = 256;
-static int last_adr_8 = 1048576;
-static int last_cnt_9 = -1;
-static int last_sz_10 = -1;
 static const char TARG_IDENT[16] =
 {
   '\x7F',
@@ -56,15 +51,17 @@ int dmem_cmd(int ac, char **av)
   unsigned __int8 *buf; // [esp+2Ch] [ebp-4h]
   int aca; // [esp+38h] [ebp+8h]
   char **ava; // [esp+3Ch] [ebp+Ch]
+  static int last_sz = -1;
+  static int last_cnt = 256;
 
   cnt = 256;
   if ( ac <= 0 )
   {
-    cnt = last_cnt_3;
-    sz = last_sz_2;
+    cnt = last_cnt;
+    sz = last_sz;
 LABEL_17:
-    last_cnt_3 = cnt;
-    last_sz_2 = sz;
+    last_cnt = cnt;
+    last_sz = sz;
     switch ( sz )
     {
       case 'd':
@@ -479,16 +476,19 @@ int inp_cmd(int ac, char **av)
   unsigned __int8 *buf; // [esp+24h] [ebp-4h]
   int aca; // [esp+30h] [ebp+8h]
   char **ava; // [esp+34h] [ebp+Ch]
+  static int last_adr = 1048576;
+  static int last_cnt = -1;
+  static int last_sz = -1;
 
   if ( ac <= 0 )
   {
-    adr = last_adr_8;
-    cnt = last_cnt_9;
-    v9 = last_sz_10;
+    adr = last_adr;
+    cnt = last_cnt;
+    v9 = last_sz;
 LABEL_18:
-    last_adr_8 = adr;
-    last_cnt_9 = cnt;
-    last_sz_10 = v9;
+    last_adr = adr;
+    last_cnt = cnt;
+    last_sz = v9;
     if ( v9 == 104 )
     {
       cnt *= 2;
@@ -649,8 +649,8 @@ LABEL_18:
         ava = av + 1;
         if ( aca > 0 && **ava == 45 || aca > 2 )
           return ds_error("Usage: %s [<adr> [<cnt>]]", v7);
-        adr = last_adr_8;
-        cnt = last_cnt_9;
+        adr = last_adr;
+        cnt = last_cnt;
         if ( aca <= 0 )
           goto LABEL_13;
         if ( ds_eval_word(*ava, (unsigned int *)&adr) )
