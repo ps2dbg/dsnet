@@ -17,7 +17,7 @@ static void *__cdecl ds_new(int size)
 {
   void *r; // [esp+0h] [ebp-4h]
 
-  r = ds_alloc_mem_low("subst.c", "_ds_new", size);
+  r = ds_alloc(size);
   if ( !r )
     return 0;
   ds_bzero(r, size);
@@ -30,8 +30,8 @@ static void *__cdecl ds_free_re(RE *re)
   {
     ds_free_re(re->next);
     ds_free_re(re->sub);
-    ds_free_mem_low(re->class_, "subst.c", "ds_free_re");
-    ds_free_mem_low(re, "subst.c", "ds_free_re");
+    ds_free(re->class_);
+    ds_free(re);
   }
   return 0;
 }
@@ -39,9 +39,9 @@ static void *__cdecl ds_free_re(RE *re)
 static void *__cdecl ds_free_rerp(RERP *rerp)
 {
   ds_free_re(rerp->re);
-  ds_free_mem_low(rerp->re_str, "subst.c", "ds_free_rerp");
-  ds_free_mem_low(rerp->rp, "subst.c", "ds_free_rerp");
-  ds_free_mem_low(rerp, "subst.c", "ds_free_rerp");
+  ds_free(rerp->re_str);
+  ds_free(rerp->rp);
+  ds_free(rerp);
   return 0;
 }
 
@@ -62,7 +62,7 @@ static char *__cdecl ds_alloc_rp(int ac, char **av)
   v2 = n;
   if ( !n )
     v2 = 1;
-  p = (char *)ds_alloc_mem_low("subst.c", "ds_alloc_rp", v2);
+  p = (char *)ds_alloc(v2);
   if ( !p )
     return 0;
   if ( !n )
@@ -98,7 +98,7 @@ static char *__cdecl ds_alloc_str(char *str)
     ++str;
     n -= 2;
   }
-  p = (char *)ds_alloc_mem_low("subst.c", "ds_alloc_str", n + 1);
+  p = (char *)ds_alloc(n + 1);
   if ( !p )
     return 0;
   if ( n > 0 )
@@ -507,7 +507,7 @@ int __cdecl ds_subst_cmd(int ac, char **av)
           re = ds_compile_re(s1);
           if ( re )
           {
-            rerp_3 = (RERP *)ds_alloc_mem_low("subst.c", "ds_subst_cmd", 20);
+            rerp_3 = (RERP *)ds_alloc(20);
             if ( rerp_3 )
             {
               ds_bzero(rerp_3, sizeof(RERP));
@@ -534,7 +534,7 @@ int __cdecl ds_subst_cmd(int ac, char **av)
         }
       }
     }
-    ds_free_mem_low(s1, "subst.c", "ds_subst_cmd");
+    ds_free(s1);
     ds_free_re(re);
     return r;
   }

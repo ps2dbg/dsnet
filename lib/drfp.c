@@ -88,7 +88,7 @@ static void __cdecl drfp_errmsg(int proto, char *tag, char *fname, char *err)
     v6 = strlen(path) + 7 + v5;
     v7 = strlen(err);
     len = v7 + 3 + v6 + 1;
-    msg = (char *)ds_alloc_mem_low("drfp.c", "drfp_errmsg", v7 + 3 + v6 + 15);
+    msg = (char *)ds_alloc(v7 + 3 + v6 + 15);
     if ( msg )
     {
       ds_bzero(msg, 4u);
@@ -114,7 +114,7 @@ static void __cdecl drfp_errmsg(int proto, char *tag, char *fname, char *err)
       db = ds_alloc_buf(1043, 72, msg, len + 4);
       if ( db )
         ds_drfp_err_func(db);
-      ds_free_mem_low(msg, "drfp.c", "drfp_errmsg");
+      ds_free(msg);
     }
   }
 }
@@ -159,7 +159,7 @@ static void __cdecl free_handle(int handle)
   handle_map[handle].dir = 0;
   handle_map[handle].ino = 0;
   if ( handle_map[handle].name )
-    ds_free_mem_low(handle_map[handle].name, "drfp.c", "free_handle");
+    ds_free(handle_map[handle].name);
   handle_map[handle].name = 0;
   --ds_drfp_opened_files;
 }
@@ -480,7 +480,7 @@ static DSP_BUF *__cdecl recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
         if ( handle >= 0 )
         {
           v9 = strlen(path);
-          v10 = (char *)ds_alloc_mem_low("drfp.c", "recv_drfp_open", v9 + 1);
+          v10 = (char *)ds_alloc(v9 + 1);
           handle_map[handle].name = v10;
           if ( v10 )
           {
@@ -550,7 +550,7 @@ static DSP_BUF *__cdecl recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
     if ( handle >= 0 )
     {
       v8 = strlen(path);
-      v9 = (char *)ds_alloc_mem_low("drfp.c", "recv_drfp_dopen", v8 + 1);
+      v9 = (char *)ds_alloc(v8 + 1);
       handle_map[handle].name = v9;
       if ( v9 )
       {
@@ -992,7 +992,7 @@ static DSP_BUF *__cdecl recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
   fd = handle_to_fd(*argsa);
   if ( fd >= 0 )
   {
-    data = (unsigned __int8 *)ds_alloc_mem_low("drfp.c", "recv_drfp_read", len + 4);
+    data = (unsigned __int8 *)ds_alloc(len + 4);
     if ( data )
     {
       r = read(fd, data + 4, len);
@@ -1019,7 +1019,7 @@ static DSP_BUF *__cdecl recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh
   *(_DWORD *)data = len;
   send_drfp(desc, db, dh, 5u, seq, v10, data, len + 4);
   if ( data )
-    ds_free_mem_low(data, "drfp.c", "recv_drfp_read");
+    ds_free(data);
   return 0;
 }
 
@@ -1208,12 +1208,12 @@ static DSP_BUF *__cdecl recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
       goto LABEL_15;
     }
     len = strlen(dent->d_name) + 69; /* TODO: calculate size using sizeof */
-    sce_dent = (struct sce_dirent *)ds_alloc_mem_low("drfp.c", "recv_drfp_dread", len);
+    sce_dent = (struct sce_dirent *)ds_alloc(len);
     if ( !sce_dent )
       break;
     v6 = strlen(dent->d_name);
     v7 = strlen(handle_map[handle].name);
-    dest = (char *)ds_alloc_mem_low("drfp.c", "recv_drfp_dread", v7 + v6 + 2);
+    dest = (char *)ds_alloc(v7 + v6 + 2);
     if ( !dest )
       break;
     strcpy(dest, handle_map[handle].name);
@@ -1228,9 +1228,9 @@ static DSP_BUF *__cdecl recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
     {
       result = drfp_err(errno);
       len = 0;
-      ds_free_mem_low(sce_dent, "drfp.c", "recv_drfp_dread");
+      ds_free(sce_dent);
     }
-    ds_free_mem_low(dest, "drfp.c", "recv_drfp_dread");
+    ds_free(dest);
     if ( !result )
       goto LABEL_15;
   }
@@ -1239,7 +1239,7 @@ static DSP_BUF *__cdecl recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *d
 LABEL_15:
   send_drfp(desc, db, dh, 0x17u, seq, result, sce_dent, len);
   if ( sce_dent )
-    ds_free_mem_low(sce_dent, "drfp.c", "recv_drfp_dread");
+    ds_free(sce_dent);
   return 0;
 }
 

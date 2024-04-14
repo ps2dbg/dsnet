@@ -129,7 +129,7 @@ static int __cdecl ds_load_history()
         {
           *(q - 1) = 0;
           v6 = strlen(p);
-          hp = (DS_HIST *)ds_alloc_mem_low("editline.c", "ds_load_history", v6 + sizeof(DS_HIST) + 5);
+          hp = (DS_HIST *)ds_alloc(v6 + sizeof(DS_HIST) + 5);
           if ( !hp )
             return -1;
           v2 = hb;
@@ -149,7 +149,7 @@ static int __cdecl ds_load_history()
         }
         p = q;
       }
-      ds_free_mem_low(buf, "editline.c", "ds_load_history");
+      ds_free(buf);
       return 0;
     }
     else
@@ -489,7 +489,7 @@ LABEL_131:
           goto LABEL_152;
         if ( hb->tail && !strcmp(buf, hb->tail->buf) )
           goto LABEL_150;
-        hp = (DS_HIST *)ds_alloc_mem_low("editline.c", "ds_editline", r + sizeof(DS_HIST) + 5);
+        hp = (DS_HIST *)ds_alloc(r + sizeof(DS_HIST) + 5);
         if ( !hp )
           return -1;
         hp->no = hb->no++;
@@ -523,7 +523,7 @@ LABEL_131:
                 hp->back->forw = forw;
               else
                 hb->head = forw;
-              ds_free_mem_low(hp, "editline.c", "ds_editline");
+              ds_free(hp);
             }
             while ( hb->head );
           }

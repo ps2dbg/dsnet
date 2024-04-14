@@ -112,7 +112,7 @@ int __cdecl ds_send_netmp_default_msg(DS_DESC *desc)
   v4 = strlen(user);
   v5 = strlen(host) + 1 + v4;
   len = strlen(prog) + 1 + v5;
-  msg = (char *)ds_alloc_mem_low("netmp.c", "ds_send_netmp_default_msg", len);
+  msg = (char *)ds_alloc(len);
   if ( !msg )
     return -1;
   v7 = strlen(user);
@@ -127,7 +127,7 @@ int __cdecl ds_send_netmp_default_msg(DS_DESC *desc)
   memcpy(p_1 + 1, prog, v9);
   strlen(prog);
   r = ds_send_netmp(desc, 4, 0, msg, len);
-  ds_free_mem_low(msg, "netmp.c", "ds_send_netmp_default_msg");
+  ds_free(msg);
   return r;
 }
 
@@ -168,7 +168,7 @@ int __cdecl ds_send_netmp_status_reply(DS_DESC *desc)
       len += n * dp->nprotos;
     }
   }
-  msg = (char *)ds_alloc_mem_low("netmp.c", "ds_send_netmp_status_reply", len);
+  msg = (char *)ds_alloc(len);
   p = msg;
   if ( !msg )
     return -1;
@@ -210,7 +210,7 @@ int __cdecl ds_send_netmp_status_reply(DS_DESC *desc)
     }
   }
   v8 = ds_send_netmp(desc, 7, 0, msg, len);
-  ds_free_mem_low(msg, "netmp.c", "ds_send_netmp_status_reply");
+  ds_free(msg);
   return v8;
 }
 

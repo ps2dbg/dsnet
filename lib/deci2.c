@@ -8,7 +8,7 @@ DSP_BUF *__cdecl ds_alloc_buf(int proto, int did, void *ptr, int len)
 
   if ( (unsigned int)(len + sizeof(DSP_BUF)) <= 0xFFFF )
   {
-    db = (DSP_BUF *)ds_alloc_mem_low("deci2.c", "ds_alloc_buf", len + sizeof(DSP_BUF) + 8);
+    db = (DSP_BUF *)ds_alloc(len + sizeof(DSP_BUF) + 8);
     if ( db )
     {
       *(_WORD *)db->buf = len + 8;
@@ -37,7 +37,7 @@ DSP_BUF *__cdecl ds_alloc_buf(int proto, int did, void *ptr, int len)
 
 DSP_BUF *__cdecl ds_free_buf(DSP_BUF *db)
 {
-  return (DSP_BUF *)ds_free_mem_low(db, "deci2.c", "ds_free_buf");
+  return (DSP_BUF *)ds_free(db);
 }
 
 DSP_BUF *__cdecl ds_dup_buf(DSP_BUF *db)
@@ -46,7 +46,7 @@ DSP_BUF *__cdecl ds_dup_buf(DSP_BUF *db)
   DSP_BUF *r; // [esp+8h] [ebp-4h]
 
   len = *(unsigned __int16 *)db->buf;
-  r = (DSP_BUF *)ds_alloc_mem_low("deci2.c", "ds_dup_buf", len + sizeof(DSP_BUF));
+  r = (DSP_BUF *)ds_alloc(len + sizeof(DSP_BUF));
   if ( !r )
     return 0;
   memcpy(r->buf, db->buf, len);

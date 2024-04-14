@@ -156,7 +156,7 @@ static IMOD *__cdecl alloc_imod(int id, int ac, char **av)
   IMOD *p; // [esp+20h] [ebp-4h]
 
   f_dev = 0;
-  p = (IMOD *)ds_alloc_mem_low("mod.c", "alloc_imod", sizeof(IMOD));
+  p = (IMOD *)ds_alloc(sizeof(IMOD));
   if ( !p )
     return 0;
   ds_bzero(p, sizeof(IMOD));
@@ -185,14 +185,14 @@ static IMOD *__cdecl alloc_imod(int id, int ac, char **av)
     {
       if ( (unsigned int)(&bp_1[strlen(av[i])] - ((char *)&p->arg_siz + 3)) > 0xA0 )
       {
-        ds_free_mem_low(buf, "mod.c", "alloc_imod");
+        ds_free(buf);
         ds_error("too long argument");
-        return (IMOD *)ds_free_mem_low(p, "mod.c", "alloc_imod");
+        return (IMOD *)ds_free(p);
       }
       strcpy(bp_1, av[i]);
       bp_1 += strlen(av[i]) + 1;
     }
-    ds_free_mem_low(buf, "mod.c", "alloc_imod");
+    ds_free(buf);
 #ifdef DSNET_COMPILING_E
     p->arg_siz = bp_1 - 80 - (char *)p;
 #endif /* DSNET_COMPILING_E */
@@ -244,8 +244,8 @@ static IMOD *__cdecl free_imod(IMOD *p)
     else
       imod_list.head = p->forw;
     if ( p->name )
-      ds_free_mem_low(p->name, "mod.c", "free_imod");
-    ds_free_mem_low(p, "mod.c", "free_imod");
+      ds_free(p->name);
+    ds_free(p);
   }
   return 0;
 }
@@ -270,9 +270,9 @@ static void __cdecl set_modname(IMOD *p, char *name)
   char *v3; // eax
 
   if ( p->name )
-    ds_free_mem_low(p->name, "mod.c", "set_modname");
+    ds_free(p->name);
   v2 = strlen(name);
-  v3 = (char *)ds_alloc_mem_low("mod.c", "set_modname", v2 + 1);
+  v3 = (char *)ds_alloc(v2 + 1);
   p->name = v3;
   if ( v3 )
     strcpy(p->name, name);
@@ -375,9 +375,9 @@ LABEL_5:
       return 0;
     case 11:
     case 69:
-      mblke = (unsigned int *)ds_free_mem_low(mblks, "mod.c", "iload_callback");
+      mblke = (unsigned int *)ds_free(mblks);
       mblks = mblke;
-      mblks = (unsigned int *)ds_alloc_mem_low("mod.c", "iload_callback", len);
+      mblks = (unsigned int *)ds_alloc(len);
       if ( mblks )
       {
         memcpy(mblks, ptr, len);
@@ -1214,7 +1214,7 @@ LABEL_76:
       }
     }
   }
-  mblke = (unsigned int *)ds_free_mem_low(mblks, "mod.c", "memlist_cmd");
+  mblke = (unsigned int *)ds_free(mblks);
   mblks = mblke;
   return 0;
 }

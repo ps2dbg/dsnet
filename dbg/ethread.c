@@ -217,7 +217,7 @@ int __cdecl dt_cmd(int ac, char **av)
       }
     }
   }
-  listhdr = (DBGP_HDR *)ds_alloc_mem_low("ethread.c", "dt_cmd", 13316 + sizeof(DBGP_HDR));
+  listhdr = (DBGP_HDR *)ds_alloc(13316 + sizeof(DBGP_HDR));
   if ( !listhdr )
     return -1;
   listhdr->code = code_5;
@@ -228,10 +228,10 @@ int __cdecl dt_cmd(int ac, char **av)
     {
       cnt = (int)&listhdr[1];
       p_result = (DBGP_EE_THREADLIST_DATA *)&listhdr[1].result;
-      tcbhdr = (DBGP_HDR *)ds_alloc_mem_low("ethread.c", "dt_cmd", 768 + sizeof(DBGP_HDR));
+      tcbhdr = (DBGP_HDR *)ds_alloc(768 + sizeof(DBGP_HDR));
       if ( !tcbhdr )
       {
-        ds_free_mem_low(listhdr, "ethread.c", "dt_cmd");
+        ds_free(listhdr);
         return -1;
       }
       if ( (mode_4 & 1) != 0 )
@@ -274,7 +274,7 @@ int __cdecl dt_cmd(int ac, char **av)
           }
         }
       }
-      ds_free_mem_low(tcbhdr, "ethread.c", "dt_cmd");
+      ds_free(tcbhdr);
     }
     else
     {
@@ -295,7 +295,7 @@ int __cdecl dt_cmd(int ac, char **av)
       }
     }
   }
-  ds_free_mem_low(listhdr, "ethread.c", "dt_cmd");
+  ds_free(listhdr);
   return 0;
 }
 
@@ -520,7 +520,7 @@ int __cdecl ds_cmd(int ac, char **av)
       code_17 = 0;
     }
   }
-  hdr = (DBGP_HDR *)ds_alloc_mem_low("ethread.c", "ds_cmd", 7172 + sizeof(DBGP_HDR));
+  hdr = (DBGP_HDR *)ds_alloc(7172 + sizeof(DBGP_HDR));
   if ( !hdr )
     return -1;
   hdr->code = code_17;
@@ -550,7 +550,7 @@ int __cdecl ds_cmd(int ac, char **av)
       data = (DBGP_EE_SEMABLOCK_DATA *)tid;
     }
   }
-  ds_free_mem_low(hdr, "ethread.c", "ds_cmd");
+  ds_free(hdr);
   return 0;
 }
 
@@ -572,7 +572,7 @@ int __cdecl intr_cmd(int ac, char **av)
     return ds_error("intr command is required DBGP version %d.%d later.", 3, 10);
   if ( ac > 1 )
     return ds_error("Usage: intr");
-  hdr = (DBGP_HDR *)ds_alloc_mem_low("ethread.c", "intr_cmd", 5120 + sizeof(DBGP_HDR));
+  hdr = (DBGP_HDR *)ds_alloc(5120 + sizeof(DBGP_HDR));
   if ( !hdr )
     return -1;
   r = get_handlerlist(hdr);
@@ -599,7 +599,7 @@ int __cdecl intr_cmd(int ac, char **av)
       ++pdata;
     }
   }
-  ds_free_mem_low(hdr, "ethread.c", "intr_cmd");
+  ds_free(hdr);
   return 0;
 }
 

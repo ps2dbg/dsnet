@@ -3697,7 +3697,7 @@ static int __cdecl add_help_map(int ej, int level, char *key, char **pl)
   HELP_MAP *hm; // [esp+4h] [ebp-4h]
 
   v4 = strlen(key);
-  hm = (HELP_MAP *)ds_alloc_mem_low("help.c", "add_help_map", v4 + sizeof(HELP_MAP) + 1);
+  hm = (HELP_MAP *)ds_alloc(v4 + sizeof(HELP_MAP) + 1);
   if ( !hm )
     return -1;
   hm->ej = ej;

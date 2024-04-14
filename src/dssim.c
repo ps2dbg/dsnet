@@ -1923,7 +1923,7 @@ static int __cdecl send_cmd(int ac, char **av)
     db = last_db_2;
     goto LABEL_36;
   }
-  db = (DSP_BUF *)ds_alloc_mem_low("dssim.c", "send_cmd", size);
+  db = (DSP_BUF *)ds_alloc(size);
   if ( !db )
     return -1;
   ds = (DECI2_HDR *)db->buf;
@@ -1938,7 +1938,7 @@ static int __cdecl send_cmd(int ac, char **av)
     n = strlen(*av);
     if ( ds_scan_hex_word(*av, &val) )
     {
-      ds_free_mem_low(db, "dssim.c", "send_cmd");
+      ds_free(db);
       return -1;
     }
     if ( n <= 0 || n > 2 )
@@ -1968,7 +1968,7 @@ static int __cdecl send_cmd(int ac, char **av)
   if ( (unsigned int)(bp - (unsigned __int8 *)ds) <= 7 || size != ds->length )
   {
     ds_printf("send_cmd: invalid length (0x%x<-0x%x)\n", ds->length, size);
-    ds_free_mem_low(db, "dssim.c", "send_cmd");
+    ds_free(db);
     return -1;
   }
 LABEL_36:
@@ -2982,7 +2982,7 @@ int __cdecl main(int ac, char **av)
   {
     ds_printf("target mode (mem=%dKB)\n", target_mem_size);
     target_mem_size <<= 10;
-    target_mems = (unsigned __int8 *)ds_alloc_mem_low("dssim.c", "main", target_mem_size);
+    target_mems = (unsigned __int8 *)ds_alloc(target_mem_size);
     if ( !target_mems )
       ds_exit(135);
     for ( i = 0; i <= 9; ++i )

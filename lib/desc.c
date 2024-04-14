@@ -37,7 +37,7 @@ DS_DESC *__cdecl ds_add_select_list(
   else
     len = 0;
 
-  desc = ds_alloc_mem_low("desc.c", "ds_add_select_list", len + sizeof(DS_DESC) + 8 /* FIXME: allocated size is 108 */);
+  desc = ds_alloc(len + sizeof(DS_DESC) + 8 /* FIXME: allocated size is 108 */);
   if ( !desc )
   {
     close(fd);
@@ -178,7 +178,7 @@ LABEL_36:
     }
   }
 LABEL_39:
-  rf = (DS_RECV_FUNC_DESC *)ds_alloc_mem_low("desc.c", "ds_add_recv_func", sizeof(DS_RECV_FUNC_DESC));
+  rf = (DS_RECV_FUNC_DESC *)ds_alloc(sizeof(DS_RECV_FUNC_DESC));
   if ( !rf )
     return 0;
   rf->proto = proto;
@@ -211,7 +211,7 @@ DS_RECV_FUNC_DESC *__cdecl ds_del_recv_func(DS_DESC *desc, DS_RECV_FUNC_DESC *rf
     rf->back->forw = forw;
   else
     desc->recv_func_list.head = forw;
-  return (DS_RECV_FUNC_DESC *)ds_free_mem_low(rf, "desc.c", "ds_del_recv_func");
+  return (DS_RECV_FUNC_DESC *)ds_free(rf);
 }
 
 DS_DESC *__cdecl ds_close_desc(DS_DESC *desc)
@@ -263,13 +263,13 @@ LABEL_12:
     forw = prf->forw;
     if ( desc->type != 32 && desc->type != 64 )
       prf->func(desc, 0);
-    ds_free_mem_low(prf, "desc.c", "ds_close_desc");
+    ds_free(prf);
   }
   close(desc->fd);
-  ds_free_mem_low(desc->protos, "desc.c", "ds_close_desc");
+  ds_free(desc->protos);
   if ( desc->f_psnet )
     ds_free_psnet(desc);
-  return (DS_DESC *)ds_free_mem_low(desc, "desc.c", "ds_close_desc");
+  return (DS_DESC *)ds_free(desc);
 }
 
 static int __cdecl xrecv_common(DS_DESC *desc, DSP_BUF *db)
@@ -489,7 +489,7 @@ static int __cdecl xrecv_dev(DS_DESC *desc)
   {
     if ( (unsigned int)nbytes > 7 )
     {
-      db = (DSP_BUF *)ds_alloc_mem_low("desc.c", "xrecv_dev", nbytes + sizeof(DSP_BUF));
+      db = (DSP_BUF *)ds_alloc(nbytes + sizeof(DSP_BUF));
       if ( db )
       {
         dh = (DECI2_HDR *)db->buf;
@@ -656,7 +656,7 @@ static int __cdecl xrecv_net(DS_DESC *desc)
     n_1 = desc->rhdr.length;
     if ( (unsigned int)n_1 <= 7 )
       return ds_error("xrecv_net - invalid length (0x%x)", n_1);
-    db = (DSP_BUF *)ds_alloc_mem_low("desc.c", "xrecv_net", n_1 + sizeof(DSP_BUF));
+    db = (DSP_BUF *)ds_alloc(n_1 + sizeof(DSP_BUF));
     if ( !db )
       return -1;
     memcpy(db->buf, &desc->rhdr, desc->rlen);
@@ -920,7 +920,7 @@ static int __cdecl xrecv_netdev(DS_DESC *desc)
   DECI2_HDR *dh; // [esp+4h] [ebp-8h]
   DSP_BUF *db; // [esp+8h] [ebp-4h]
 
-  db = (DSP_BUF *)ds_alloc_mem_low("desc.c", "xrecv_netdev", 4104 + sizeof(DSP_BUF));
+  db = (DSP_BUF *)ds_alloc(4104 + sizeof(DSP_BUF));
   if ( !db )
     return -1;
   dh = (DECI2_HDR *)db->buf;

@@ -522,7 +522,7 @@ LABEL_14:
   oldcount_33 = count;
   if ( count > 0x100 )
     return ds_error("error: count > 0x100");
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_dg_cmd", 10 * count + 4);
+  cur_pointer = ds_alloc(10 * count + 4);
   if ( !cur_pointer )
     return ds_error("no memory");
   if ( !pa_dg((unsigned int *)cur_pointer, offset, count) )
@@ -560,7 +560,7 @@ LABEL_14:
       gif = (gifdata_t *)((char *)gif + 10);
     }
   }
-  ds_free_mem_low(cur_pointer, "pacons.c", "pa_dg_cmd");
+  ds_free(cur_pointer);
   return 0;
 }
 
@@ -595,12 +595,12 @@ LABEL_14:
   oldsize_37 = size;
   if ( size > 0xFFE0 )
     return ds_error("error: size > 0xffe0");
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_dgi_cmd", size + 4);
+  cur_pointer = ds_alloc(size + 4);
   if ( !cur_pointer )
     return ds_error("no memory");
   if ( !pa_mem(0x20000000u, (unsigned int *)cur_pointer, offset, size) )
     print_hex((char *)cur_pointer, offset, size);
-  ds_free_mem_low(cur_pointer, "pacons.c", "pa_dgi_cmd");
+  ds_free(cur_pointer);
   return 0;
 }
 
@@ -635,12 +635,12 @@ LABEL_14:
   oldsize_41 = size;
   if ( size > 0xFFE0 )
     return ds_error("error: size > 0xffe0");
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_dii_cmd", size + 4);
+  cur_pointer = ds_alloc(size + 4);
   if ( !cur_pointer )
     return ds_error("no memory");
   if ( !pa_mem(0x30000000u, (unsigned int *)cur_pointer, offset, size) )
     print_hex((char *)cur_pointer, offset, size);
-  ds_free_mem_low(cur_pointer, "pacons.c", "pa_dii_cmd");
+  ds_free(cur_pointer);
   return 0;
 }
 
@@ -706,12 +706,12 @@ int __cdecl pa_de_cmd(int ac, char **av)
     return ds_error("error: size > 0x20");
   if ( ds_eval_word(av[1], &offset) )
     return ds_error("Invalid argument");
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_de_cmd", 10 * size + 4);
+  cur_pointer = ds_alloc(10 * size + 4);
   if ( !cur_pointer )
     return ds_error("no memory");
   if ( !pa_de((unsigned int *)cur_pointer, offset, size) )
     print_hex((char *)cur_pointer, offset, 10 * size);
-  ds_free_mem_low(cur_pointer, "pacons.c", "pa_de_cmd");
+  ds_free(cur_pointer);
   return 0;
 }
 
@@ -735,12 +735,12 @@ int __cdecl pa_dei_cmd(int ac, char **av)
     return ds_error("error: size > 0xffe0");
   if ( ds_eval_word(av[1], &offset) )
     return ds_error("Invalid argument");
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_dei_cmd", size + 4);
+  cur_pointer = ds_alloc(size + 4);
   if ( !cur_pointer )
     return ds_error("no memory");
   if ( !pa_mem(0x10000000u, (unsigned int *)cur_pointer, offset, size) )
     print_hex((char *)cur_pointer, offset, size);
-  ds_free_mem_low(cur_pointer, "pacons.c", "pa_dei_cmd");
+  ds_free(cur_pointer);
   return 0;
 }
 
@@ -764,12 +764,12 @@ int __cdecl pa_di_cmd(int ac, char **av)
     return ds_error("error: size > 0x20");
   if ( ds_eval_word(av[1], &offset) )
     return ds_error("Invalid argument");
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_di_cmd", 16 * size + 4);
+  cur_pointer = ds_alloc(16 * size + 4);
   if ( !cur_pointer )
     return ds_error("no memory");
   if ( !pa_di((unsigned int *)cur_pointer, offset, size) )
     print_hex((char *)cur_pointer, 16 * offset, 16 * size);
-  ds_free_mem_low(cur_pointer, "pacons.c", "pa_di_cmd");
+  ds_free(cur_pointer);
   return 0;
 }
 
@@ -786,7 +786,7 @@ int __cdecl pa_reset()
   *(_DWORD *)&db->buf[8] = 2;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_reset", 4);
+  cur_pointer = ds_alloc(4);
   if ( cur_pointer )
   {
     do
@@ -803,7 +803,7 @@ int __cdecl pa_reset()
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_reset");
+    ds_free(cur_pointer);
     return v1;
   }
   else
@@ -862,7 +862,7 @@ int __cdecl pa_sg_cmd(int ac, char **av)
   fpw = ds_fopen(av[1], "w");
   if ( !fpw )
     return v8;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_sg_cmd", 10 * count + 4);
+  cur_pointer = ds_alloc(10 * count + 4);
   if ( cur_pointer )
   {
     ptr = (char *)cur_pointer + 4;
@@ -886,7 +886,7 @@ int __cdecl pa_sg_cmd(int ac, char **av)
     }
     show_statics(10 * v9, s, u);
     ds_fclose(fpw);
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_sg_cmd");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -921,7 +921,7 @@ int __cdecl pa_sgi_cmd(int ac, char **av)
   fpw = ds_fopen(av[1], "w");
   if ( !fpw )
     return -1;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_sgi_cmd", size + 4);
+  cur_pointer = ds_alloc(size + 4);
   if ( cur_pointer )
   {
     ptr = (char *)cur_pointer + 4;
@@ -945,7 +945,7 @@ int __cdecl pa_sgi_cmd(int ac, char **av)
     }
     show_statics(total, s, tut);
     ds_fclose(fpw);
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_sgi_cmd");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -980,7 +980,7 @@ int __cdecl pa_sei_cmd(int ac, char **av)
   fpw = ds_fopen(av[1], "w");
   if ( !fpw )
     return -1;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_sei_cmd", size + 4);
+  cur_pointer = ds_alloc(size + 4);
   if ( cur_pointer )
   {
     ptr = (char *)cur_pointer + 4;
@@ -1004,7 +1004,7 @@ int __cdecl pa_sei_cmd(int ac, char **av)
     }
     show_statics(total, s, tut);
     ds_fclose(fpw);
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_sei_cmd");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -1039,7 +1039,7 @@ int __cdecl pa_sii_cmd(int ac, char **av)
   fpw = ds_fopen(av[1], "w");
   if ( !fpw )
     return -1;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_sii_cmd", size + 4);
+  cur_pointer = ds_alloc(size + 4);
   if ( cur_pointer )
   {
     ptr = (char *)cur_pointer + 4;
@@ -1063,7 +1063,7 @@ int __cdecl pa_sii_cmd(int ac, char **av)
     }
     show_statics(total, s, tut);
     ds_fclose(fpw);
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_sii_cmd");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -1098,7 +1098,7 @@ int __cdecl pa_si_cmd(int ac, char **av)
   fpw = ds_fopen(av[1], "w");
   if ( !fpw )
     return -1;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_si_cmd", 16 * size + 4);
+  cur_pointer = ds_alloc(16 * size + 4);
   if ( cur_pointer )
   {
     ptr = (char *)cur_pointer + 4;
@@ -1122,7 +1122,7 @@ int __cdecl pa_si_cmd(int ac, char **av)
     }
     show_statics(16 * v8, s, u);
     ds_fclose(fpw);
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_si_cmd");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -1162,7 +1162,7 @@ int __cdecl pa_se_cmd(int ac, char **av)
   fpw = ds_fopen(av[1], "w");
   if ( !fpw )
     return -1;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_se_cmd", 10 * size + 4);
+  cur_pointer = ds_alloc(10 * size + 4);
   if ( cur_pointer )
   {
     ptr = (char *)cur_pointer + 4;
@@ -1186,7 +1186,7 @@ int __cdecl pa_se_cmd(int ac, char **av)
     }
     show_statics(10 * v8, s, u);
     ds_fclose(fpw);
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_se_cmd");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -1210,7 +1210,7 @@ int __cdecl pa_getreg(unsigned int code, unsigned int *data)
   *(_DWORD *)&db->buf[8] = code;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_getreg", 8);
+  cur_pointer = ds_alloc(8);
   if ( cur_pointer )
   {
     do
@@ -1232,7 +1232,7 @@ int __cdecl pa_getreg(unsigned int code, unsigned int *data)
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_getreg");
+    ds_free(cur_pointer);
     return v3;
   }
   else
@@ -1255,7 +1255,7 @@ int __cdecl pa_dr(unsigned int addr, unsigned int *data)
   *(_DWORD *)&db->buf[8] = addr | 0x60000000;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_dr", 8);
+  cur_pointer = ds_alloc(8);
   if ( cur_pointer )
   {
     do
@@ -1277,7 +1277,7 @@ int __cdecl pa_dr(unsigned int addr, unsigned int *data)
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_dr");
+    ds_free(cur_pointer);
     return v3;
   }
   else
@@ -1300,7 +1300,7 @@ int __cdecl pa_start()
   *(_DWORD *)&db->buf[8] = 4;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_start", 4);
+  cur_pointer = ds_alloc(4);
   if ( cur_pointer )
   {
     do
@@ -1317,7 +1317,7 @@ int __cdecl pa_start()
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_start");
+    ds_free(cur_pointer);
     return v1;
   }
   else
@@ -1340,7 +1340,7 @@ int __cdecl pa_stop()
   *(_DWORD *)&db->buf[8] = 6;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_stop", 4);
+  cur_pointer = ds_alloc(4);
   if ( cur_pointer )
   {
     do
@@ -1357,7 +1357,7 @@ int __cdecl pa_stop()
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_stop");
+    ds_free(cur_pointer);
     return v1;
   }
   else
@@ -1394,7 +1394,7 @@ int __cdecl pa_ver(unsigned int *data)
   {
     ds_error("Timeout\n");
   }
-  ds_free_mem_low(cur_pointer, "pacons.c", "pa_ver");
+  ds_free(cur_pointer);
   return v2;
 }
 
@@ -1557,7 +1557,7 @@ int __cdecl pa_ver_cmd(int ac, char **av)
 {
   if ( ac && ac != 1 )
     return ds_error("Usage: ver ");
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_ver_cmd", 24);
+  cur_pointer = ds_alloc(24);
   if ( !cur_pointer )
     return ds_error("no memory");
   if ( !pa_ver((unsigned int *)cur_pointer) )
@@ -1632,7 +1632,7 @@ static int __cdecl pa_puttrigpos(char **av)
   *++ph = pos;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_puttrigpos", 4);
+  cur_pointer = ds_alloc(4);
   if ( cur_pointer )
   {
     do
@@ -1647,7 +1647,7 @@ static int __cdecl pa_puttrigpos(char **av)
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_puttrigpos");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -1681,7 +1681,7 @@ static int __cdecl pa_sr(int ac, char **av)
   *++ph = data;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_sr", 4);
+  cur_pointer = ds_alloc(4);
   if ( cur_pointer )
   {
     do
@@ -1696,7 +1696,7 @@ static int __cdecl pa_sr(int ac, char **av)
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_sr");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -1731,7 +1731,7 @@ int __cdecl pa_gettrigpos(unsigned int *data)
   *(_DWORD *)&db->buf[8] = 32;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_gettrigpos", 8);
+  cur_pointer = ds_alloc(8);
   if ( cur_pointer )
   {
     do
@@ -1753,7 +1753,7 @@ int __cdecl pa_gettrigpos(unsigned int *data)
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_gettrigpos");
+    ds_free(cur_pointer);
     return v2;
   }
   else
@@ -1774,7 +1774,7 @@ static int __cdecl pa_getgif(unsigned int code, gifreg_t *gifreg)
   *(_DWORD *)&db->buf[8] = code;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_getgif", 28);
+  cur_pointer = ds_alloc(28);
   if ( cur_pointer )
   {
     do
@@ -1791,7 +1791,7 @@ static int __cdecl pa_getgif(unsigned int code, gifreg_t *gifreg)
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_getgif");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -1813,7 +1813,7 @@ static int __cdecl pa_putgif(unsigned int code, gifreg_t *gifreg)
   qmemcpy(&db->buf[12], gifreg, 0x18u);
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_putgif", 4);
+  cur_pointer = ds_alloc(4);
   if ( cur_pointer )
   {
     do
@@ -1828,7 +1828,7 @@ static int __cdecl pa_putgif(unsigned int code, gifreg_t *gifreg)
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_putgif");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -1852,7 +1852,7 @@ static int __cdecl pa_putiopmem(unsigned int code, iopmem_t *pmem)
   *(_DWORD *)&db->buf[24] = pmem->cdrom;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_putiopmem", 4);
+  cur_pointer = ds_alloc(4);
   if ( cur_pointer )
   {
     do
@@ -1867,7 +1867,7 @@ static int __cdecl pa_putiopmem(unsigned int code, iopmem_t *pmem)
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_putiopmem");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -1889,7 +1889,7 @@ static int __cdecl pa_putreg(unsigned int code, unsigned int value)
   *(_DWORD *)&db->buf[12] = value;
   cur_state = 1;
   ds_send_desc(target_desc, db);
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_putreg", 4);
+  cur_pointer = ds_alloc(4);
   if ( cur_pointer )
   {
     do
@@ -1904,7 +1904,7 @@ static int __cdecl pa_putreg(unsigned int code, unsigned int value)
     {
       ds_error("Timeout\n");
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_putreg");
+    ds_free(cur_pointer);
     return 0;
   }
   else
@@ -2450,7 +2450,7 @@ int __cdecl pa_ce_cmd(int ac, char **av)
   left = size;
   if ( size > 0x800 )
     size = 2048;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_ce_cmd", 10 * size + 4);
+  cur_pointer = ds_alloc(10 * size + 4);
   if ( cur_pointer )
   {
     p = (char *)cur_pointer + 4;
@@ -2470,7 +2470,7 @@ int __cdecl pa_ce_cmd(int ac, char **av)
     }
     if ( !strcmp(av[1], "DISP_Check") )
       v4 = result_pfm(&verify, mode, av[1]);
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_ce_cmd");
+    ds_free(cur_pointer);
     return v4;
   }
   else
@@ -2507,7 +2507,7 @@ int __cdecl pa_cei_cmd(int ac, char **av)
   m_init = 1;
   if ( size > 0x8000 )
     size = 0x8000;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_cei_cmd", size + 4);
+  cur_pointer = ds_alloc(size + 4);
   if ( cur_pointer )
   {
     bp = (char *)cur_pointer + 4;
@@ -2524,7 +2524,7 @@ int __cdecl pa_cei_cmd(int ac, char **av)
       if ( size > v7 )
         size = v7;
     }
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_cei_cmd");
+    ds_free(cur_pointer);
     return v4;
   }
   else
@@ -2558,7 +2558,7 @@ int __cdecl pa_cgi_cmd(int ac, char **av)
   memset(&gif, 0, sizeof(gif));
   if ( size > 0x8000 )
     size = 0x8000;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_cgi_cmd", size + 4);
+  cur_pointer = ds_alloc(size + 4);
   if ( !cur_pointer )
   {
     ds_error("no memory");
@@ -2603,7 +2603,7 @@ int __cdecl pa_cgi_cmd(int ac, char **av)
       return ds_error("GIF_TEXSWAPCheck Error %d \n", gif.m_complete);
     }
   }
-  ds_free_mem_low(cur_pointer, "pacons.c", "pa_cgi_cmd");
+  ds_free(cur_pointer);
   return ret;
 }
 
@@ -2635,7 +2635,7 @@ int __cdecl pa_cii_cmd(int ac, char **av)
   v6 = size;
   if ( size > 0x8000 )
     size = 0x8000;
-  cur_pointer = ds_alloc_mem_low("pacons.c", "pa_cii_cmd", size + 4);
+  cur_pointer = ds_alloc(size + 4);
   if ( cur_pointer )
   {
     bp = (char *)cur_pointer + 4;
@@ -2648,7 +2648,7 @@ int __cdecl pa_cii_cmd(int ac, char **av)
         size = left;
     }
     ret = result_sss(&verify);
-    ds_free_mem_low(cur_pointer, "pacons.c", "pa_cii_cmd");
+    ds_free(cur_pointer);
     return ret;
   }
   else
