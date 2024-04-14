@@ -75,7 +75,7 @@ void __cdecl ds_status_mem()
   ds_printf("  total %d bytes\n", tsiz);
 }
 
-void *__cdecl ds_alloc_mem_low(char *file, char *func, int size)
+void *__cdecl ds_alloc_mem_low(const char *file, const char *func, int size)
 {
   MEM *tail; // edx
   MEM *p; // [esp+4h] [ebp-4h]
@@ -109,7 +109,7 @@ void *__cdecl ds_alloc_mem_low(char *file, char *func, int size)
   return &p[1];
 }
 
-void *__cdecl ds_free_mem_low(void *ptr, char *file, char *func)
+void *__cdecl ds_free_mem_low(void *ptr, const char *file, const char *func)
 {
   MEM *p; // [esp+8h] [ebp-4h]
 
