@@ -343,7 +343,7 @@ static void __cdecl abort_input(int code)
     goto LABEL_7;
   if ( (opt_tty_mask->val & 1) != 0 )
     flush_tty_buf();
-  if ( (cur_state & 2) != 0 && (db = alloc_dbgp(0, 0, 20, 0, 0, 0, 0, 0)) != 0 )
+  if ( (cur_state & 2) != 0 && (db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_BREAK, 0, 0, 0, 0, 0)) != 0 )
   {
     ds_send_desc(target_desc, db);
     cur_proto = TARGET_SDBGP;
@@ -974,11 +974,11 @@ static int __cdecl get_conf(DBGP_CONF_DATA *conf)
   DSP_BUF *db; // [esp+8h] [ebp-4h]
 
 LABEL_1:
-  db = alloc_dbgp(0, 0, 0, 0, 0, 0, &p, sizeof(DBGP_CONF_DATA));
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETCONF, 0, 0, 0, &p, sizeof(DBGP_CONF_DATA));
   if ( !db )
     return -1;
   ds_bzero(p, sizeof(DBGP_CONF_DATA));
-  r = send_and_wait(db, 0, conf, sizeof(DBGP_CONF_DATA), 0);
+  r = send_and_wait(db, DBGP_TYPE_GETCONF, conf, sizeof(DBGP_CONF_DATA), 0);
   if ( !r )
     return 0;
   if ( (cur_state & 0xFF0) == 2048 && dcmp_waiting_status )
@@ -1003,7 +1003,7 @@ static void __cdecl send_dbconf()
   DBGP_CONF_DATA *p; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
 
-  db = alloc_dbgp(0, 0, 0, 0, 0, 0, &p, sizeof(DBGP_CONF_DATA));
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETCONF, 0, 0, 0, &p, sizeof(DBGP_CONF_DATA));
   if ( db )
   {
     ds_bzero(p, sizeof(DBGP_CONF_DATA));
@@ -1056,7 +1056,7 @@ static int __cdecl rdwr_mem_align(int code, int align, int cpuid, int space, uns
     else
       v8 = 0;
     nw = v8;
-    db = alloc_dbgp(v18, 0, v20, 0, 0, 1, &mh, v8 + 12);
+    db = alloc_dbgp(v18, DBGP_GROUP_SYSTEM, v20, 0, 0, 1, &mh, v8 + 12);
     if ( !db )
       return -1;
     mh->space = v17;
@@ -1136,10 +1136,10 @@ int __cdecl get_handlerlist(DBGP_HDR *phdr)
 {
   DSP_BUF *db; // [esp+0h] [ebp-8h]
 
-  db = alloc_dbgp(0, 1, 54, phdr->code, 0, 0, 0, 0);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_THREAD, DBGP_EE_THREAD_TYPE_HANDLERLIST, phdr->code, 0, 0, 0, 0);
   if ( !db )
     return -1;
-  if ( send_and_wait(db, 54, phdr, 0, 0) )
+  if ( send_and_wait(db, DBGP_EE_THREAD_TYPE_HANDLERLIST, phdr, 0, 0) )
     return -1;
   return 0;
 }
@@ -1151,11 +1151,11 @@ int __cdecl get_tcb(DBGP_HDR *phdr, int tid)
   int id; // [esp+8h] [ebp-4h]
 
   id = 0;
-  db = alloc_dbgp(0, 1, 50, phdr->code, 0, 0, &ptid, 4);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_THREAD, DBGP_EE_THREAD_TYPE_TCB, phdr->code, 0, 0, &ptid, 4);
   if ( !db )
     return -1;
   *ptid = tid;
-  if ( send_and_wait(db, 50, phdr, 0, 0) )
+  if ( send_and_wait(db, DBGP_EE_THREAD_TYPE_TCB, phdr, 0, 0) )
     return -1;
   else
     return 0;
@@ -1165,10 +1165,10 @@ int __cdecl get_thread_list(DBGP_HDR *phdr)
 {
   DSP_BUF *db; // [esp+0h] [ebp-8h]
 
-  db = alloc_dbgp(0, 1, 48, phdr->code, 0, 0, 0, 0);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_THREAD, DBGP_EE_THREAD_TYPE_THREADLIST, phdr->code, 0, 0, 0, 0);
   if ( !db )
     return -1;
-  if ( send_and_wait(db, 48, phdr, 0, 0) )
+  if ( send_and_wait(db, DBGP_EE_THREAD_TYPE_THREADLIST, phdr, 0, 0) )
     return -1;
   return 0;
 }
@@ -1180,11 +1180,11 @@ int __cdecl get_semablock(DBGP_HDR *phdr, int sid)
   int id; // [esp+8h] [ebp-4h]
 
   id = 0;
-  db = alloc_dbgp(0, 1, 52, phdr->code, 0, 0, &psid, 4);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_THREAD, DBGP_EE_THREAD_TYPE_SEMABLOCK, phdr->code, 0, 0, &psid, 4);
   if ( !db )
     return -1;
   *psid = sid;
-  if ( send_and_wait(db, 52, phdr, 0, 0) )
+  if ( send_and_wait(db, DBGP_EE_THREAD_TYPE_SEMABLOCK, phdr, 0, 0) )
     return -1;
   else
     return 0;
@@ -1211,7 +1211,7 @@ int __cdecl load_word_registers(unsigned int *masks, unsigned int *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, 0, 4, 0, 0, (unsigned __int8)nr, &rh, 8 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, (unsigned __int8)nr, &rh, 8 * nr);
     if ( !db )
       return -1;
     if ( i > 9 )
@@ -1245,7 +1245,7 @@ int __cdecl load_word_registers(unsigned int *masks, unsigned int *pv, int n)
         ++i;
       }
     }
-    if ( send_and_wait(db, 4, pv, nr, 0) )
+    if ( send_and_wait(db, DBGP_TYPE_GETREG, pv, nr, 0) )
       return -1;
     pv += nr;
     n -= nr;
@@ -1275,7 +1275,7 @@ int __cdecl store_word_registers(unsigned int *masks, unsigned int *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, 0, 6, 0, 0, (unsigned __int8)nr, &rh, 8 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, (unsigned __int8)nr, &rh, 8 * nr);
     if ( !db )
       return -1;
     if ( i > 9 )
@@ -1309,7 +1309,7 @@ int __cdecl store_word_registers(unsigned int *masks, unsigned int *pv, int n)
         ++i;
       }
     }
-    if ( send_and_wait(db, 6, 0, nr, 0) )
+    if ( send_and_wait(db, DBGP_TYPE_PUTREG, 0, nr, 0) )
       return -1;
     n -= nr;
   }
@@ -1335,7 +1335,7 @@ static int __cdecl load_quad_registers_id(int id, unsigned int *masks, quad *pv,
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, 0, 4, 0, 0, (unsigned __int8)nr, &rh, 20 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, (unsigned __int8)nr, &rh, 20 * nr);
     if ( !db )
       return -1;
     if ( i > 10 )
@@ -1369,7 +1369,7 @@ static int __cdecl load_quad_registers_id(int id, unsigned int *masks, quad *pv,
         ++i;
       }
     }
-    if ( send_and_wait(db, 4, pv, nr, 0) )
+    if ( send_and_wait(db, DBGP_TYPE_GETREG, pv, nr, 0) )
       return -1;
     pv += nr;
     n -= nr;
@@ -1397,7 +1397,7 @@ static int __cdecl store_quad_registers_id(int id, unsigned int *masks, quad *pv
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, 0, 6, 0, 0, (unsigned __int8)nr, &rh, 20 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, (unsigned __int8)nr, &rh, 20 * nr);
     if ( !db )
       return -1;
     if ( i > 10 )
@@ -1436,7 +1436,7 @@ static int __cdecl store_quad_registers_id(int id, unsigned int *masks, quad *pv
         ++i;
       }
     }
-    if ( send_and_wait(db, 6, 0, nr, 0) )
+    if ( send_and_wait(db, DBGP_TYPE_PUTREG, 0, nr, 0) )
       return -1;
     n -= nr;
   }
@@ -1524,11 +1524,11 @@ int __cdecl cont_and_wait_halt(int code, int cnt)
 {
   DSP_BUF *db; // [esp+8h] [ebp-8h]
 
-  db = alloc_dbgp(0, 0, 22, (unsigned __int8)code, 0, (unsigned __int8)cnt, 0, 0);
-  if ( db )
-    return send_and_wait(db, 22, 0, 0, 36);
-  else
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_CONTINUE, code, 0, cnt, 0, 0);
+  if ( !db )
     return -1;
+
+  return send_and_wait(db, DBGP_TYPE_CONTINUE, 0, 0, DBGP_RESULT_EXCEPTION);
 }
 
 int __cdecl run_and_wait_halt(unsigned int entry_point, unsigned int gp_value, int argc, char *args, int args_len)
@@ -1536,7 +1536,7 @@ int __cdecl run_and_wait_halt(unsigned int entry_point, unsigned int gp_value, i
   DBGP_EERUN *er; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
 
-  db = alloc_dbgp(0, 0, 24, 0, 0, 0, &er, args_len + sizeof(DBGP_EERUN));
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_RUN, 0, 0, 0, &er, args_len + sizeof(DBGP_EERUN));
   if ( !db )
     return -1;
   ds_bzero(er, sizeof(DBGP_EERUN));
@@ -1548,18 +1548,18 @@ int __cdecl run_and_wait_halt(unsigned int entry_point, unsigned int gp_value, i
     if ( args_len > 0 )
       memcpy(&er[1], args, args_len);
   }
-  return send_and_wait(db, 24, 0, 0, 36);
+  return send_and_wait(db, DBGP_TYPE_RUN, 0, 0, DBGP_RESULT_EXCEPTION);
 }
 
 int __cdecl break_and_wait_halt()
 {
   DSP_BUF *db; // [esp+0h] [ebp-4h]
 
-  db = alloc_dbgp(0, 0, 20, 0, 0, 0, 0, 0);
-  if ( db )
-    return send_and_wait(db, 20, 0, 0, 0);
-  else
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_BREAK, 0, 0, 0, 0, 0);
+  if ( !db )
     return -1;
+
+  return send_and_wait(db, DBGP_TYPE_BREAK, 0, 0, 0);
 }
 
 int __cdecl wait_halt()
@@ -1571,11 +1571,11 @@ int __cdecl get_brkpt(DBGP_BRKPT_DATA *bps, int *pn)
 {
   DSP_BUF *db; // [esp+0h] [ebp-4h]
 
-  db = alloc_dbgp(0, 0, 16, 0, 0, 0, 0, 0);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETBRKPT, 0, 0, 0, 0, 0);
   if ( !db )
     return -1;
   cur_count_pointer = pn;
-  if ( send_and_wait(db, 16, bps, dbconf.nbrkpt, 0) )
+  if ( send_and_wait(db, DBGP_TYPE_GETBRKPT, bps, dbconf.nbrkpt, 0) )
     return -1;
   else
     return 0;
@@ -1587,7 +1587,7 @@ int __cdecl put_brkpt(DBGP_BRKPT_DATA *bps, int n)
   DBGP_BRKPT_DATA *dp; // [esp+4h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+8h] [ebp-4h]
 
-  db = alloc_dbgp(0, 0, 18, 0, 0, (unsigned __int8)n, &dp, 8 * n);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTBRKPT, 0, 0, (unsigned __int8)n, &dp, 8 * n);
   if ( !db )
     return -1;
   for ( i = 0; n > i; ++i )
@@ -1598,7 +1598,7 @@ int __cdecl put_brkpt(DBGP_BRKPT_DATA *bps, int n)
     ++bps;
   }
   cur_count_pointer = 0;
-  if ( send_and_wait(db, 18, 0, n, 0) )
+  if ( send_and_wait(db, DBGP_TYPE_PUTBRKPT, 0, n, 0) )
     return -1;
   else
     return 0;
@@ -1871,7 +1871,7 @@ LABEL_20:
       }
       v15 = 64;
     }
-    db = alloc_dbgp(0, 2, v15, 0, 0, 0, &wp, n);
+    db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_MODULE, v15, 0, 0, 0, &wp, n);
     if ( db )
     {
       if ( v15 == 66 )
@@ -2225,11 +2225,11 @@ static int __cdecl dbgctl(int id, int flag)
   unsigned int *wp; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
 
-  db = alloc_dbgp(id, 0, 36, 0, 0, 0, &wp, 4);
+  db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_DBGCTL, 0, 0, 0, &wp, 4);
   if ( !db )
     return -1;
   *wp = flag;
-  return send_and_wait(db, 36, 0, 0, 0);
+  return send_and_wait(db, DBGP_TYPE_DBGCTL, 0, 0, 0);
 }
 
 static int __cdecl dbgctl_cmd(int ac, char **av)
@@ -2297,13 +2297,13 @@ static int __cdecl xgkt_cmd(int ac, char **av)
     return -1;
   if ( setup_xgkt(fname, cnt, off) )
     return -1;
-  db = alloc_dbgp(2, 0, 32, 0, 0, 0, &xc, 12);
+  db = alloc_dbgp(DBGP_CPUID_VU1, DBGP_GROUP_SYSTEM, DBGP_TYPE_XGKTCTL, 0, 0, 0, &xc, 12);
   if ( !db )
     return -1;
   xc->flag = opt_xgkt_flag->val;
   xc->off = off;
   xc->cnt = cnt;
-  if ( send_and_wait(db, 32, 0, 0, 0) )
+  if ( send_and_wait(db, DBGP_TYPE_XGKTCTL, 0, 0, 0) )
     return -1;
   ds_printf("*** XGKICK Trace Started ");
   ds_printf(" (flag=0x%x fname=\"%s\" cnt=0x%x off=0x%x)\n", opt_xgkt_flag->val, fname, cnt, off);
@@ -2354,7 +2354,7 @@ static int __cdecl storeimage_cmd(int ac, char **av)
     return -1;
   rdimg_seq = 0;
   rdimg_len = 0;
-  db = alloc_dbgp(0, 0, 40, 0, 0, 0, &pp, 16);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_RDIMG, 0, 0, 0, &pp, 16);
   if ( !db )
     return -1;
   pp->sbp = sbp;
@@ -2364,7 +2364,7 @@ static int __cdecl storeimage_cmd(int ac, char **av)
   pp->y = y;
   pp->w = w;
   pp->h = h;
-  r = send_and_wait(db, 40, 0, 0, 0);
+  r = send_and_wait(db, DBGP_TYPE_RDIMG, 0, 0, 0);
   if ( rdimg_stream )
     ds_fclose(rdimg_stream);
   rdimg_stream = 0;
@@ -2388,11 +2388,11 @@ static int __cdecl bpfunc_cmd(int ac, char **av)
     return ds_error("Usage: bpfunc <adr>");
   if ( ds_eval_word(*ava, &adr) )
     return -1;
-  db = alloc_dbgp(0, 0, 46, 0, 0, 0, &wp, 4);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_SETBPFUNC, 0, 0, 0, &wp, 4);
   if ( !db )
     return -1;
   *wp = adr;
-  if ( send_and_wait(db, 46, 0, 0, 0) )
+  if ( send_and_wait(db, DBGP_TYPE_SETBPFUNC, 0, 0, 0) )
     return -1;
   else
     return 0;
