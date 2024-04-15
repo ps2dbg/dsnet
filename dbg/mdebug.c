@@ -1,16 +1,14 @@
 
-#include "dsxdb_prototypes.h"
+#include "mdebug.h"
 
-static struct {MDEBUG *head;MDEBUG *tail;} mdebug_list = { NULL, NULL };
+#include "dsxdb_prototypes.h"
+#include "list.h"
+
+static LIST_HEAD(mdebug_list);
+
 static char *cur_fname = NULL;
 static char *cur_buf = NULL;
 static int cur_size = 0;
-static char *next_file_27 = NULL;
-static int next_line_28 = 0;
-static int next_cnt_29 = 0;
-static char *next_obj_path_30 = NULL;
-
-static char path_22[1024];
 
 static void print_sym(SYM *p, char *strs);
 static char *set_abs_path(char *fname);
@@ -19,370 +17,365 @@ static char *search_source_file(char *fname, char *obj_path, char *src_dirs);
 
 void clear_mdebug()
 {
-  MDEBUG *q; // [esp+0h] [ebp-8h]
-  MDEBUG *p; // [esp+4h] [ebp-4h]
+  MDEBUG *md;
 
-  for ( p = mdebug_list.head; p; p = q )
-  {
-    q = p->forw;
-    ds_free(p->shdr);
-    ds_free(p->fdt_adrs);
-    ds_free(p->pdt_adrs);
-    ds_free(p->path);
-    ds_free(p);
+  list_for_each_safe(md, &mdebug_list, list) {
+    ds_free(md->shdr);
+    ds_free(md->fdt_adrs);
+    ds_free(md->pdt_adrs);
+    ds_free(md->path);
+    ds_free(md);
   }
-  mdebug_list.tail = 0;
-  mdebug_list.head = 0;
+
   clear_source_line_buffer();
 }
 
 void clear_mdebug_with_id(int id)
 {
-  MDEBUG *q; // [esp+8h] [ebp-8h]
-  MDEBUG *p; // [esp+Ch] [ebp-4h]
+  MDEBUG *q;
+  MDEBUG *p;
+  MDEBUG *md;
 
-  for ( p = mdebug_list.head; p; p = q )
-  {
-    q = p->forw;
-    if ( p->id == id )
-    {
-      if ( p->forw )
-        p->forw->back = p->back;
-      else
-        mdebug_list.tail = p->back;
-      if ( p->back )
-        p->back->forw = p->forw;
-      else
-        mdebug_list.head = p->forw;
-      ds_free(p->shdr);
-      ds_free(p->fdt_adrs);
-      ds_free(p->pdt_adrs);
-      ds_free(p->path);
-      ds_free(p);
+  list_for_each_safe(md, &mdebug_list, list) {
+    if (md->id == id) {
+      list_remove(&md->list);
+
+      ds_free(md->shdr);
+      ds_free(md->fdt_adrs);
+      ds_free(md->pdt_adrs);
+      ds_free(md->path);
+      ds_free(md);
     }
   }
+
   clear_source_line_buffer();
 }
 
 static void print_sym(SYM *p, char *strs)
 {
-  char *s; // [esp+0h] [ebp-4h]
-  char *s_1; // [esp+0h] [ebp-4h]
-  char *s_2; // [esp+0h] [ebp-4h]
+  char *st;
+  char *sc;
+  char *stab;
 
   ds_printf(" 0x%W", p->value);
-  switch ( p->st_sc_index & 0x3F )
+  switch ( p->st )
   {
-    case 0u:
-      s = "Nil";
+    case ST_NIL:
+      st = "Nil";
       break;
-    case 1u:
-      s = "Global";
+    case ST_GLOBAL:
+      st = "Global";
       break;
-    case 2u:
-      s = "Static";
+    case ST_STATIC:
+      st = "Static";
       break;
-    case 3u:
-      s = "Param";
+    case ST_PARAM:
+      st = "Param";
       break;
-    case 4u:
-      s = "Local";
+    case ST_LOCAL:
+      st = "Local";
       break;
-    case 5u:
-      s = "Label";
+    case ST_LABEL:
+      st = "Label";
       break;
-    case 6u:
-      s = "Proc";
+    case ST_PROC:
+      st = "Proc";
       break;
-    case 7u:
-      s = "Block";
+    case ST_BLOCK:
+      st = "Block";
       break;
-    case 8u:
-      s = "End";
+    case ST_END:
+      st = "End";
       break;
-    case 9u:
-      s = "Member";
+    case ST_MEMBER:
+      st = "Member";
       break;
-    case 0xAu:
-      s = "Typedef";
+    case ST_TYPEDEF:
+      st = "Typedef";
       break;
-    case 0xBu:
-      s = "File";
+    case ST_FILE_SYMBOL:
+      st = "File";
       break;
-    case 0xEu:
-      s = "StaticProc";
+    case ST_STATICPROC:
+      st = "StaticProc";
       break;
-    case 0xFu:
-      s = "Constant";
+    case ST_CONSTANT:
+      st = "Constant";
       break;
     default:
-      s = 0;
+      st = 0;
       break;
   }
-  if ( s )
-    ds_printf(" %-10s", s);
+
+  if ( st )
+    ds_printf(" %-10s", st);
   else
-    ds_printf(" %10d", p->st_sc_index & 0x3F);
-  switch ( (p->st_sc_index >> 6) & 0x1F )
+    ds_printf(" %10d", p->st);
+
+  switch ( p->sc )
   {
-    case 0u:
-      s_1 = "Nil";
+    case SC_NIL:
+      sc = "Nil";
       break;
-    case 1u:
-      s_1 = "Text";
+    case SC_TEXT:
+      sc = "Text";
       break;
-    case 2u:
-      s_1 = "Data";
+    case SC_DATA:
+      sc = "Data";
       break;
-    case 3u:
-      s_1 = "Bss";
+    case SC_BSS:
+      sc = "Bss";
       break;
-    case 4u:
-      s_1 = "Register";
+    case SC_REGISTER:
+      sc = "Register";
       break;
-    case 5u:
-      s_1 = "Abs";
+    case SC_ABS:
+      sc = "Abs";
       break;
-    case 6u:
-      s_1 = "Undefined";
+    case SC_UNDEFINED:
+      sc = "Undefined";
       break;
-    case 8u:
-      s_1 = "Bits";
+    case SC_LOCAL:
+      sc = "Local";
       break;
-    case 9u:
-      s_1 = "Dbx";
+    case SC_BITS:
+      sc = "Bits";
       break;
-    case 0xAu:
-      s_1 = "RegImage";
+    case SC_DBX:
+      sc = "Dbx";
       break;
-    case 0xBu:
-      s_1 = "Info";
+    case SC_REG_IMAGE:
+      sc = "RegImage";
       break;
-    case 0xCu:
-      s_1 = "UserStruct";
+    case SC_INFO:
+      sc = "Info";
       break;
-    case 0xDu:
-      s_1 = "SData";
+    case SC_USER_STRUCT:
+      sc = "UserStruct";
       break;
-    case 0xEu:
-      s_1 = "SBss";
+    case SC_SDATA:
+      sc = "SData";
       break;
-    case 0xFu:
-      s_1 = "RData";
+    case SC_SBSS:
+      sc = "SBss";
       break;
-    case 0x10u:
-      s_1 = "Var";
+    case SC_RDATA:
+      sc = "RData";
       break;
-    case 0x11u:
-      s_1 = "Common";
+    case SC_VAR:
+      sc = "Var";
       break;
-    case 0x12u:
-      s_1 = "SCommon";
+    case SC_COMMON:
+      sc = "Common";
       break;
-    case 0x13u:
-      s_1 = "VarRegister";
+    case SC_SCOMMON:
+      sc = "SCommon";
       break;
-    case 0x14u:
-      s_1 = "Variant";
+    case SC_VAR_REGISTER:
+      sc = "VarRegister";
       break;
-    case 0x15u:
-      s_1 = "SUndefined";
+    case SC_VARIANT:
+      sc = "Variant";
+      break;
+    case SC_SUNDEFINED:
+      sc = "SUndefined";
       break;
     default:
-      s_1 = 0;
+      sc = 0;
       break;
   }
-  if ( s_1 )
-    ds_printf(" %-11s", s_1);
+
+  if ( sc )
+    ds_printf(" %-11s", sc);
   else
-    ds_printf(" %11d", (p->st_sc_index >> 6) & 0x1F);
-  ds_printf(" 0x%05x", (unsigned __int16)HIWORD(p->st_sc_index) >> 4);
-  if ( ((p->st_sc_index >> 12) & 0xFFF00) == 586496 )
+    ds_printf(" %11d", p->sc);
+
+  ds_printf(" 0x%05x", p->index);
+
+  stab = 0;
+  // is STAB
+  if ( (p->index & 0xFFF00) == 0x8f300)
   {
-    switch ( (unsigned __int8)(p->st_sc_index >> 12) )
+    switch ( p->index -  0x8f300 )
     {
-      case 0u:
-        s_2 = "UNDF";
+      case SC_STAB:
+        stab = "UNDF";
         break;
-      case 0x20u:
-        s_2 = "GSYM";
+      case SC_N_GSYM:
+        stab = "GSYM";
         break;
-      case 0x22u:
-        s_2 = "FNAME";
+      case SC_N_FNAME:
+        stab = "FNAME";
         break;
-      case 0x24u:
-        s_2 = "FUN";
+      case SC_N_FUN:
+        stab = "FUN";
         break;
-      case 0x26u:
-        s_2 = "STSYM";
+      case SC_N_STSYM:
+        stab = "STSYM";
         break;
-      case 0x28u:
-        s_2 = "LCSYM";
+      case SC_N_LCSYM:
+        stab = "LCSYM";
         break;
-      case 0x2Au:
-        s_2 = "MAIN";
+      case SC_N_MAIN:
+        stab = "MAIN";
         break;
-      case 0x2Cu:
-        s_2 = "ROSYM";
+      case SC_N_ROSYM:
+        stab = "ROSYM";
         break;
-      case 0x30u:
-        s_2 = "PC";
+      case SC_N_PC:
+        stab = "PC";
         break;
-      case 0x32u:
-        s_2 = "NSYMS";
+      case SC_N_NSYMS:
+        stab = "NSYMS";
         break;
-      case 0x34u:
-        s_2 = "NOMAP";
+      case SC_N_NOMAP:
+        stab = "NOMAP";
         break;
-      case 0x38u:
-        s_2 = "OBJ";
+      case SC_N_OBJ:
+        stab = "OBJ";
         break;
-      case 0x3Cu:
-        s_2 = "OPT";
+      case SC_N_OPT:
+        stab = "OPT";
         break;
-      case 0x40u:
-        s_2 = "RSYM";
+      case SC_N_RSYM:
+        stab = "RSYM";
         break;
-      case 0x42u:
-        s_2 = "M2C";
+      case SC_N_M2C:
+        stab = "M2C";
         break;
-      case 0x44u:
-        s_2 = "SLINE";
+      case SC_N_SLINE:
+        stab = "SLINE";
         break;
-      case 0x46u:
-        s_2 = "DSLINE";
+      case SC_N_DSLINE:
+        stab = "DSLINE";
         break;
-      case 0x48u:
-        s_2 = "BSLINE";
+      case SC_N_BSLINE:
+        stab = "BSLINE";
         break;
-      case 0x4Au:
-        s_2 = "DEFD";
+      case SC_N_EFD:
+        stab = "DEFD";
         break;
-      case 0x4Cu:
-        s_2 = "FLINE";
+      case SC_N_FLINE:
+        stab = "FLINE";
         break;
-      case 0x50u:
-        s_2 = "EHDECL";
+      case SC_N_EHDECL:
+        stab = "EHDECL";
         break;
-      case 0x54u:
-        s_2 = "CATCH";
+      case SC_N_CATCH:
+        stab = "CATCH";
         break;
-      case 0x60u:
-        s_2 = "SSYM";
+      case SC_N_SSYM:
+        stab = "SSYM";
         break;
-      case 0x62u:
-        s_2 = "ENDM";
+      case SC_N_ENDM:
+        stab = "ENDM";
         break;
-      case 0x64u:
-        s_2 = "SO";
+      case SC_N_SO:
+        stab = "SO";
         break;
-      case 0x6Cu:
-        s_2 = "ALIAS";
+      case SC_N_ALIAS:
+        stab = "ALIAS";
         break;
-      case 0x80u:
-        s_2 = "LSYM";
+      case SC_N_LSYM:
+        stab = "LSYM";
         break;
-      case 0x82u:
-        s_2 = "BINCL";
+      case SC_N_BINCL:
+        stab = "BINCL";
         break;
-      case 0x84u:
-        s_2 = "SOL";
+      case SC_N_SOL:
+        stab = "SOL";
         break;
-      case 0xA0u:
-        s_2 = "PSYM";
+      case SC_N_PSYM:
+        stab = "PSYM";
         break;
-      case 0xA2u:
-        s_2 = "EINCL";
+      case SC_N_EINCL:
+        stab = "EINCL";
         break;
-      case 0xA4u:
-        s_2 = "ENTRY";
+      case SC_N_ENTRY:
+        stab = "ENTRY";
         break;
-      case 0xC0u:
-        s_2 = "LBRAC";
+      case SC_N_LBRAC:
+        stab = "LBRAC";
         break;
-      case 0xC2u:
-        s_2 = "EXCL";
+      case SC_N_EXCL:
+        stab = "EXCL";
         break;
-      case 0xC4u:
-        s_2 = "SCOPE";
+      case SC_N_SCOPE:
+        stab = "SCOPE";
         break;
-      case 0xE0u:
-        s_2 = "RBRAC";
+      case SC_N_RBRAC:
+        stab = "RBRAC";
         break;
-      case 0xE2u:
-        s_2 = "BCOMM";
+      case SC_N_BCOMM:
+        stab = "BCOMM";
         break;
-      case 0xE4u:
-        s_2 = "ECOMM";
+      case SC_N_ECOMM:
+        stab = "ECOMM";
         break;
-      case 0xE8u:
-        s_2 = "ECOML";
+      case SC_N_ECOML:
+        stab = "ECOML";
         break;
-      case 0xEAu:
-        s_2 = "WITH";
+      case SC_N_WITH:
+        stab = "WITH";
         break;
-      case 0xF0u:
-        s_2 = "NBTEXT";
+      case SC_N_NBTEXT:
+        stab = "NBTEXT";
         break;
-      case 0xF2u:
-        s_2 = "NBDATA";
+      case SC_N_NBDATA:
+        stab = "NBDATA";
         break;
-      case 0xF4u:
-        s_2 = "NBBSS";
+      case SC_N_NBBSS:
+        stab = "NBBSS";
         break;
-      case 0xF6u:
-        s_2 = "NBSTS";
+      case SC_N_NBSTS:
+        stab = "NBSTS";
         break;
-      case 0xF8u:
-        s_2 = "NBLCS";
+      case SC_N_NBLCS:
+        stab = "NBLCS";
         break;
-      case 0xFEu:
-        s_2 = "LENG";
+      case SC_N_LENG:
+        stab = "LENG";
         break;
       default:
-        s_2 = 0;
+        stab = 0;
         break;
     }
   }
-  else
-  {
-    s_2 = 0;
-  }
-  if ( s_2 )
-    ds_printf(" %-6s", s_2);
+
+  if ( stab )
+    ds_printf(" %-6s", stab);
   else
     ds_printf(" %6s", "");
+
   ds_printf(" %s\n", &strs[p->iss]);
 }
 
 int show_mdebug(int ac, char **av)
 {
-  int n; // [esp+0h] [ebp-14h]
-  char *str; // [esp+4h] [ebp-10h]
-  EXT_SYM *esym; // [esp+8h] [ebp-Ch]
-  SYM *sym; // [esp+Ch] [ebp-8h]
-  MDEBUG *md; // [esp+10h] [ebp-4h]
-  int aca; // [esp+1Ch] [ebp+8h]
-  char **ava; // [esp+20h] [ebp+Ch]
+  int n;
+  char *str = NULL;
+  MDEBUG *md;
 
-  str = 0;
   if ( ac <= 0 )
     return 0;
-  aca = ac - 1;
-  ava = av + 1;
-  if ( aca > 0 && **ava == 45 )
+
+  ac--;
+  av++;
+
+  if ( ac > 0 && **av == '-' )
     return ds_error("Usage: show mdebug [<str>]");
-  if ( aca > 0 )
+
+  if ( ac > 0 )
   {
-    str = *ava;
-    n = strlen(*ava);
-    if ( aca > 1 )
+    str = *av;
+    n = strlen(*av);
+    if ( ac > 1 )
       return ds_error("Usage: show mdebug [<str>]");
   }
-  for ( md = mdebug_list.head; md; md = md->forw )
-  {
+
+  list_for_each(md, &mdebug_list, list) {
     ds_printf("<<%s>>\n", md->path);
-    for ( sym = md->lsyms; md->lsyme > sym; ++sym )
+    for ( SYM* sym = md->lsyms; md->lsyme > sym; ++sym )
     {
       if ( match_symbol(str, n, &md->lstrs[sym->iss]) )
       {
@@ -390,7 +383,8 @@ int show_mdebug(int ac, char **av)
         print_sym(sym, md->lstrs);
       }
     }
-    for ( esym = md->esyms; md->esyme > esym; ++esym )
+
+    for ( EXT_SYM* esym = md->esyms; md->esyme > esym; ++esym )
     {
       if ( match_symbol(str, n, &md->estrs[esym->sym.iss]) )
       {
@@ -404,18 +398,19 @@ int show_mdebug(int ac, char **av)
 
 static char *set_abs_path(char *fname)
 {
-  size_t v2; // eax
-  char *r; // [esp+0h] [ebp-404h]
-  char path[1024]; // [esp+4h] [ebp-400h] BYREF
+  size_t v2;
+  char *r;
+  char path[1024];
 
   if ( !ds_abs_path(path, 1024, fname) )
     return 0;
-  v2 = strlen(path);
-  r = (char *)ds_alloc(v2 + 1);
+
+  r = ds_alloc(strlen(path) + 1 );
+
   if ( r )
     return strcpy(r, path);
-  else
-    return 0;
+
+  return 0;
 }
 
 int load_mdebug(
@@ -427,21 +422,20 @@ int load_mdebug(
         int base,
         char *path)
 {
-  MDEBUG *tail; // edx
-  unsigned int pdt_eadr; // [esp+Ch] [ebp-40h]
-  unsigned int pdt_sadr; // [esp+10h] [ebp-3Ch]
-  unsigned int fdt_eadr; // [esp+14h] [ebp-38h]
-  unsigned int fdt_sadr; // [esp+18h] [ebp-34h]
-  SYM *syme; // [esp+20h] [ebp-2Ch]
-  SYM *syms; // [esp+24h] [ebp-28h]
-  SYM *sym; // [esp+28h] [ebp-24h]
-  PDT *pdte; // [esp+2Ch] [ebp-20h]
-  PDT *pdt; // [esp+30h] [ebp-1Ch]
-  MDEBUG *md; // [esp+38h] [ebp-14h]
-  SYM_HDR* shdr; // [esp+40h] [ebp-Ch]
-  unsigned int size; // [esp+44h] [ebp-8h]
-  unsigned offset; // [esp+48h] [ebp-4h]
-  int ida; // [esp+64h] [ebp+18h]
+  unsigned int pdt_eadr;
+  unsigned int pdt_sadr;
+  unsigned int fdt_eadr;
+  unsigned int fdt_sadr;
+  SYM *syme;
+  SYM *syms;
+  SYM *sym;
+  PDT *pdte;
+  PDT *pdt;
+  MDEBUG *md;
+  SYM_HDR* shdr;
+  unsigned int size;
+  unsigned offset;
+  int ida;
 
 #ifdef DSNET_COMPILING_E
   ida = look_eemod(stream, elf_header, section_header, id, base, clear_mdebug_with_id);
@@ -625,11 +619,11 @@ int load_mdebug(
       syms = 0;
       for ( sym = &md->lsyms[fdt->isymBase + pdt->isym]; md->lsyme > sym; ++sym )
       {
-        if ( !syms && ((sym->st_sc_index & 0x3F) == 6 || (sym->st_sc_index & 0x3F) == 14) )
+        if ( !syms && (sym->st == ST_PROC || sym->st == ST_STATICPROC) )
         {
           syms = sym;
         }
-        else if ( (sym->st_sc_index & 0x3F) == 8 )
+        else if ( sym->st == ST_END )
         {
           syme = sym;
           break;
@@ -661,18 +655,11 @@ int load_mdebug(
     md->fdt_adrs[((ptrdiff_t)fdt - (ptrdiff_t)md->fdts) / sizeof(*fdt)].eadr = fdt_eadr;
 
   }
+
   md->id = ida;
   md->base = base;
-  tail = mdebug_list.tail;
-  md->back = mdebug_list.tail;
 
-  if ( tail )
-    md->back->forw = md;
-  else
-    mdebug_list.head = md;
-
-  md->forw = 0;
-  mdebug_list.tail = md;
+  list_insert(&mdebug_list, &md->list);
   clear_source_line_buffer();
 
   return 0;
@@ -689,48 +676,32 @@ error:
 
 unsigned int file_and_line_to_address(int line, char *path)
 {
-  int base; // [esp+Ch] [ebp-20h]
-  SYM *sym; // [esp+14h] [ebp-18h]
-  ADRS *adrs; // [esp+18h] [ebp-14h]
-  FDT *fdte; // [esp+1Ch] [ebp-10h]
-  FDT *fdt; // [esp+20h] [ebp-Ch]
-  MDEBUG *md; // [esp+28h] [ebp-4h]
+  int base;
+  SYM *sym;
+  FDT *fdte;
+  FDT *fdt;
+  MDEBUG *md;
 
-  for ( md = mdebug_list.head; md; md = md->forw )
-  {
-    base = module_base(md->id, md->base, 65311, 0);
+  list_for_each(md, &mdebug_list, list) {
+    base = module_base(md->id, md->base, 0xff1f, 0);
     fdt = md->fdts;
     fdte = &fdt[md->shdr->ifdMax];
-    adrs = md->fdt_adrs;
-    while ( fdte > fdt )
-    {
-      if ( !strcmp(&md->lstrs[fdt->issBase + fdt->rss], path) && fdt < fdte )
+
+    for (fdt = md->fdts; fdt < fdte; fdt++) {
+      if ( strcmp(&md->lstrs[fdt->issBase + fdt->rss], path) != 0) {
+        continue;
+      }
+
+      for ( sym = &md->lsyms[fdt->isymBase]; &md->lsyms[fdt->isymBase + fdt->csym] > sym; ++sym )
       {
-        for ( sym = &md->lsyms[fdt->isymBase]; &md->lsyms[fdt->isymBase + fdt->csym] > sym; ++sym )
+        if ( sym->st == ST_LABEL && sym->sc == SC_TEXT && !(sym->index & 0x80000) && sym->index == line)
         {
-#ifdef DSNET_COMPILING_E
-         if ( (sym->st_sc_index & 0x3F) == 5
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          if ( (sym->st_sc_index & 0x3F) == 5
-#endif /* DSNET_COMPILING_I */
-            && ((sym->st_sc_index >> 6) & 0x1F) == 1
-#ifdef DSNET_COMPILING_E
-            && ((sym->st_sc_index >> 12) & 0x80000) == 0
-            && line == sym->st_sc_index >> 12 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-            && line == (unsigned __int16)HIWORD(sym->st_sc_index) >> 4 )
-#endif /* DSNET_COMPILING_I */
-          {
-            return sym->value + base;
-          }
+          return sym->value + base;
         }
       }
-      ++adrs;
-      ++fdt;
     }
   }
+
   return 0;
 }
 
@@ -740,7 +711,7 @@ char *address_to_file_and_line(unsigned int loc, int *pline, int *f_has, int *pd
   unsigned int pdt_eadr; // [esp+Ch] [ebp-3Ch]
   unsigned int pdt_sadr; // [esp+10h] [ebp-38h]
   int delta; // [esp+14h] [ebp-34h]
-  int line; // [esp+18h] [ebp-30h]
+  unsigned int line; // [esp+18h] [ebp-30h]
   int nfound; // [esp+1Ch] [ebp-2Ch]
   int base; // [esp+20h] [ebp-28h]
   SYM *syme; // [esp+24h] [ebp-24h]
@@ -759,15 +730,15 @@ char *address_to_file_and_line(unsigned int loc, int *pline, int *f_has, int *pd
     *pline = 0;
   if ( ppath )
     *ppath = 0;
-  for ( md = mdebug_list.head; ; md = md->forw )
-  {
-    if ( !md )
-      return 0;
-    base = module_base(md->id, md->base, 65311, 0);
+
+  list_for_each(md, &mdebug_list, list) {
+    base = module_base(md->id, md->base, 0xff1f, 0);
     fdt = md->fdts;
     fdte = &fdt[md->shdr->ifdMax];
+
     for ( adrs = md->fdt_adrs; fdte > fdt && (loc < adrs->sadr + base || loc >= adrs->eadr + base); ++adrs )
       ++fdt;
+
     if ( fdt < fdte )
     {
       pdt = &md->pdts[fdt->ipdFirst];
@@ -778,6 +749,7 @@ char *address_to_file_and_line(unsigned int loc, int *pline, int *f_has, int *pd
       {
         ++pdt;
       }
+
       if ( pdt < pdte )
       {
         pdt_sadr = adrs_1->sadr;
@@ -787,13 +759,15 @@ char *address_to_file_and_line(unsigned int loc, int *pline, int *f_has, int *pd
         nfound = 0;
         while ( syme > sym )
         {
-          if ( (sym->st_sc_index & 0x3F) == 5 && ((sym->st_sc_index >> 6) & 0x1F) == 1 )
+          if ( sym->st == ST_LABEL && sym->sc == SC_TEXT && !(sym->index & 0x80000) )
           {
             value = sym->value;
             if ( value < pdt_sadr || pdt_eadr <= value )
               goto LABEL_33;
+
             if ( f_has )
               *f_has = 1;
+
             if ( pdelta && (delta = loc - (value + base), delta >= 0) )
             {
               *pdelta = delta;
@@ -804,68 +778,86 @@ LABEL_33:
               if ( loc != value + base )
                 goto LABEL_35;
             }
-            line = (unsigned __int16)HIWORD(sym->st_sc_index) >> 4;
+            line = sym->index;
             ++nfound;
           }
 LABEL_35:
           ++sym;
         }
+
         if ( nfound )
           break;
       }
     }
   }
+
+  if (list_entry_is_head(md, &mdebug_list, list)) {
+      return NULL;
+  }
+
   if ( pline )
     *pline = line;
+
   if ( ppath )
     *ppath = md->path;
+
   return &md->lstrs[fdt->issBase + fdt->rss];
 }
 
 int symbol_to_value_by_mdebug(char *file, char *name, unsigned int *pv)
 {
-  int v4; // eax
-  unsigned int rpc; // [esp+8h] [ebp-20h] BYREF
-  int delta; // [esp+Ch] [ebp-1Ch] BYREF
-  int index; // [esp+10h] [ebp-18h]
-  int line; // [esp+14h] [ebp-14h] BYREF
-  SYM *syme; // [esp+18h] [ebp-10h]
-  SYM *sym; // [esp+1Ch] [ebp-Ch]
-  FDT *fdt; // [esp+20h] [ebp-8h]
-  MDEBUG *md; // [esp+24h] [ebp-4h]
+  int v4;
+  unsigned int rpc;
+  int delta;
+  int index;
+  int line = 0;
+  SYM *syme;
+  SYM *sym;
+  FDT *fdt;
+  MDEBUG *md;
 
   line = 0;
   if ( file )
     goto LABEL_6;
+
   if ( ds_eval_word("$_PC", &rpc) )
     return -1;
+
   file = address_to_file_and_line(rpc, 0, 0, &delta, 0);
+
   if ( !file )
     return ds_error("*** No line for $PC");
 LABEL_6:
   v4 = 0;
+
   if ( *name > 47 && *name <= 57 )
     v4 = 1;
+
   if ( v4 && ds_scan_digit_word(name, (unsigned int *)&line) )
     return -1;
-  for ( md = mdebug_list.head; ; md = md->forw )
-  {
-    if ( !md )
-      return -1;
+
+  list_for_each(md, &mdebug_list, list) {
     for ( fdt = md->fdts; md->fdte > fdt && strcmp(file, &md->lstrs[fdt->issBase + fdt->rss]); ++fdt )
       ;
-    if ( fdt < md->fdte )
+
+    if ( fdt < md->fdte ) {
       break;
+    }
   }
+
+  if (list_entry_is_head(md, &mdebug_list, list)) {
+    return NULL;
+  }
+
   sym = &md->lsyms[fdt->isymBase];
   syme = &md->lsyms[fdt->isymBase + fdt->csym];
   if ( line )
   {
     while ( syme > sym )
     {
-      if ( (sym->st_sc_index & 0x3F) == 5 && ((sym->st_sc_index >> 6) & 0x1F) == 1 )
+      if ( sym->st == ST_LABEL && sym->sc == SC_TEXT )
       {
-        index = (unsigned __int16)HIWORD(sym->st_sc_index) >> 4;
+        index = sym->index;
         if ( index == line )
           goto LABEL_25;
       }
@@ -876,7 +868,7 @@ LABEL_6:
   {
     while ( syme > sym )
     {
-      if ( ((sym->st_sc_index & 0x3F) == 6 || (sym->st_sc_index & 0x3F) == 14) && !strcmp(name, &md->lstrs[sym->iss]) )
+      if ( (sym->st == ST_PROC || sym->st == ST_STATICPROC ) && !strcmp(name, &md->lstrs[sym->iss]))
       {
 LABEL_25:
         *pv = sym->value;
@@ -904,6 +896,7 @@ static char *search_source_file(char *fname, char *obj_path, char *src_dirs)
   char *p_1; // [esp+Ch] [ebp-804h]
   char tmp[1024]; // [esp+10h] [ebp-800h] BYREF
   char obj_dir[1024]; // [esp+410h] [ebp-400h] BYREF
+  static char path[1024];
 
   if ( *fname == 47 || !*src_dirs )
     return fname;
@@ -918,27 +911,27 @@ static char *search_source_file(char *fname, char *obj_path, char *src_dirs)
   p_1 = src_dirs;
   while ( *p_1 )
   {
-    q = path_22;
+    q = path;
     while ( *p_1 && *p_1 != 58 )
       *q++ = *p_1++;
     if ( *p_1 == 58 )
       ++p_1;
     *q = 0;
-    if ( path_22[0] != 64 )
+    if ( path[0] != 64 )
       goto LABEL_25;
     if ( obj_path )
     {
-      strcpy(tmp, &path_22[1]);
-      strcpy(path_22, obj_dir);
-      q_1 = &path_22[strlen(path_22)];
+      strcpy(tmp, &path[1]);
+      strcpy(path, obj_dir);
+      q_1 = &path[strlen(path)];
       strcpy(q_1, tmp);
       q = &q_1[strlen(tmp)];
 LABEL_25:
-      if ( q > path_22 && *(q - 1) != 47 )
+      if ( q > path && *(q - 1) != 47 )
         *q++ = 47;
       strcpy(q, fname);
-      if ( !ds_access(path_22, 1) )
-        return path_22;
+      if ( !ds_access(path, 1) )
+        return path;
     }
   }
   return 0;
@@ -946,42 +939,49 @@ LABEL_25:
 
 char *string_by_file_and_line(char *fname, int line, char *obj_path)
 {
-  size_t v4; // eax
   char *v5; // eax
-  char *v6; // eax
-  char *v7; // [esp-4h] [ebp-1Ch]
-  char *r; // [esp+0h] [ebp-18h]
+  char *srcdir; // [esp-4h] [ebp-1Ch]
+  char *ret; // [esp+0h] [ebp-18h]
   char *q; // [esp+4h] [ebp-14h]
   char *pe; // [esp+8h] [ebp-10h]
   char *p; // [esp+Ch] [ebp-Ch]
   int i; // [esp+10h] [ebp-8h]
   void *stream; // [esp+14h] [ebp-4h]
-  char *s2; // [esp+20h] [ebp+8h]
+  char *srcfile; // [esp+20h] [ebp+8h]
 
   if ( !fname || !line )
     return 0;
-  v7 = source_directories_str();
-  s2 = search_source_file(fname, obj_path, v7);
-  if ( !s2 )
+
+  srcdir = source_directories_str();
+  srcfile = search_source_file(fname, obj_path, srcdir);
+
+  if ( !srcfile )
     return 0;
-  if ( cur_fname && cur_buf && !strcmp(cur_fname, s2) )
-    goto LABEL_17;
-  clear_source_line_buffer();
-  stream = ds_fopen_low(s2, "r");
-  if ( !stream )
-    return 0;
-  if ( ds_fsize(s2, &cur_size) < 0 )
-    return 0;
-  v4 = strlen(s2);
-  cur_fname = (char *)ds_alloc(v4 + 1);
-  if ( !cur_fname )
-    return 0;
-  strcpy(cur_fname, s2);
-  cur_buf = (char *)ds_fload(stream, 0, 0, 1, cur_size);
-  ds_fclose(stream);
-  if ( !cur_buf )
-    return 0;
-LABEL_17:
+
+  if ( !cur_fname || !cur_buf || strcmp(cur_fname, srcfile) != 0 )
+  {
+    clear_source_line_buffer();
+    stream = ds_fopen_low(srcfile, "r");
+
+    if ( !stream )
+        return 0;
+
+    if ( ds_fsize(srcfile, &cur_size) < 0 )
+        return 0;
+
+    cur_fname = ds_alloc(strlen(srcfile) + 1);
+
+    if ( !cur_fname )
+        return 0;
+
+    strcpy(cur_fname, srcfile);
+    cur_buf = ds_fload(stream, 0, 0, 1, cur_size);
+    ds_fclose(stream);
+
+    if ( !cur_buf )
+        return 0;
+  }
+
   p = cur_buf;
   pe = &cur_buf[cur_size];
   for ( i = 1; pe > p && line > i; ++i )
@@ -994,17 +994,22 @@ LABEL_17:
     }
     while ( *v5 != 10 );
   }
+
   if ( p >= pe || line != i )
     return 0;
+
   for ( q = p; pe > q && *q != 10; ++q )
     ;
-  v6 = (char *)ds_alloc(q - p + 1);
-  r = v6;
-  if ( !v6 )
+
+  ret = ds_alloc(q - p + 1);
+
+  if ( !ret )
     return 0;
-  memcpy(v6, p, q - p);
-  r[q - p] = 0;
-  return r;
+
+  memcpy(ret, p, q - p);
+  ret[q - p] = 0;
+
+  return ret;
 }
 
 int list_cmd(int ac, char **av)
@@ -1025,66 +1030,78 @@ int list_cmd(int ac, char **av)
   char *file; // [esp+24h] [ebp-Ch]
   unsigned int rpc; // [esp+28h] [ebp-8h] BYREF
   unsigned int adr; // [esp+2Ch] [ebp-4h] BYREF
-  int aca; // [esp+38h] [ebp+8h]
-  char **ava; // [esp+3Ch] [ebp+Ch]
+  static char *next_file = NULL;
+  static int next_cnt = 0;
+  static char *next_obj_path = NULL;
+  static int next_line = 0;
 
   if ( ds_eval_word("$_PC", &rpc) )
     return -1;
+
   rpc_file = address_to_file_and_line(rpc, &pline, 0, &pdelta, &ppath);
   if ( !rpc_file )
   {
     rpc_file = "";
     pline = 0;
   }
+
   if ( ac > 0 )
   {
-    aca = ac - 1;
-    ava = av + 1;
-    if ( aca > 0 && **ava == 45 )
+    ac--;
+    av++;
+
+    if ( ac > 0 && **av == '-' )
       return ds_error("Usage: list [<adr> [<cnt> [<back>]]]");
     adr = rpc;
     back = 10;
     cnt = 21;
-    if ( aca > 0 )
+    if ( ac > 0 )
     {
-      if ( ds_eval_word(*ava, &adr) )
+      if ( ds_eval_word(*av, &adr) )
         return -1;
-      if ( aca > 1 )
+
+      if ( ac > 1 )
       {
-        if ( ds_eval_word(ava[1], (unsigned int *)&cnt) )
+        if ( ds_eval_word(av[1], &cnt) )
           return -1;
-        if ( aca > 2 )
+
+        if ( ac > 2 )
         {
-          if ( ds_eval_word(ava[2], (unsigned int *)&back) )
+          if ( ds_eval_word(av[2], &back) )
             return -1;
-          if ( aca > 3 )
+
+          if ( ac > 3 )
             return ds_error("Usage: list [<adr> [<cnt> [<back>]]]");
         }
       }
     }
     file = address_to_file_and_line(adr, &line, 0, &delta, &ppath);
+
     if ( !file || line <= 0 )
       return ds_error("*** No line for 0x%W", adr);
+
     ds_printf(" %s:%d\n", file, line);
   }
   else
   {
-    file = next_file_27;
-    if ( !next_file_27 )
+    file = next_file;
+    if ( !next_file )
       return 0;
-    line = next_line_28;
-    if ( next_line_28 <= 0 )
+    line = next_line;
+    if ( next_line <= 0 )
       return 0;
-    ppath = next_obj_path_30;
+    ppath = next_obj_path;
     back = 0;
-    cnt = next_cnt_29;
+    cnt = next_cnt;
   }
-  next_cnt_29 = cnt;
+
+  next_cnt = cnt;
   for ( line -= back; ; ++line )
   {
     v3 = cnt--;
     if ( v3 <= 0 )
       break;
+
     if ( line > 0 )
     {
       v15 = string_by_file_and_line(file, line, ppath);
@@ -1100,9 +1117,10 @@ int list_cmd(int ac, char **av)
       }
     }
   }
-  next_file_27 = file;
-  next_line_28 = line;
-  next_obj_path_30 = ppath;
+
+  next_file = file;
+  next_line = line;
+  next_obj_path = ppath;
   return 0;
 }
 

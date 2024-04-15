@@ -1,4 +1,5 @@
 
+#include "list.h"
 #ifndef DSNET_VERSION_STRING
 #define DSNET_VERSION_STRING "1.23.1"
 #endif
@@ -1208,7 +1209,10 @@ typedef struct {
 typedef struct {
     unsigned int iss;
     unsigned int value;
-    unsigned int st_sc_index;
+    unsigned int st : 6;
+    unsigned int sc : 5;
+    unsigned int reserved: 1;
+    unsigned int index : 20;
 } SYM;
 typedef struct {
     short unsigned int reserved;
@@ -1257,8 +1261,7 @@ typedef struct {
     unsigned int eadr;
 } ADRS;
 struct mdebug {
-    struct mdebug* forw;
-    struct mdebug* back;
+    struct list_head list;
     char* path;
     int id;
     int base;
