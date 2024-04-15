@@ -20,6 +20,8 @@ void clear_mdebug()
   MDEBUG *md;
 
   list_for_each_safe(md, &mdebug_list, list) {
+    list_remove(&md->list);
+
     ds_free(md->shdr);
     ds_free(md->fdt_adrs);
     ds_free(md->pdt_adrs);
@@ -32,8 +34,6 @@ void clear_mdebug()
 
 void clear_mdebug_with_id(int id)
 {
-  MDEBUG *q;
-  MDEBUG *p;
   MDEBUG *md;
 
   list_for_each_safe(md, &mdebug_list, list) {
