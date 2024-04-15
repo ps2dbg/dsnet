@@ -245,7 +245,8 @@ static EE_REGS ee_regs[] =
   { 10, 28, 4, "vu1vi28" },
   { 10, 29, 4, "vu1vi29" },
   { 10, 30, 4, "vu1vi30" },
-  { 10, 31, 4, "vu1vi31" }
+  { 10, 31, 4, "vu1vi31" },
+  { 0, 0, 0, NULL }
 };
 
 extern quad regbuf_vals[11][32]; // defined in dbg.c
