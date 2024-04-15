@@ -245,7 +245,8 @@ static EE_REGS ee_regs[] =
   { 10, 28, 4, "vu1vi28" },
   { 10, 29, 4, "vu1vi29" },
   { 10, 30, 4, "vu1vi30" },
-  { 10, 31, 4, "vu1vi31" }
+  { 10, 31, 4, "vu1vi31" },
+  { 0, 0, 0, NULL }
 };
 
 extern quad regbuf_vals[11][32]; // defined in dbg.c
@@ -1132,14 +1133,10 @@ static void print_vuc(char *name, int kind, int number, unsigned int val)
 static int set_regmasks(unsigned int *masks, char *name)
 {
   int v3; // eax
-  int rk; // [esp+18h] [ebp-10h]
-  int n; // [esp+1Ch] [ebp-Ch] BYREF
+  int rk = 0; // [esp+18h] [ebp-10h]
+  int n = 0; // [esp+1Ch] [ebp-Ch] BYREF
   EE_REGS *reg; // [esp+20h] [ebp-8h]
-  char *p; // [esp+24h] [ebp-4h]
 
-  p = name;
-  n = 0;
-  rk = 0;
   if ( !strcmp("all", name) )
   {
     rk = 2047;
@@ -1218,30 +1215,35 @@ static int set_regmasks(unsigned int *masks, char *name)
   }
   else
   {
-    if ( *p == 36 )
-      ++p;
-    if ( *p == 95 )
-      ++p;
-    if ( !strcmp("cr", p) )
+    if ( *name == '$' )
+      name++;
+
+    if ( *name == '_' )
+      name++;
+
+    if ( !strcmp("cr", name) )
     {
-      p = "cause";
+      name = "cause";
     }
-    else if ( !strcmp("sr", p) )
+    else if ( !strcmp("sr", name) )
     {
-      p = "status";
+      name = "status";
     }
+
     for ( reg = ee_regs; reg->name; ++reg )
     {
-      if ( !strcmp(p, reg->name) )
+      if ( !strcmp(name, reg->name) )
       {
         masks[reg->kind] |= 1 << reg->number;
         return 1;
       }
     }
+
     v3 = 0;
-    if ( *p > 47 && *p <= 57 )
+    if ( *name > '/' && *name <= 'C' )
       v3 = 1;
-    if ( v3 && !ds_scan_digit_word(p, (unsigned int *)&n) )
+
+    if ( v3 && !ds_scan_digit_word(name, &n) )
     {
       for ( reg = ee_regs; reg->name; ++reg )
       {
