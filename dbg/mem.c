@@ -1,14 +1,10 @@
 
 #include "dsxdb_prototypes.h"
+#include "elf.h"
 
 unsigned int dot = 1048576u;
 unsigned int current_entry_point = 0u;
 unsigned int current_gp_value = 0u;
-static int last_sz_2 = -1;
-static int last_cnt_3 = 256;
-static int last_adr_8 = 1048576;
-static int last_cnt_9 = -1;
-static int last_sz_10 = -1;
 static const char TARG_IDENT[16] =
 {
   '\x7F',
@@ -56,15 +52,17 @@ int dmem_cmd(int ac, char **av)
   unsigned __int8 *buf; // [esp+2Ch] [ebp-4h]
   int aca; // [esp+38h] [ebp+8h]
   char **ava; // [esp+3Ch] [ebp+Ch]
+  static int last_sz = -1;
+  static int last_cnt = 256;
 
   cnt = 256;
   if ( ac <= 0 )
   {
-    cnt = last_cnt_3;
-    sz = last_sz_2;
+    cnt = last_cnt;
+    sz = last_sz;
 LABEL_17:
-    last_cnt_3 = cnt;
-    last_sz_2 = sz;
+    last_cnt = cnt;
+    last_sz = sz;
     switch ( sz )
     {
       case 'd':
@@ -479,16 +477,19 @@ int inp_cmd(int ac, char **av)
   unsigned __int8 *buf; // [esp+24h] [ebp-4h]
   int aca; // [esp+30h] [ebp+8h]
   char **ava; // [esp+34h] [ebp+Ch]
+  static int last_adr = 1048576;
+  static int last_cnt = -1;
+  static int last_sz = -1;
 
   if ( ac <= 0 )
   {
-    adr = last_adr_8;
-    cnt = last_cnt_9;
-    v9 = last_sz_10;
+    adr = last_adr;
+    cnt = last_cnt;
+    v9 = last_sz;
 LABEL_18:
-    last_adr_8 = adr;
-    last_cnt_9 = cnt;
-    last_sz_10 = v9;
+    last_adr = adr;
+    last_cnt = cnt;
+    last_sz = v9;
     if ( v9 == 104 )
     {
       cnt *= 2;
@@ -649,8 +650,8 @@ LABEL_18:
         ava = av + 1;
         if ( aca > 0 && **ava == 45 || aca > 2 )
           return ds_error("Usage: %s [<adr> [<cnt>]]", v7);
-        adr = last_adr_8;
-        cnt = last_cnt_9;
+        adr = last_adr;
+        cnt = last_cnt;
         if ( aca <= 0 )
           goto LABEL_13;
         if ( ds_eval_word(*ava, (unsigned int *)&adr) )
@@ -1052,411 +1053,224 @@ LABEL_29:
 
 int pload_cmd(int ac, char **av)
 {
-  unsigned int type; // eax
-  int v4; // [esp+4h] [ebp-43Ch] BYREF
-  int id; // [esp+8h] [ebp-438h] BYREF
-  int sload; // [esp+Ch] [ebp-434h]
-  int symndx; // [esp+10h] [ebp-430h]
-  int r; // [esp+14h] [ebp-42Ch]
-  unsigned __int8 *v9; // [esp+18h] [ebp-428h]
-  unsigned __int8 *buf; // [esp+1Ch] [ebp-424h]
-  DS_ELF_REGINFO *ri; // [esp+20h] [ebp-420h]
-  DS_ELF_SHDR *sh; // [esp+24h] [ebp-41Ch]
-  DS_ELF_SHDR *shdr; // [esp+28h] [ebp-418h]
-  DS_ELF_PHDR *ph; // [esp+2Ch] [ebp-414h]
-  DS_ELF_PHDR *phdr; // [esp+30h] [ebp-410h]
-  DS_ELF_EHDR *ehdr; // [esp+34h] [ebp-40Ch]
-  void *stream; // [esp+38h] [ebp-408h]
-  char *av0; // [esp+3Ch] [ebp-404h]
-  char path[1024]; // [esp+40h] [ebp-400h] BYREF
-  int aca; // [esp+448h] [ebp+8h]
-  char **ava; // [esp+44Ch] [ebp+Ch]
+  DS_ELF_REGINFO *reginfo = NULL;
+  DS_ELF_SHDR *shdr = NULL;
+  DS_ELF_PHDR *phdr = NULL;
+  DS_ELF_EHDR *ehdr = NULL;
+  unsigned int base = 0;
+  unsigned int id = 0;
+  void *stream = NULL;
+  byte *buf = NULL;
+  char path[1024];
+  int ret = -1;
+  int pload;
 
-  stream = 0;
-  ehdr = 0;
-  phdr = 0;
-  shdr = 0;
-  ri = 0;
-  buf = 0;
-  r = -1;
-  id = 0;
-  v4 = 0;
   if ( ac <= 0 )
     return 0;
-  aca = ac - 1;
-  av0 = *av;
-  ava = av + 1;
-  sload = strcmp("sload", av0) == 0;
-  if ( aca > 1 && !strcmp("-id", *ava) )
+
+  pload = strcmp("sload", *av) != 0;
+  av++;
+  ac--;
+
+  if ( ac > 1 && !strcmp("-id", *av) )
   {
-    ds_scan_hex_word(ava[1], (unsigned int *)&id);
-    aca -= 2;
-    ava += 2;
+    ds_scan_hex_word(av[1], &id);
+    ac -= 2;
+    av += 2;
   }
-  if ( aca > 1 && !strcmp("-b", *ava) )
+
+  if ( ac > 1 && !strcmp("-b", *av) )
   {
-    ds_scan_hex_word(ava[1], (unsigned int *)&v4);
-    aca -= 2;
-    ava += 2;
+    ds_scan_hex_word(av[1], &base);
+    ac -= 2;
+    av += 2;
   }
-  if ( aca > 0 && **ava == 45 )
-    goto LABEL_11;
-  if ( aca > 0 )
-    strcpy(path, *ava);
-  if ( sload )
-  {
-    if ( !aca )
-    {
+
+  if ( ac > 0 && **av == '-' ) {
+fmt_err:
+    if ( pload )
+      return ds_error("Usage: pload <fname> [<args>]...");
+    else
+      return ds_error("Usage: sload [-id <id>] [-b <base>] [<fname>]");
+  }
+
+  if ( ac > 0 ) {
+    strcpy(path, *av);
+  }
+
+  if (pload) {
+    if ( ac > 0 ) {
+#ifdef DSNET_COMPILING_E
+      set_runarg(ac, av);
+#endif
+    } else {
+      goto fmt_err;
+    }
+  } else {
+    if (ac == 0) {
       clear_symbol();
       clear_mdebug();
       return 0;
     }
-    if ( aca > 1 )
-      goto LABEL_11;
-#ifdef DSNET_COMPILING_E
-LABEL_23:
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-LABEL_22:
-#endif /* DSNET_COMPILING_I */
-    stream = ds_fopen(path, "r");
-    if ( !stream )
-#ifdef DSNET_COMPILING_E
-      goto LABEL_85;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      goto LABEL_96;
-#endif /* DSNET_COMPILING_I */
-    ehdr = (DS_ELF_EHDR *)ds_fload(stream, 0, 0, 52, 1);
-    if ( !ehdr )
-#ifdef DSNET_COMPILING_E
-      goto LABEL_85;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      goto LABEL_96;
-#endif /* DSNET_COMPILING_I */
-    v9 = (unsigned __int8 *)ehdr;
-    if ( ehdr->ident[0] == 98 && v9[1] == 1 || *v9 == 1 && v9[1] == 98 )
-    {
-      if ( !sload )
-        ds_printf("ECOFF is not supported\n");
-#ifdef DSNET_COMPILING_E
-      goto LABEL_85;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-      goto LABEL_96;
-#endif /* DSNET_COMPILING_I */
-    }
-    for ( symndx = 0; (unsigned int)symndx <= 0xF; ++symndx )
-    {
-#ifdef DSNET_COMPILING_E
-      if ( symndx == 8 /* EI_ABIVERSION */ )
-      {
-        if ( ehdr->ident[symndx] != '\x00' && ehdr->ident[symndx] != '\x01' )
-        {
-          ds_printf("EI_ABIVERSION identification error: it is neither 0 nor 1\n");
-          goto LABEL_85;
-        }
-      }
-      else
-#endif /* DSNET_COMPILING_E */
-      if ( ehdr->ident[symndx] != TARG_IDENT[symndx] )
-      {
-        ds_printf("ident error\n");
-#ifdef DSNET_COMPILING_E
-        goto LABEL_85;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        goto LABEL_96;
-#endif /* DSNET_COMPILING_I */
-      }
-    }
-#ifdef DSNET_COMPILING_E
-    if ( ehdr->machine == 8 && (ehdr->type == 2 || ehdr->type == 0xFF91) )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    if ( ehdr->machine == 8 && (ehdr->type == 2 || ehdr->type == 0xFF80 || ehdr->type == 0xFF81) )
-#endif /* DSNET_COMPILING_I */
-    {
-      if ( ehdr->ehsize == 52 && ehdr->phentsize == 32 )
-      {
-#ifdef DSNET_COMPILING_E
-        if ( !sload )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-        if ( ehdr->phnum )
-#endif /* DSNET_COMPILING_I */
-        {
-#ifdef DSNET_COMPILING_E
-          if ( !ehdr->phnum )
-          {
-            ds_printf("program header not found\n");
-            goto LABEL_85;
-          }
-#endif /* DSNET_COMPILING_E */
-          phdr = (DS_ELF_PHDR *)ds_fload(stream, 0, ehdr->phoff, 32, ehdr->phnum);
-#ifdef DSNET_COMPILING_E
-          if ( !phdr )
-            goto LABEL_85;
-          ph = phdr;
-          symndx = 0;
-          while ( symndx < ehdr->phnum )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          if ( phdr )
-#endif /* DSNET_COMPILING_I */
-          {
-#ifdef DSNET_COMPILING_E
-            if ( ph->type == 1 || ph->filesz )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-            if ( ehdr->type == 2 )
-#endif /* DSNET_COMPILING_I */
-            {
-#ifdef DSNET_COMPILING_E
-              ds_printf("Loading program (address=0x%W size=0x%W) ...\n", ph->vaddr, ph->filesz);
-              buf = (unsigned __int8 *)ds_fload(stream, 0, ph->offset, 1, ph->filesz);
-              if ( !buf || ds_store_mem(ph->vaddr, buf, ph->filesz) )
-                goto LABEL_85;
-              buf = (unsigned __int8 *)ds_free(buf);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-              if ( v4 )
-              {
-                ds_printf("-b option for not relocatable ??\n");
-                goto LABEL_96;
-              }
-              v4 = -1;
-#endif /* DSNET_COMPILING_I */
-            }
-#ifdef DSNET_COMPILING_E
-            ++symndx;
-            ++ph;
-          }
-        }
-        if ( ehdr->shnum )
-        {
-          shdr = (DS_ELF_SHDR *)ds_fload(stream, 0, ehdr->shoff, 40, ehdr->shnum);
-          if ( shdr )
-          {
-            sh = shdr;
-            symndx = 0;
-            while ( symndx < ehdr->shnum )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-            if ( sload )
-#endif /* DSNET_COMPILING_I */
-            {
-#ifdef DSNET_COMPILING_E
-              ++symndx;
-              ++sh;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-              ph = phdr;
-              symndx = 0;
-              while ( symndx < ehdr->phnum )
-              {
-                if ( ph->type == 1 || ph->filesz )
-                  mod_set_vaddr(id, ph->vaddr);
-                ++symndx;
-                ++ph;
-              }
-#endif /* DSNET_COMPILING_I */
-            }
-#ifdef DSNET_COMPILING_E
-            sh = shdr;
-            symndx = 0;
-            while ( symndx < ehdr->shnum )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-            else
-#endif /* DSNET_COMPILING_I */
-            {
-#ifdef DSNET_COMPILING_E
-              type = sh->type;
-              if ( type == 1879048197 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-              ph = phdr;
-              symndx = 0;
-              while ( symndx < ehdr->phnum )
-#endif /* DSNET_COMPILING_I */
-              {
-#ifdef DSNET_COMPILING_E
-                load_mdebug(stream, ehdr, shdr, symndx, id, v4, path);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-                if ( ph->type == 1 || ph->filesz )
-                {
-                  ds_printf("Loading program (address=0x%W size=0x%W) ...\n", ph->vaddr, ph->filesz);
-                  buf = (unsigned __int8 *)ds_fload(stream, 0, ph->offset, 1, ph->filesz);
-                  if ( !buf || ds_store_mem(ph->vaddr, buf, ph->filesz) )
-                    goto LABEL_96;
-                  buf = (unsigned __int8 *)ds_free(buf);
-                }
-                ++symndx;
-                ++ph;
-#endif /* DSNET_COMPILING_I */
-              }
-#ifdef DSNET_COMPILING_E
-              else if ( type > 0x70000005 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-            }
-            if ( ehdr->shnum )
-            {
-              shdr = (DS_ELF_SHDR *)ds_fload(stream, 0, ehdr->shoff, 40, ehdr->shnum);
-              if ( shdr )
-#endif /* DSNET_COMPILING_I */
-              {
-#ifdef DSNET_COMPILING_E
-                if ( type == 1879048198 && sh->size == 24 )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-                sh = shdr;
-                symndx = 0;
-                while ( symndx < ehdr->shnum )
-#endif /* DSNET_COMPILING_I */
-                {
-#ifdef DSNET_COMPILING_E
-                  ri = (DS_ELF_REGINFO *)ds_free(ri);
-                  ri = (DS_ELF_REGINFO *)ds_fload(stream, 0, sh->offset, 24, 1);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-                  ++symndx;
-                  ++sh;
-                }
-                sh = shdr;
-                symndx = 0;
-                while ( symndx < ehdr->shnum )
-                {
-                  type = sh->type;
-                  if ( type == 1879048197 )
-                  {
-                    load_mdebug(stream, ehdr, shdr, symndx, id, v4, path);
-                  }
-                  else if ( type > 0x70000005 )
-                  {
-                    if ( type == 1879048198 && sh->size == 24 )
-                    {
-                      ri = (DS_ELF_REGINFO *)ds_free(ri);
-                      ri = (DS_ELF_REGINFO *)ds_fload(stream, 0, sh->offset, 24, 1);
-                      if ( !ri )
-                        goto LABEL_96;
-                    }
-                  }
-                  else if ( type == 2 && sh->link && sh->link < ehdr->shnum && sh->entsize == 16 )
-                  {
-                    load_symbol(stream, ehdr, shdr, symndx, sh->link, id, v4);
-                  }
-                  ++symndx;
-                  ++sh;
-                }
-                if ( !sload )
-                {
-#endif /* DSNET_COMPILING_I */
-                  if ( !ri )
-#ifdef DSNET_COMPILING_E
-                    goto LABEL_85;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-                  {
-                    ds_printf("REGINFO not found\n");
-                    goto LABEL_96;
-                  }
-                  ds_printf("Entry address = 0x%W\n", ehdr->entry);
-                  ds_printf("GP value      = 0x%W\n", ri->gp_value);
-                  current_entry_point = ehdr->entry;
-                  current_gp_value = ri->gp_value;
-#endif /* DSNET_COMPILING_I */
-                }
-#ifdef DSNET_COMPILING_I
-                r = 0;
-#endif /* DSNET_COMPILING_I */
-              }
-#ifdef DSNET_COMPILING_E
-              else if ( type == 2 && sh->link && sh->link < ehdr->shnum && sh->entsize == 16 )
-              {
-                load_symbol(stream, ehdr, shdr, symndx, sh->link, id, v4);
-              }
-              ++symndx;
-              ++sh;
-#endif /* DSNET_COMPILING_E */
-            }
-#ifdef DSNET_COMPILING_E
-            if ( !sload )
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-            else
-#endif /* DSNET_COMPILING_I */
-            {
-#ifdef DSNET_COMPILING_E
-              if ( !ri )
-              {
-                ds_printf("REGINFO not found\n");
-                goto LABEL_85;
-              }
-              ds_printf("Entry address = 0x%W\n", ehdr->entry);
-              ds_printf("GP value      = 0x%W\n", ri->gp_value);
-              current_entry_point = ehdr->entry;
-              current_gp_value = ri->gp_value;
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-              ds_printf("section header not found\n");
-#endif /* DSNET_COMPILING_I */
-            }
-#ifdef DSNET_COMPILING_E
-            r = 0;
-#endif /* DSNET_COMPILING_E */
-          }
-        }
-        else
-        {
-#ifdef DSNET_COMPILING_E
-          ds_printf("section header not found\n");
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          ds_printf("program header not found\n");
-#endif /* DSNET_COMPILING_I */
-        }
-      }
-      else
-      {
-        ds_printf("invalid header\n");
-      }
-    }
-    else
-    {
-      ds_printf("arch error (type=0x%x, machine=0x%x)\n", ehdr->type, ehdr->machine);
-    }
-#ifdef DSNET_COMPILING_E
-LABEL_85:
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-LABEL_96:
-#endif /* DSNET_COMPILING_I */
-    ds_free(buf);
-    ds_free(ri);
-    ds_free(shdr);
-    ds_free(phdr);
-    ds_free(ehdr);
-    ds_fclose(stream);
-    return r;
-  }
-  if ( aca > 0 )
-#ifdef DSNET_COMPILING_E
-  {
-    set_runarg(aca, ava);
-    goto LABEL_23;
-  }
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-    goto LABEL_22;
-#endif /* DSNET_COMPILING_I */
-LABEL_11:
-  if ( sload )
-    return ds_error("Usage: sload [-id <id>] [-b <base>] [<fname>]");
-  else
-    return ds_error("Usage: pload <fname> [<args>]...");
-}
 
+    if (ac > 1) {
+      goto fmt_err;
+    }
+  }
+
+  stream = ds_fopen(path, "r");
+  if ( !stream ) {
+    goto exit;
+  }
+
+  ehdr = ds_fload(stream, 0, 0, sizeof(*ehdr), 1);
+  if ( !ehdr ) {
+    goto exit;
+  }
+
+  if ( (ehdr->ident[0] == 'b' && ehdr->ident[1] == 1) || (ehdr->ident[0] == 1 && ehdr->ident[1] == 'b') ) {
+    if ( pload ) {
+      ds_printf("ECOFF is not supported\n");
+    }
+    goto exit;
+  }
+
+  for (int i = 0; i < EI_NIDENT ; ++i ) {
+    // support both EI_ABIVERSION 0 and 1
+    if (i == EI_ABIVERSION && (ehdr->ident[i] != 0 && ehdr->ident[i] != 1)) {
+      ds_printf("EI_ABIVERSION identification error: it is neither 0 nor 1\n");
+      goto exit;
+    } else {
+      continue;
+    }
+
+    if ( ehdr->ident[i] != TARG_IDENT[i] ) {
+      ds_printf("ident error\n");
+      goto exit;
+    }
+  }
+
+#ifdef DSNET_COMPILING_E
+  if ( ehdr->machine != EM_MIPS || (ehdr->type != ET_EXEC && ehdr->type != 0xFF91) ) {
+    ds_printf("arch error (type=0x%x, machine=0x%x)\n", ehdr->type, ehdr->machine);
+    goto exit;
+  }
+#elif DSNET_COMPILING_I
+  if ( ehdr->machine != EM_MIPS || (ehdr->type != ET_EXEC && ehdr->type != 0xFF80 || ehdr->type != 0xFF81) ) {
+    ds_printf("arch error (type=0x%x, machine=0x%x)\n", ehdr->type, ehdr->machine);
+    goto exit;
+  }
+#endif
+
+  if ( ehdr->ehsize != sizeof(DS_ELF_EHDR) || ehdr->phentsize != sizeof(DS_ELF_PHDR) ) {
+    ds_printf("invalid header\n");
+    goto exit;
+  }
+
+  if ( TARGET_IOP && ehdr->type == ET_EXEC ) {
+    if (base != 0) {
+      ds_printf("-b option for not relocatable ??\n");
+      goto exit;
+    }
+
+    base = -1;
+  }
+
+  // always phdr load for iop
+  if ( pload || TARGET_IOP ) {
+    if ( ehdr->phnum == 0 ) {
+      ds_printf("program header not found\n");
+      goto exit;
+    }
+
+    phdr = ds_fload(stream, 0, ehdr->phoff, sizeof(*phdr), ehdr->phnum);
+    if ( !phdr ) {
+      goto exit;
+    }
+  }
+
+  // IOP only sload step
+  if ( TARGET_IOP && !pload ) {
+    for (int i = 0; i < ehdr->phnum; i++) {
+      if ( phdr[i].type == PT_LOAD || phdr[i].filesz ) {
+        mod_set_vaddr(id, phdr[i].vaddr);
+      }
+    }
+  }
+
+  if ( pload ) {
+    for (int i = 0; i < ehdr->phnum; i++) {
+      if ( phdr[i].type == PT_LOAD || phdr[i].filesz ) {
+        ds_printf("Loading program (address=0x%W size=0x%W) ...\n", phdr[i].vaddr, phdr[i].filesz);
+        buf = ds_fload(stream, 0, phdr[i].offset, 1, phdr[i].filesz);
+
+        if ( !buf ) {
+          goto exit;
+        }
+
+        if ( ds_store_mem(phdr[i].vaddr, buf, phdr[i].filesz) ) {
+          goto exit;
+        }
+
+        buf = ds_free(buf);
+      }
+    }
+  }
+
+  if ( ehdr->shnum == 0 ) {
+    ds_printf("section header not found\n");
+    goto exit;
+  }
+
+  shdr = ds_fload(stream, 0, ehdr->shoff, sizeof(*shdr), ehdr->shnum);
+  if ( !shdr ) {
+    goto exit;
+  }
+
+  for ( int i = 0; i < ehdr->shnum; i++ ) {
+    switch (shdr[i].type) {
+      case SHT_MIPS_DEBUG:
+        load_mdebug(stream, ehdr, shdr, i, id, base, path);
+        break;
+      case SHT_MIPS_REGINFO:
+        if (shdr[i].size == sizeof(DS_ELF_REGINFO)) {
+          reginfo = ds_free(reginfo);
+          reginfo = ds_fload(stream, 0, shdr[i].offset, sizeof(*reginfo), 1);
+          if ( !reginfo )
+            goto exit;
+        }
+        break;
+      case SHT_SYMTAB:
+        if (shdr[i].link && shdr[i].link < ehdr->shnum && shdr[i].entsize == sizeof(DS_ELF_SYMTAB)) {
+          load_symbol(stream, ehdr, shdr, i, shdr[i].link, id, base);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  if ( pload ) {
+    if ( !reginfo ) {
+      ds_printf("REGINFO not found\n");
+      goto exit;
+    }
+
+    ds_printf("Entry address = 0x%W\n", ehdr->entry);
+    ds_printf("GP value      = 0x%W\n", reginfo->gp_value);
+    current_entry_point = ehdr->entry;
+    current_gp_value = reginfo->gp_value;
+  }
+
+  ret = 0;
+
+exit:
+  ds_free(buf);
+  ds_free(reginfo);
+  ds_free(shdr);
+  ds_free(phdr);
+  ds_free(ehdr);
+  ds_fclose(stream);
+
+  return ret;
+}
