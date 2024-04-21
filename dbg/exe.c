@@ -1,6 +1,8 @@
 
 #include "dsxdb_prototypes.h"
 
+#include <limits.h>
+
 extern DBGP_CONF_DATA dbconf; // defined in dbg.c
 #ifdef DSNET_COMPILING_E
 extern unsigned int current_entry_point; // defined in mem.c
@@ -1939,46 +1941,66 @@ LABEL_28:
 #ifdef DSNET_COMPILING_E
 int set_runarg(int ac, char **av)
 {
-  int v3; // ebx
-  char *v4; // ebx
-  char *v5; // ebx
-  char *buf; // [esp+4h] [ebp-Ch]
-  char *bp; // [esp+8h] [ebp-8h]
-  int i_3; // [esp+Ch] [ebp-4h]
-  int i; // [esp+Ch] [ebp-4h]
-  int i_2; // [esp+Ch] [ebp-4h]
+  char full_path[PATH_MAX];
+  char *abs_path;
+  char *buf;
+  char *bp;
 
   if ( run_args )
-    run_args = (char *)ds_free(run_args);
+    run_args = ds_free(run_args);
+
   run_argc = 0;
+
   buf = ds_decode_args(ac, av);
   if ( !buf )
     return -1;
-  i_3 = 0;
-  run_args_len = 0;
-  while ( ac > i_3 )
-  {
-    v3 = run_args_len + 1;
-    run_args_len = strlen(av[i_3++]) + v3;
+
+  /* We want to resolve the absolute path to provide it to argv[0]
+   * PS2SDK's IO functions will not be able to resolve relative
+   * paths otherwise */
+  abs_path = realpath(*av, full_path);
+  if (!abs_path) {
+    /* just use whatever the relative path the user gave us was
+     * we will error out later if the file didn't actually exist */
+    abs_path = *av;
   }
+
+  run_args_len = 0;
+
+  /* calculate total argument list size */
+  run_args_len += strlen("host:");
+  run_args_len += strlen(abs_path) + 1;
+  for (int i = 1; i < ac; i++) {
+    run_args_len += strlen(av[i]) + 1;
+  }
+
+  /* + an int for each string size */
   run_args_len += sizeof(_DWORD) * ac;
-  run_args = (char *)ds_alloc(run_args_len);
+  run_args = ds_alloc(run_args_len);
   bp = run_args;
+
   if ( !run_args )
     return -1;
-  for ( i = 0; ac > i; ++i )
+
+  *(_DWORD *)bp = strlen("host:") + strlen(abs_path) + 1;
+  bp += 4;
+
+  for (int i = 1; i < ac; ++i )
   {
-    v4 = bp;
+    *(_DWORD *)bp = strlen(av[i]) + 1;
     bp += 4;
-    *(_DWORD *)v4 = strlen(av[i]) + 1;
   }
-  for ( i_2 = 0; ac > i_2; ++i_2 )
+
+  bp = ds_stpcpy(bp, "host:");
+  bp = ds_stpcpy(bp, abs_path) + 1;
+  for (int i = 1; i < ac; ++i )
   {
-    v5 = strcpy(bp, av[i_2]);
-    bp = &v5[strlen(av[i_2]) + 1];
+    bp = ds_stpcpy(bp, av[i]) + 1;
   }
+
   run_argc = ac;
   ds_free(buf);
+
   return 0;
 }
 
