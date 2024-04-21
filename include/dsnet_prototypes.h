@@ -126,6 +126,7 @@ extern char *ds_abs_path(char *buf, int len, char *fname);
 extern DS_DESC *ds_open_comport(char *name, DS_RECV_FUNC *recv_func);
 extern DS_DESC *ds_open_netdev(char *name, DS_RECV_FUNC *recv_func);
 extern int ds_comp_main(char *device, int escape);
+extern char* ds_stpcpy(char* dst, char* src);
 
 extern int ds_errno;
 

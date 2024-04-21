@@ -28,6 +28,7 @@
 
 #ifdef _WIN32
 #include <winsock.h>
+#define realpath(N,R) _fullpath((R),(N),PATH_MAX)
 #else
 #include <arpa/inet.h>
 #include <netdb.h>

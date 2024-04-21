@@ -541,3 +541,12 @@ int ds_comp_main(char *device, int escape)
   return 0;
 }
 
+char* ds_stpcpy(char* dst, char* src) {
+  unsigned size = strlen(src);
+  char *p = dst + size;
+
+  memcpy(dst, src, size);
+  *p = '\0';
+
+  return p;
+}
