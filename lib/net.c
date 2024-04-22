@@ -244,15 +244,14 @@ DS_DESC *ds_listen_net(char *portp, int (*accept_func)(DS_DESC *desc))
     return 0;
   }
 
+  hold = 1;
   if ( setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &hold, sizeof(hold)) < 0 )
   {
     close(fd);
     ds_error("!setsockopt(REUSEADDR)");
     return 0;
-
   }
 
-  hold = 1;
   if ( bind(fd, (const struct sockaddr *)&sin, 0x10u) < 0 )
   {
     close(fd);
