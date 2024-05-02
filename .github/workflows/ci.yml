@@ -37,7 +37,7 @@
       "timeout-minutes" : 20,
       "steps" : [
         {
-          "uses" : "actions/checkout@v2",
+          "uses" : "actions/checkout@v4",
           "with" : {
             "submodules" : "recursive"
           }
@@ -49,13 +49,13 @@
           "run" : "sudo apt-get install build-essential"
         },
         {
-          "uses" : "actions/setup-python@v1",
+          "uses" : "actions/setup-python@v5",
           "with" : {
             "python-version" : "3.x"
           }
         },
         {
-          "uses" : "actions/cache@v1",
+          "uses" : "actions/cache@v4",
           "with" : {
             "path" : "~/.cache/pip",
             "key" : "${{ runner.os }}-pip",
@@ -76,7 +76,7 @@
           "run" : "7z a -tzip dsnet-ubuntu.zip build/ds*"
         },
         {
-          "uses" : "actions/upload-artifact@master",
+          "uses" : "actions/upload-artifact@v4",
           "with" : {
             "name" : "dsnet-ubuntu",
             "path" : "dsnet-ubuntu.zip"
@@ -132,7 +132,7 @@
       },
       "steps" : [
         {
-          "uses" : "actions/checkout@v2",
+          "uses" : "actions/checkout@v4",
           "with" : {
             "submodules" : "recursive"
           }
@@ -172,7 +172,7 @@
           "run" : "7z a -tzip dsnet-win32-${{ matrix.platform.cmake-system-compiler }}.zip build/ds*.exe"
         },
         {
-          "uses" : "actions/upload-artifact@master",
+          "uses" : "actions/upload-artifact@v4",
           "with" : {
             "name" : "dsnet-win32-${{ matrix.platform.cmake-system-compiler }}-${{ matrix.platform.compiler }}",
             "path" : "dsnet-win32-${{ matrix.platform.cmake-system-compiler }}-${{ matrix.platform.compiler }}.zip"
@@ -188,19 +188,19 @@
       },
       "steps" : [
         {
-          "uses" : "actions/checkout@v2",
+          "uses" : "actions/checkout@v4",
           "with" : {
             "submodules" : "recursive"
           }
         },
         {
-          "uses" : "actions/setup-python@v1",
+          "uses" : "actions/setup-python@v5",
           "with" : {
             "python-version" : "3.x"
           }
         },
         {
-          "uses" : "actions/cache@v1",
+          "uses" : "actions/cache@v4",
           "with" : {
             "path" : "~/.cache/pip",
             "key" : "${{ runner.os }}-pip",
@@ -221,7 +221,7 @@
           "run" : "7z a -tzip dsnet-macos.zip build/ds*"
         },
         {
-          "uses" : "actions/upload-artifact@master",
+          "uses" : "actions/upload-artifact@v4",
           "with" : {
             "name" : "dsnet-macos",
             "path" : "dsnet-macos.zip"
@@ -237,7 +237,7 @@
       "steps" : [
         {
           "name" : "Download all artifacts",
-          "uses" : "actions/download-artifact@v3"
+          "uses" : "actions/download-artifact@v4"
         },
         {
           "name" : "Create release",
