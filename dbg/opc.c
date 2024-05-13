@@ -2,325 +2,494 @@
 #include "dsxdb_prototypes.h"
 
 extern unsigned int dot; // defined in mem.c
-#ifdef DSNET_COMPILING_I
-static int last_cnt_16 = 20;
-#endif /* DSNET_COMPILING_I */
-static const char *gpr_name[] =
-{
-  "zero",
-  "at",
-  "v0",
-  "v1",
-  "a0",
-  "a1",
-  "a2",
-  "a3",
-  "t0",
-  "t1",
-  "t2",
-  "t3",
-  "t4",
-  "t5",
-  "t6",
-  "t7",
-  "s0",
-  "s1",
-  "s2",
-  "s3",
-  "s4",
-  "s5",
-  "s6",
-  "s7",
-  "t8",
-  "t9",
-  "k0",
-  "k1",
-  "gp",
-  "sp",
-  "fp",
-  "ra"
+
+static const char *gpr_name[32] = {
+    "zero",
+    "at",
+    "v0",
+    "v1",
+    "a0",
+    "a1",
+    "a2",
+    "a3",
+    "t0",
+    "t1",
+    "t2",
+    "t3",
+    "t4",
+    "t5",
+    "t6",
+    "t7",
+    "s0",
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5",
+    "s6",
+    "s7",
+    "t8",
+    "t9",
+    "k0",
+    "k1",
+    "gp",
+    "sp",
+    "fp",
+    "ra",
 };
-static const char *cpr_name[] =
-{
+
+static const char *cpr_name[4][32] =
+    {
+        {
 #ifdef DSNET_COMPILING_E
-  "index",
-  "random",
-  "entrylo0",
-  "entrylo1",
-  "context",
-  "pagemask",
-  "wired",
-  "rsvd7",
-  "badvaddr",
-  "count",
-  "entryhi",
-  "compare",
-  "status",
-  "cause",
+            "index",
+            "random",
+            "entrylo0",
+            "entrylo1",
+            "context",
+            "pagemask",
+            "wired",
+            "rsvd7",
+            "badvaddr",
+            "count",
+            "entryhi",
+            "compare",
+            "status",
+            "cause",
+            "epc",
+            "prid",
+            "config",
+            "rsvd17",
+            "rsvd18",
+            "rsvd19",
+            "rsvd20",
+            "rsvd21",
+            "rsvd22",
+            "badpaddr",
+            "debug",
+            "perf",
+            "rsvd26",
+            "rsvd27",
+            "taglo",
+            "taghi",
+            "errorepc",
+            "rsvd31",
 #endif /* DSNET_COMPILING_E */
 #ifdef DSNET_COMPILING_I
-  "0",
-  "1",
-  "2",
-  "bpc",
-  "4",
-  "bda",
-  "tar",
-  "dcic",
-  "bada",
-  "bdam",
-  "10",
-  "bpcm",
-  "sr",
-  "cr",
+            "0",
+            "1",
+            "2",
+            "bpc",
+            "4",
+            "bda",
+            "tar",
+            "dcic",
+            "bada",
+            "bdam",
+            "10",
+            "bpcm",
+            "sr",
+            "cr",
+            "epc",
+            "prid",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
 #endif /* DSNET_COMPILING_I */
-  "epc",
-  "prid",
+        },
+        {
 #ifdef DSNET_COMPILING_E
-  "config",
-  "rsvd17",
-  "rsvd18",
-  "rsvd19",
-  "rsvd20",
-  "rsvd21",
-  "rsvd22",
-  "badpaddr",
-  "debug",
-  "perf",
-  "rsvd26",
-  "rsvd27",
-  "taglo",
-  "taghi",
-  "errorepc",
-  "rsvd31"
+            "fpr0",
+            "fpr1",
+            "fpr2",
+            "fpr3",
+            "fpr4",
+            "fpr5",
+            "fpr6",
+            "fpr7",
+            "fpr8",
+            "fpr9",
+            "fpr10",
+            "fpr11",
+            "fpr12",
+            "fpr13",
+            "fpr14",
+            "fpr15",
+            "fpr16",
+            "fpr17",
+            "fpr18",
+            "fpr19",
+            "fpr20",
+            "fpr21",
+            "fpr22",
+            "fpr23",
+            "fpr24",
+            "fpr25",
+            "fpr26",
+            "fpr27",
+            "fpr28",
+            "fpr29",
+            "fpr30",
+            "fpr31",
 #endif /* DSNET_COMPILING_E */
 #ifdef DSNET_COMPILING_I
-  "16",
-  "17",
-  "18",
-  "19",
-  "20",
-  "21",
-  "22",
-  "23",
-  "24",
-  "25",
-  "26",
-  "27",
-  "28",
-  "29",
-  "30",
-  "31"
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
 #endif /* DSNET_COMPILING_I */
-};
+        },
+        {
 #ifdef DSNET_COMPILING_E
-static const char *fpr_name[] =
+            "vf00",
+            "vf01",
+            "vf02",
+            "vf03",
+            "vf04",
+            "vf05",
+            "vf06",
+            "vf07",
+            "vf08",
+            "vf09",
+            "vf10",
+            "vf11",
+            "vf12",
+            "vf13",
+            "vf14",
+            "vf15",
+            "vf16",
+            "vf17",
+            "vf18",
+            "vf19",
+            "vf20",
+            "vf21",
+            "vf22",
+            "vf23",
+            "vf24",
+            "vf25",
+            "vf26",
+            "vf27",
+            "vf28",
+            "vf29",
+            "vf30",
+            "vf31",
 #endif /* DSNET_COMPILING_E */
 #ifdef DSNET_COMPILING_I
-static const char *fllt_name[] =
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
 #endif /* DSNET_COMPILING_I */
-{
+        },
+        {
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
+        },
+};
+
+static const char *ccr_name[4][32] =
+    {
+        {
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
+        },
+        {
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
+        },
+        {
 #ifdef DSNET_COMPILING_E
-  "fpr0",
-  "fpr1",
-  "fpr2",
-  "fpr3",
-  "fpr4",
-  "fpr5",
-  "fpr6",
-  "fpr7",
-  "fpr8",
-  "fpr9",
-  "fpr10",
-  "fpr11",
-  "fpr12",
-  "fpr13",
-  "fpr14",
-  "fpr15",
-  "fpr16",
-  "fpr17",
-  "fpr18",
-  "fpr19",
-  "fpr20",
-  "fpr21",
-  "fpr22",
-  "fpr23",
-  "fpr24",
-  "fpr25",
-  "fpr26",
-  "fpr27",
-  "fpr28",
-  "fpr29",
-  "fpr30",
-  "fpr31"
+            "vi00",
+            "vi01",
+            "vi02",
+            "vi03",
+            "vi04",
+            "vi05",
+            "vi06",
+            "vi07",
+            "vi08",
+            "vi09",
+            "vi10",
+            "vi11",
+            "vi12",
+            "vi13",
+            "vi14",
+            "vi15",
+            "vi16",
+            "vi17",
+            "vi18",
+            "vi19",
+            "vi20",
+            "vi21",
+            "vi22",
+            "vi23",
+            "vi24",
+            "vi25",
+            "vi26",
+            "vi27",
+            "vi28",
+            "vi29",
+            "vi30",
+            "vi31",
 #endif /* DSNET_COMPILING_E */
 #ifdef DSNET_COMPILING_I
-  "0",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-  "20",
-  "21",
-  "22",
-  "23",
-  "24",
-  "25",
-  "26",
-  "27",
-  "28",
-  "29",
-  "30",
-  "31"
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
 #endif /* DSNET_COMPILING_I */
+        },
+        {
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
+        },
 };
-#ifdef DSNET_COMPILING_E
-static const char *vf_name[] =
-{
-  "vf00",
-  "vf01",
-  "vf02",
-  "vf03",
-  "vf04",
-  "vf05",
-  "vf06",
-  "vf07",
-  "vf08",
-  "vf09",
-  "vf10",
-  "vf11",
-  "vf12",
-  "vf13",
-  "vf14",
-  "vf15",
-  "vf16",
-  "vf17",
-  "vf18",
-  "vf19",
-  "vf20",
-  "vf21",
-  "vf22",
-  "vf23",
-  "vf24",
-  "vf25",
-  "vf26",
-  "vf27",
-  "vf28",
-  "vf29",
-  "vf30",
-  "vf31"
-};
-#endif /* DSNET_COMPILING_E */
-static const char *ccr_name[] =
-{
-  "0",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-  "20",
-  "21",
-  "22",
-  "23",
-  "24",
-  "25",
-  "26",
-  "27",
-  "28",
-  "29",
-  "30",
-  "31"
-};
-#ifdef DSNET_COMPILING_E
-static const char *vi_name[] =
-{
-  "vi00",
-  "vi01",
-  "vi02",
-  "vi03",
-  "vi04",
-  "vi05",
-  "vi06",
-  "vi07",
-  "vi08",
-  "vi09",
-  "vi10",
-  "vi11",
-  "vi12",
-  "vi13",
-  "vi14",
-  "vi15",
-  "vi16",
-  "vi17",
-  "vi18",
-  "vi19",
-  "vi20",
-  "vi21",
-  "vi22",
-  "vi23",
-  "vi24",
-  "vi25",
-  "vi26",
-  "vi27",
-  "vi28",
-  "vi29",
-  "vi30",
-  "vi31"
-};
+
 static const char *dest_name[] =
-{
-  "    ",
-  "w   ",
-  "z   ",
-  "wz  ",
-  "y   ",
-  "wy  ",
-  "yz  ",
-  "wyz ",
-  "x   ",
-  "wx  ",
-  "xz  ",
-  "wxz ",
-  "xy  ",
-  "wxy ",
-  "xyz ",
-  "wxyz"
+    {
+        "    ",
+        "w   ",
+        "z   ",
+        "wz  ",
+        "y   ",
+        "wy  ",
+        "yz  ",
+        "wyz ",
+        "x   ",
+        "wx  ",
+        "xz  ",
+        "wxz ",
+        "xy  ",
+        "wxy ",
+        "xyz ",
+        "wxyz",
 };
+
 static const char *xyzw_name[] =
-{ "x", "y", "z", "w" };
-static int last_cnt_16 = 20;
-#endif /* DSNET_COMPILING_E */
-static struct {BT *head;BT *tail;} bts = { NULL, NULL };
+    {"x", "y", "z", "w"};
+
+static struct
+{
+    BT *head;
+    BT *tail;
+} bts = {NULL, NULL};
 static int bt_no = 0;
 OPCODE opcodes[] =
 {
@@ -1190,17 +1359,17 @@ static char *disasm(
       }
       else if ( !strcmp("zt", opr) )
       {
-        v23 = ds_sprintf(bp, "$%s", (&cpr_name[32 * ((inst >> 26) & 7)])[BYTE2(inst) & 0x1F]);
+        v23 = ds_sprintf(bp, "$%s", cpr_name[(inst >> 26) & 7][BYTE2(inst) & 0x1F]);
         bp += v23;
       }
       else if ( !strcmp("zd", opr) )
       {
-        v24 = ds_sprintf(bp, "$%s", (&cpr_name[32 * ((inst >> 26) & 7)])[(unsigned __int16)inst >> 11]);
+        v24 = ds_sprintf(bp, "$%s", cpr_name[(inst >> 26) & 7][(unsigned __int16)inst >> 11]);
         bp += v24;
       }
       else if ( !strcmp("cd", opr) )
       {
-        v25 = ds_sprintf(bp, "$%s", (&ccr_name[32 * ((inst >> 26) & 7)])[(unsigned __int16)inst >> 11]);
+        v25 = ds_sprintf(bp, "$%s", ccr_name[(inst >> 26) & 7][(unsigned __int16)inst >> 11]);
         bp += v25;
       }
       else if ( !strcmp("simm", opr) )
@@ -1332,22 +1501,12 @@ LABEL_84:
         }
         else if ( !strcmp("ft", opr) )
         {
-#ifdef DSNET_COMPILING_E
-          v45 = ds_sprintf(bp, "$%s", fpr_name[BYTE2(inst) & 0x1F]);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          v45 = ds_sprintf(bp, "$%s", fllt_name[BYTE2(inst) & 0x1F]);
-#endif /* DSNET_COMPILING_I */
+          v45 = ds_sprintf(bp, "$%s", cpr_name[1][BYTE2(inst) & 0x1F]);
           bp += v45;
         }
         else if ( !strcmp("fs", opr) )
         {
-#ifdef DSNET_COMPILING_E
-          v46 = ds_sprintf(bp, "$%s", fpr_name[(unsigned __int16)inst >> 11]);
-#endif /* DSNET_COMPILING_E */
-#ifdef DSNET_COMPILING_I
-          v46 = ds_sprintf(bp, "$%s", fllt_name[(unsigned __int16)inst >> 11]);
-#endif /* DSNET_COMPILING_I */
+          v46 = ds_sprintf(bp, "$%s", cpr_name[1][(unsigned __int16)inst >> 11]);
           bp += v46;
         }
 #ifdef DSNET_COMPILING_E
@@ -1358,11 +1517,11 @@ LABEL_84:
 #endif /* DSNET_COMPILING_I */
         {
 #ifdef DSNET_COMPILING_E
-          v47 = ds_sprintf(bp, "$%s", fpr_name[(inst >> 6) & 0x1F]);
+          v47 = ds_sprintf(bp, "$%s", cpr_name[1][(inst >> 6) & 0x1F]);
 #endif /* DSNET_COMPILING_E */
 #ifdef DSNET_COMPILING_I
           if ( !strcmp("fd", opr) )
-            v47 = ds_sprintf(bp, "$%s", fllt_name[(inst >> 6) & 0x1F]);
+            v47 = ds_sprintf(bp, "$%s", cpr_name[1][(inst >> 6) & 0x1F]);
           else
             v47 = ds_sprintf(bp, "??%s??", opr);
 #endif /* DSNET_COMPILING_I */
@@ -1381,32 +1540,32 @@ LABEL_84:
         }
         else if ( !strcmp("vft", opr) )
         {
-          v50 = ds_sprintf(bp, "%s", vf_name[BYTE2(inst) & 0x1F]);
+          v50 = ds_sprintf(bp, "%s", cpr_name[2][BYTE2(inst) & 0x1F]);
           bp += v50;
         }
         else if ( !strcmp("vfs", opr) )
         {
-          v51 = ds_sprintf(bp, "%s", vf_name[(unsigned __int16)inst >> 11]);
+          v51 = ds_sprintf(bp, "%s", cpr_name[2][(unsigned __int16)inst >> 11]);
           bp += v51;
         }
         else if ( !strcmp("vfd", opr) )
         {
-          v52 = ds_sprintf(bp, "%s", vf_name[(inst >> 6) & 0x1F]);
+          v52 = ds_sprintf(bp, "%s", cpr_name[2][(inst >> 6) & 0x1F]);
           bp += v52;
         }
         else if ( !strcmp("vit", opr) )
         {
-          v53 = ds_sprintf(bp, "%s", vi_name[BYTE2(inst) & 0x1F]);
+          v53 = ds_sprintf(bp, "%s", ccr_name[2][BYTE2(inst) & 0x1F]);
           bp += v53;
         }
         else if ( !strcmp("vis", opr) )
         {
-          v54 = ds_sprintf(bp, "%s", vi_name[(unsigned __int16)inst >> 11]);
+          v54 = ds_sprintf(bp, "%s", ccr_name[2][(unsigned __int16)inst >> 11]);
           bp += v54;
         }
         else if ( !strcmp("vid", opr) )
         {
-          v55 = ds_sprintf(bp, "%s", vi_name[(inst >> 6) & 0x1F]);
+          v55 = ds_sprintf(bp, "%s", ccr_name[2][(inst >> 6) & 0x1F]);
           bp += v55;
         }
         else if ( !strcmp("&ftf", opr) )
@@ -1541,6 +1700,7 @@ int di_cmd(int ac, char **av)
   unsigned __int8 *dp; // [esp+43Ch] [ebp-103E8h]
   unsigned __int8 dat[65507]; // [esp+440h] [ebp-103E4h] BYREF
   unsigned __int8 buf[1024]; // [esp+10424h] [ebp-400h] BYREF
+  static int last_cnt = 20;
 
   mark = 0;
   v13 = 0;
@@ -1548,7 +1708,7 @@ int di_cmd(int ac, char **av)
   if ( ac > 0 )
     v2 = 20;
   else
-    v2 = last_cnt_16;
+    v2 = last_cnt;
   cnt = v2;
   if ( ac > 0 )
   {
@@ -1581,7 +1741,7 @@ int di_cmd(int ac, char **av)
     return -1;
   if ( (adr & 3) != 0 )
     return ds_error("address alignment error");
-  last_cnt_16 = cnt;
+  last_cnt = cnt;
   cnt *= 4;
   if ( cnt <= 0 )
     return 0;
@@ -1671,10 +1831,10 @@ static int name_regno(int kind, int z, char *name, int *pval)
     }
     else if ( kind == 2 )
     {
-      if ( !strcmp(s2, (&cpr_name[32 * z])[val]) )
+      if ( !strcmp(s2, cpr_name[z][val]) )
         break;
     }
-    else if ( kind == 3 && !strcmp(s2, (&ccr_name[32 * z])[val]) )
+    else if ( kind == 3 && !strcmp(s2, ccr_name[z][val]) )
     {
       break;
     }
@@ -2715,4 +2875,3 @@ LABEL_11:
   disp_bt(&br, cnt);
   return 0;
 }
-

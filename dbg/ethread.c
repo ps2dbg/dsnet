@@ -97,7 +97,6 @@ static const char *dmac_state_strs[] =
 
 static int mode_4 = 1;
 static int code_5 = 63;
-static int tid_6 = 0;
 static int fmode_7 = 1;
 static int bmode_8 = 0;
 static int code_17 = 1;
@@ -118,13 +117,16 @@ int dt_cmd(int ac, char **av)
   int i_3; // [esp+0h] [ebp-28h]
   BT_REG br; // [esp+4h] [ebp-24h] BYREF
   DBGP_EE_THREADLIST_DATA *p_result; // [esp+10h] [ebp-18h]
-  void* pv; // [esp+14h] [ebp-14h] BYREF
+  unsigned int pv; // [esp+14h] [ebp-14h] BYREF
   int cnt; // [esp+18h] [ebp-10h]
   DBGP_HDR *tcbhdr; // [esp+1Ch] [ebp-Ch]
   DBGP_HDR *listhdr; // [esp+20h] [ebp-8h]
   int r; // [esp+24h] [ebp-4h]
   int aca; // [esp+30h] [ebp+8h]
   char **ava; // [esp+34h] [ebp+Ch]
+  char *c;
+
+  static int tid = 0;
 
   r = 0;
   if ( !IsSupported(3, 10) )
@@ -145,9 +147,9 @@ int dt_cmd(int ac, char **av)
       aca = ac - 1;
       for ( ava = av + 1; aca > 0 && **ava == 45; ++ava )
       {
-        for ( pv = (*ava + 1); *(_BYTE *)pv; ++pv )
+        for ( c = (*ava + 1); c; ++c )
         {
-          switch ( *(_BYTE *)pv )
+          switch ( *c )
           {
             case 'a':
               LOBYTE(code_5) = code_5 | 0x3F;
@@ -211,7 +213,7 @@ int dt_cmd(int ac, char **av)
           return -1;
         if ( pv > 0xFF )
           return ds_error("Thread id must be smaller than %d.", 256);
-        tid_6 = pv;
+        tid = pv;
         mode_4 &= 0xFFFFFFFC;
         LOBYTE(mode_4) = mode_4 | 2;
       }
@@ -258,7 +260,7 @@ int dt_cmd(int ac, char **av)
       }
       else
       {
-        r = get_tcb(tcbhdr, tid_6);
+        r = get_tcb(tcbhdr, tid);
         if ( !r )
         {
           disp_tcb(tcbhdr, fmode_7);
@@ -279,19 +281,19 @@ int dt_cmd(int ac, char **av)
     else
     {
       p_result = (DBGP_EE_THREADLIST_DATA *)&listhdr[1];
-      pv = &listhdr[1].result;
+      c = &listhdr[1].result;
       ds_printf("tid prio      pc       sp      status cause sid wakeup count function\n");
       for ( i_3 = 0; p_result->id > i_3; ++i_3 )
       {
-        disp_thread_list((DBGP_EE_THREADLIST_DATA *)pv);
+        disp_thread_list((DBGP_EE_THREADLIST_DATA *)c);
         if ( (mode_4 & 0x80u) != 0 )
         {
-          br.pc = *(_DWORD *)(pv + 28);
-          br.sp = *(_DWORD *)(pv + 32);
-          br.ra = *(_DWORD *)(pv + 40);
+          br.pc = *(_DWORD *)(c + 28);
+          br.sp = *(_DWORD *)(c + 32);
+          br.ra = *(_DWORD *)(c + 40);
           disp_bt(&br, 0);
         }
-        pv += 52;
+        c += 52;
       }
     }
   }

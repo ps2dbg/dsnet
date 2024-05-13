@@ -62,7 +62,7 @@ int ds_fread(void *ptr, int size, int n, void *stream, int f_allow_eof)
   return r;
 }
 
-int ds_fwrite(void *ptr, int size, int n, void *stream)
+int ds_fwrite(const void *ptr, int size, int n, void *stream)
 {
   int r; // [esp+0h] [ebp-4h]
 

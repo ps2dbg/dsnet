@@ -1177,7 +1177,7 @@ struct help_map {
     int ej;
     int level;
     char* key;
-    char** pl;
+    const char** pl;
 };
 typedef struct help_map HELP_MAP;
 typedef struct {

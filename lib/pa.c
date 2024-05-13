@@ -1355,7 +1355,7 @@ static DSP_BUF *recv_pamp_reset(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
   screg[8] = 0x80000000;
   screg[8] = 0;
   screg[12] = 0;
-  ds_ioctl(sam_fd, 0x53414D01u, 30);
+  ds_ioctl(sam_fd, 0x53414D01u, (void *)30);
   while ( (screg[16422] & 0x80000000) == 0 )
     ;
   while ( (screg[32806] & 0x80000000) == 0 )
