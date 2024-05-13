@@ -3550,13 +3550,13 @@ int current_col = 0;
 static int first_18 = 0;
 
 static void print_char(void *stream, int ch);
-static void print_str(void *stream, char *str);
+static void print_str(void *stream, const char *str);
 static void print_nl(void *stream);
-static void print_jis(void *stream, char *s);
-static void print_sjis(void *stream, char *s);
-static int add_help_map(int ej, int level, char *key, char **pl);
+static void print_jis(void *stream, const char *s);
+static void print_sjis(void *stream, const char *s);
+static int add_help_map(int ej, int level, char *key, const char **pl);
 static void build_help_map(int lang);
-static int valid_delim(int lang, char *p);
+static int valid_delim(int lang, const char *p);
 static int valid_lang(int lang, HELP_MAP *hm);
 
 static void print_char(void *stream, int ch)
@@ -3575,7 +3575,7 @@ static void print_char(void *stream, int ch)
   ++current_col;
 }
 
-static void print_str(void *stream, char *str)
+static void print_str(void *stream, const char *str)
 {
   int n; // [esp+0h] [ebp-4h]
 
@@ -3599,7 +3599,7 @@ static void print_nl(void *stream)
   current_col = 0;
 }
 
-static void print_jis(void *stream, char *s)
+static void print_jis(void *stream, const char *s)
 {
   int v2; // eax
   int v3; // eax
@@ -3643,7 +3643,7 @@ static void print_jis(void *stream, char *s)
     print_str(stream, "\x1B(B");
 }
 
-static void print_sjis(void *stream, char *s)
+static void print_sjis(void *stream, const char *s)
 {
   int v2; // eax
   int v3; // eax
@@ -3686,7 +3686,7 @@ static void print_sjis(void *stream, char *s)
   }
 }
 
-static int add_help_map(int ej, int level, char *key, char **pl)
+static int add_help_map(int ej, int level, char *key, const char **pl)
 {
   size_t v4; // eax
   HELP_MAP *tail; // edx
@@ -3717,9 +3717,9 @@ static void build_help_map(int lang)
   int level; // [esp+4h] [ebp-414h]
   char buf[1024]; // [esp+8h] [ebp-410h] BYREF
   char *q; // [esp+408h] [ebp-10h]
-  char *p; // [esp+40Ch] [ebp-Ch]
-  char *ps; // [esp+410h] [ebp-8h]
-  char **pl; // [esp+414h] [ebp-4h]
+  const char *p; // [esp+40Ch] [ebp-Ch]
+  const char *ps; // [esp+410h] [ebp-8h]
+  const char **pl; // [esp+414h] [ebp-4h]
 
   level = 0;
   if ( ++first_18 == 1 )
@@ -3771,8 +3771,8 @@ int dbg_help(char *name)
   int r; // [esp+10h] [ebp-14h]
   int lang; // [esp+14h] [ebp-10h]
   char *pager; // [esp+18h] [ebp-Ch]
-  char *ps; // [esp+1Ch] [ebp-8h]
-  char **pl; // [esp+20h] [ebp-4h]
+  const char *ps; // [esp+1Ch] [ebp-8h]
+  const char **pl; // [esp+20h] [ebp-4h]
 
   r = 0;
   level = 0;
@@ -3929,7 +3929,7 @@ int dbg_help_completion(DS_HISTBUF *hb, char *name)
   }
 }
 
-static int valid_delim(int lang, char *p)
+static int valid_delim(int lang, const char *p)
 {
   if ( *p != 45 )
     return 0;

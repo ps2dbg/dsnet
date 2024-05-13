@@ -846,7 +846,7 @@ LABEL_6:
   }
 
   if (list_entry_is_head(md, &mdebug_list, list)) {
-    return NULL;
+    return 0;
   }
 
   sym = &md->lsyms[fdt->isymBase];

@@ -58,7 +58,7 @@ extern void *ds_fopen(char *fname, char *mode);
 extern void *ds_fopen_low(char *fname, char *mode);
 extern int ds_fclose(void *stream);
 extern int ds_fread(void *ptr, int size, int n, void *stream, int f_allow_eof);
-extern int ds_fwrite(void *ptr, int size, int n, void *stream);
+extern int ds_fwrite(const void *ptr, int size, int n, void *stream);
 extern int ds_fseek(void *stream, int offset, int whence);
 extern void *ds_fload(void *stream, int whence, int off, int siz, int cnt);
 extern int ds_fsize(char *fname, int *psize);

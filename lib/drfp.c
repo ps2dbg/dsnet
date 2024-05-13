@@ -34,8 +34,8 @@ static unsigned int drfp_base(unsigned int base);
 static void ds_option_expand(char *path, char *name);
 static DSP_BUF *recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
 static DSP_BUF *recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen);
-static void set_scestat_time(unsigned __int8 *st_time, int *time);
-static void set_stat_time(int *time, unsigned __int8 *st_time);
+static void set_scestat_time(unsigned __int8 *st_time, time_t *time);
+static void set_stat_time(time_t *time, unsigned __int8 *st_time);
 static unsigned int sce_mode2st_mode(unsigned int sce_mode);
 static unsigned int st_mode2sce_mode(unsigned int st_mode);
 static void sce_stat2stat(struct stat *to, struct sce_stat *from);
@@ -587,7 +587,7 @@ static DSP_BUF *recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
   return send_drfp(desc, db, dh, 0x13u, seq, result, &fd, 4u);
 }
 
-static void set_scestat_time(unsigned __int8 *st_time, int *time)
+static void set_scestat_time(unsigned __int8 *st_time, time_t *time)
 {
   struct tm *v2; // eax
 
@@ -603,7 +603,7 @@ static void set_scestat_time(unsigned __int8 *st_time, int *time)
   *((_WORD *)st_time + 3) = __PAIR16__(BYTE1(v2->tm_year), v2->tm_year);
 }
 
-static void set_stat_time(int *time, unsigned __int8 *st_time)
+static void set_stat_time(time_t *time, unsigned __int8 *st_time)
 {
   struct tm tm; // [esp+4h] [ebp-2Ch] BYREF
 
