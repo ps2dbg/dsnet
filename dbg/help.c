@@ -3607,11 +3607,7 @@ static void print_jis(void *stream, char *s)
   int c1; // [esp+0h] [ebp-Ch]
   int c0; // [esp+4h] [ebp-8h]
   int ki; // [esp+8h] [ebp-4h]
-#ifdef DSNET_COMPILING_E
-  _DWORD *savedregs; // [esp+Ch] [ebp+0h] BYREF
 
-  savedregs = &savedregs;
-#endif /* DSNET_COMPILING_E */
   ki = 0;
   while ( *s )
   {
