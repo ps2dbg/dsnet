@@ -1214,7 +1214,7 @@ int load_word_registers(unsigned int *masks, unsigned int *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, nr, (void **)&rh, 8 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, (unsigned __int8)nr, (void **)&rh, 8 * nr);
     if ( !db )
       return -1;
     if ( i > 9 )
@@ -1278,7 +1278,7 @@ int store_word_registers(unsigned int *masks, unsigned int *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, nr, (void **)&rh, 8 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, (unsigned __int8)nr, (void **)&rh, 8 * nr);
     if ( !db )
       return -1;
     if ( i > 9 )
@@ -1338,7 +1338,7 @@ static int load_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, nr, (void **)&rh, 20 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, (unsigned __int8)nr, (void **)&rh, 20 * nr);
     if ( !db )
       return -1;
     if ( i > 10 )
@@ -1400,7 +1400,7 @@ static int store_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, nr, (void **)&rh, 20 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, (unsigned __int8)nr, (void **)&rh, 20 * nr);
     if ( !db )
       return -1;
     if ( i > 10 )
@@ -1590,7 +1590,7 @@ int put_brkpt(DBGP_BRKPT_DATA *bps, int n)
   DBGP_BRKPT_DATA *dp; // [esp+4h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+8h] [ebp-4h]
 
-  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTBRKPT, 0, 0, n, (void **)&dp, 8 * n);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTBRKPT, 0, 0, (unsigned __int8)n, (void **)&dp, 8 * n);
   if ( !db )
     return -1;
   for ( i = 0; n > i; ++i )

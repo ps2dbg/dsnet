@@ -122,13 +122,13 @@ static int setup_net(int s)
 #endif
 
   hold = 1;
-  if ( setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (void *)&hold, 4u) < 0 )
+  if ( setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (const void *)&hold, 4u) < 0 )
     return ds_error("!setsockopt(KEEPALIVE)");
   hold = 1;
-  if ( setsockopt(s, IPPROTO_TCP, TCP_NODELAY, (void *)&hold, 4u) < 0 )
+  if ( setsockopt(s, IPPROTO_TCP, TCP_NODELAY, (const void *)&hold, 4u) < 0 )
     return ds_error("!setsockopt(TCP_NODELAY)");
   hold = 16;
-  if ( setsockopt(s, IPPROTO_IP, IP_TOS, (void *)&hold, 4u) < 0 && errno != ENOPROTOOPT)
+  if ( setsockopt(s, IPPROTO_IP, IP_TOS, (const void *)&hold, 4u) < 0 && errno != ENOPROTOOPT)
   {
     v3 = strerror(errno);
     ds_error("setsockopt(IP_TOS) - %s (ignored)", v3);
@@ -245,7 +245,7 @@ DS_DESC *ds_listen_net(char *portp, int (*accept_func)(DS_DESC *desc))
   }
 
   hold = 1;
-  if ( setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void *)&hold, sizeof(hold)) < 0 )
+  if ( setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const void *)&hold, sizeof(hold)) < 0 )
   {
     close(fd);
     ds_error("!setsockopt(REUSEADDR)");

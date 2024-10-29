@@ -207,13 +207,15 @@ int dt_cmd(int ac, char **av)
         LOBYTE(code_5) = code_5 | 0x3F;
       if ( aca > 0 )
       {
+        unsigned int val;
+
         if ( !isnumstr(*ava) )
           return ds_error("Usage: dt [-[abcdefhrqsuvw]*] [<tid>]");
-        if ( ds_scan_digit_word(*ava, &pv) )
+        if ( ds_scan_digit_word(*ava, &val) )
           return -1;
-        if ( pv > 0xFF )
+        if ( val > 0xFF )
           return ds_error("Thread id must be smaller than %d.", 256);
-        tid = pv;
+        tid = val;
         mode_4 &= 0xFFFFFFFC;
         LOBYTE(mode_4) = mode_4 | 2;
       }
