@@ -1000,8 +1000,8 @@ typedef struct log_data LOG_DATA;
 struct mem {
     struct mem* forw;
     struct mem* back;
-    char* file;
-    char* func;
+    const char* file;
+    const char* func;
     int size;
     int magic;
 };
