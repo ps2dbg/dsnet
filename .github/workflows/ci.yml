@@ -169,7 +169,7 @@
         },
         {
           "name" : "Prepare artifacts for release",
-          "run" : "7z a -tzip dsnet-win32-${{ matrix.platform.cmake-system-compiler }}.zip build/ds*.exe"
+          "run" : "7z a -tzip dsnet-win32-${{ matrix.platform.cmake-system-compiler }}-${{ matrix.platform.compiler }}.zip build/ds*.exe"
         },
         {
           "uses" : "actions/upload-artifact@v4",
