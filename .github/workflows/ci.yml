@@ -33,7 +33,7 @@
   },
   "jobs" : {
     "build-ubuntu" : {
-      "runs-on" : "ubuntu-20.04",
+      "runs-on" : "ubuntu-24.04",
       "timeout-minutes" : 20,
       "steps" : [
         {
@@ -85,7 +85,7 @@
       ]
     },
     "build-win32" : {
-      "runs-on" : "ubuntu-20.04",
+      "runs-on" : "ubuntu-24.04",
       "timeout-minutes" : 20,
       "env" : {
         "HOMEBREW_NO_ANALYTICS" : "1",
@@ -181,7 +181,7 @@
       ]
     },
     "build-macos" : {
-      "runs-on" : "macos-11",
+      "runs-on" : "macos-13",
       "timeout-minutes" : 20,
       "strategy" : {
         "fail-fast" : false
@@ -231,7 +231,7 @@
     },
     "create-release" : {
       "needs" : ["build-ubuntu", "build-win32", "build-macos"],
-      "runs-on" : "ubuntu-20.04",
+      "runs-on" : "ubuntu-24.04",
       "timeout-minutes" : 20,
       "if" : "github.ref == 'refs/heads/main'",
       "steps" : [
