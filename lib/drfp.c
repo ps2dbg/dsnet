@@ -73,7 +73,7 @@ static void drfp_errmsg(int proto, char *tag, char *fname, char *err)
   char *p_1; // [esp+Ch] [ebp-410h]
   char *msg; // [esp+10h] [ebp-40Ch]
   char *prog; // [esp+14h] [ebp-408h]
-  char path[1025]; // [esp+18h] [ebp-404h] BYREF
+  char path[PATH_MAX + 1]; // [esp+18h] [ebp-404h] BYREF
 
   if ( ds_drfp_err_func )
   {
@@ -82,7 +82,7 @@ static void drfp_errmsg(int proto, char *tag, char *fname, char *err)
     else
       v4 = "unknown-prog";
     prog = v4;
-    if ( !ds_abs_path(path, 1025, fname) )
+    if ( !ds_abs_path(path, sizeof(path), fname) )
       strcpy(path, fname);
     v5 = strlen(prog);
     v6 = strlen(path) + 7 + v5;
@@ -166,46 +166,46 @@ static void free_handle(int handle)
 
 static int get_ino(char *name)
 {
-#ifndef _WIN32
-  struct stat stat; // [esp+0h] [ebp-58h] BYREF
+  struct stat stbuf; // [esp+0h] [ebp-58h] BYREF
 
-  lstat(name, &stat);
-  return stat.st_ino;
+#ifndef _WIN32
+  lstat(name, &stbuf);
 #else
-  return 0;
+  stat(name, &stbuf);
 #endif
+  return stbuf.st_ino;
 }
 
 static int is_found(char *name)
 {
-#ifndef _WIN32
-  struct stat stat; // [esp+0h] [ebp-58h] BYREF
+  struct stat stbuf; // [esp+0h] [ebp-58h] BYREF
 
-  return lstat(name, &stat) >= 0;
+#ifndef _WIN32
+  return lstat(name, &stbuf) >= 0;
 #else
-  return 0;
+  return stat(name, &stbuf) >= 0;
 #endif
 }
 
 static int is_dir(char *name)
 {
-#ifndef _WIN32
-  struct stat stat; // [esp+0h] [ebp-58h] BYREF
+  struct stat stbuf; // [esp+0h] [ebp-58h] BYREF
 
-  return lstat(name, &stat) >= 0 && (stat.st_mode & 0xF000) == 0x4000;
+#ifndef _WIN32
+  return lstat(name, &stbuf) >= 0 && S_ISDIR(stbuf.st_mode);
 #else
-  return 0;
+  return stat(name, &stbuf) >= 0 && S_ISDIR(stbuf.st_mode);
 #endif
 }
 
 static int is_file(char *name)
 {
-#ifndef _WIN32
-  struct stat stat; // [esp+0h] [ebp-58h] BYREF
+  struct stat stbuf; // [esp+0h] [ebp-58h] BYREF
 
-  return lstat(name, &stat) >= 0 && (stat.st_mode & 0xF000) == 0x8000;
+#ifndef _WIN32
+  return lstat(name, &stbuf) >= 0 && S_ISREG(stbuf.st_mode);
 #else
-  return 0;
+  return stat(name, &stbuf) >= 0 && S_ISREG(stbuf.st_mode);
 #endif
 }
 
@@ -291,32 +291,31 @@ static unsigned int drfp_flag(unsigned int flag, unsigned int *pmode)
   unsigned int v2; // eax
   unsigned int r; // [esp+0h] [ebp-4h]
 
-  r = 0;
-  v2 = flag & 3;
-  if ( v2 == 2 )
+  switch ( flag & O_ACCMODE )
   {
-    r = 1;
+  case 2:
+    r = O_WRONLY;
+    break;
+  case 3:
+    r = O_RDWR;
+    break;
+  case 1:
+  default:
+    r = O_RDONLY;
+    break;
   }
-  else if ( v2 > 2 )
-  {
-    if ( v2 == 3 )
-      r = 2;
-  }
-  else if ( v2 == 1 )
-  {
-    r = 0;
-  }
+  r |= O_BINARY;
   if ( (flag & 0x200) != 0 )
-    LOBYTE(r) = r | 0x40;
+    r |= O_CREAT;
   if ( (flag & 0x400) != 0 )
-    r |= 0x200u;
+    r |= O_TRUNC;
   if ( (flag & 0x800) != 0 )
-    LOBYTE(r) = r | 0x80;
+    r |= O_EXCL;
   if ( (flag & 0x100) != 0 )
-    r |= 0x400u;
+    r |= O_APPEND;
   *pmode = HIWORD(flag);
   if ( !HIWORD(flag) )
-    *pmode = 438;
+    *pmode = 0x1b6 /* 0o666 */;
   return r;
 }
 
@@ -326,61 +325,68 @@ static unsigned int drfp_err(unsigned int err)
 
   switch ( err )
   {
-    case 2u:
+    case ENOENT:
       r = 2;
       break;
-    case 5u:
+    case EIO:
       r = 5;
       break;
-    case 9u:
+    case EBADF:
       r = 9;
       break;
-    case 0xDu:
+    case EACCES:
       r = 13;
       break;
-    case 0x10u:
+    case EBUSY:
       r = 16;
       break;
-    case 0x11u:
+    case EEXIST:
       r = 17;
       break;
-    case 0x12u:
+    case EXDEV:
       r = 18;
       break;
-    case 0x13u:
+    case ENODEV:
       r = 19;
       break;
-    case 0x14u:
+    case ENOTDIR:
       r = 20;
       break;
-    case 0x15u:
+    case EISDIR:
       r = 21;
       break;
-    case 0x18u:
+    case EMFILE:
       r = 24;
       break;
-    case 0x1Bu:
+    case EFBIG:
       r = 27;
       break;
-    case 0x1Cu:
+    case ENOSPC:
       r = 28;
       break;
-    case 0x1Eu:
+    case EROFS:
       r = 30;
       break;
-    case 0x24u:
+    case ENAMETOOLONG:
       r = 91;
       break;
-    case 0x26u:
+    case ENOSYS:
       r = 48;
       break;
-    case 0x27u:
+    case ENOTEMPTY:
       r = 90;
       break;
-    case 0x28u:
+    case ELOOP:
+#ifdef WSAELOOP
+    case WSAELOOP:
+#endif
       r = 92;
       break;
-    case 0x7Au:
+#ifndef _WIN32
+    case EDQUOT:
+#else
+    case WSAEDQUOT:
+#endif
       r = 132;
       break;
     default:
@@ -394,14 +400,14 @@ static unsigned int drfp_base(unsigned int base)
 {
   switch ( base )
   {
-    case 1u:
-      return 1;
-    case 0u:
-      return 0;
-    case 2u:
-      return 2;
+    case 1:
+      return SEEK_CUR;
+    case 2:
+      return SEEK_END;
+    case 0:
+    default:
+      return SEEK_SET;
   }
-  return 0;
 }
 
 static void ds_option_expand(char *path, char *name)
@@ -410,7 +416,7 @@ static void ds_option_expand(char *path, char *name)
   size_t v3; // [esp-4h] [ebp-410h]
   int n; // [esp+0h] [ebp-40Ch]
   char *p; // [esp+4h] [ebp-408h]
-  char buf[1025]; // [esp+8h] [ebp-404h] BYREF
+  char buf[PATH_MAX + 1]; // [esp+8h] [ebp-404h] BYREF
 
   p = 0;
   n = 0;
@@ -442,7 +448,7 @@ static DSP_BUF *recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsign
   char *v10; // eax
   char *v11; // [esp-4h] [ebp-484h]
   struct stat stbuf; // [esp+4h] [ebp-47Ch] BYREF
-  char path[1025]; // [esp+5Ch] [ebp-424h] BYREF
+  char path[PATH_MAX + 1]; // [esp+5Ch] [ebp-424h] BYREF
   int handle; // [esp+460h] [ebp-20h]
   int r; // [esp+464h] [ebp-1Ch]
   char *name; // [esp+468h] [ebp-18h]
@@ -470,9 +476,9 @@ static DSP_BUF *recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsign
     v18 = 0;
     if ( fstat(r, &stbuf) >= 0 )
     {
-      if ( (stbuf.st_mode & 0xF000) == 0x4000 )
+      if ( S_ISDIR(stbuf.st_mode) )
       {
-        v18 = drfp_err(0x15u);
+        v18 = drfp_err(EISDIR);
       }
       else
       {
@@ -491,13 +497,13 @@ static DSP_BUF *recv_drfp_open(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsign
           }
           else
           {
-            v18 = drfp_err(0xCu);
+            v18 = drfp_err(ENOMEM);
             free_handle(handle);
           }
         }
         else
         {
-          v18 = drfp_err(0x18u);
+          v18 = drfp_err(EMFILE);
         }
       }
     }
@@ -525,7 +531,7 @@ static DSP_BUF *recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
   int v10; // eax
   int ino; // eax
   char *v12; // [esp-4h] [ebp-420h]
-  char path[1025]; // [esp+0h] [ebp-41Ch] BYREF
+  char path[PATH_MAX + 1]; // [esp+0h] [ebp-41Ch] BYREF
   DIR *dirstream; // [esp+404h] [ebp-18h]
   int handle; // [esp+408h] [ebp-14h]
   char *s2; // [esp+40Ch] [ebp-10h]
@@ -554,6 +560,8 @@ static DSP_BUF *recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
       handle_map[handle].name = v9;
       if ( v9 )
       {
+        // TODO: dsnetm 1.23.4 win32 just omits the following dirfd call
+        // However, this causes the handle to not be detected
         v10 = dirfd(dirstream);
         handle_map[handle].fd = v10;
         handle_map[handle].dir = dirstream;
@@ -563,13 +571,13 @@ static DSP_BUF *recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
       }
       else
       {
-        result = drfp_err(0xCu);
+        result = drfp_err(ENOMEM);
         free_handle(handle);
       }
     }
     else
     {
-      result = drfp_err(0x18u);
+      result = drfp_err(EMFILE);
     }
     if ( result )
       closedir(dirstream);
@@ -581,7 +589,7 @@ static DSP_BUF *recv_drfp_dopen(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
     result = drfp_err(errno);
   }
 #else
-  result = drfp_err(0x18u);
+  result = drfp_err(EMFILE);
 #endif
   fd = handle;
   return send_drfp(desc, db, dh, 0x13u, seq, result, &fd, 4u);
@@ -622,30 +630,32 @@ static unsigned int sce_mode2st_mode(unsigned int sce_mode)
   unsigned int st_mode; // [esp+0h] [ebp-4h]
 
   st_mode = 0;
+#ifdef S_IFLNK
   if ( (sce_mode & 0x4000) != 0 )
-    st_mode = 40960;
+    st_mode |= S_IFLNK;
+#endif
   if ( (sce_mode & 0x2000) != 0 )
-    st_mode |= 0x8000u;
+    st_mode |= S_IFREG;
   if ( (sce_mode & 0x1000) != 0 )
-    st_mode |= 0x4000u;
+    st_mode |= S_IFDIR;
   if ( (sce_mode & 1) != 0 )
-    LOBYTE(st_mode) = st_mode | 1;
+    st_mode |= S_IXOTH;
   if ( (sce_mode & 2) != 0 )
-    LOBYTE(st_mode) = st_mode | 2;
+    st_mode |= S_IWOTH;
   if ( (sce_mode & 4) != 0 )
-    LOBYTE(st_mode) = st_mode | 4;
+    st_mode |= S_IROTH;
   if ( (sce_mode & 8) != 0 )
-    LOBYTE(st_mode) = st_mode | 8;
+    st_mode |= S_IXGRP;
   if ( (sce_mode & 0x10) != 0 )
-    LOBYTE(st_mode) = st_mode | 0x10;
+    st_mode |= S_IWGRP;
   if ( (sce_mode & 0x20) != 0 )
-    LOBYTE(st_mode) = st_mode | 0x20;
+    st_mode |= S_IRGRP;
   if ( (sce_mode & 0x40) != 0 )
-    LOBYTE(st_mode) = st_mode | 0x40;
-  if ( (sce_mode & 0x80u) != 0 )
-    LOBYTE(st_mode) = st_mode | 0x80;
+    st_mode |= S_IXUSR;
+  if ( (sce_mode & 0x80) != 0 )
+    st_mode |= S_IWUSR;
   if ( (sce_mode & 0x100) != 0 )
-    st_mode |= 0x100u;
+    st_mode |= S_IRUSR;
   return st_mode;
 }
 
@@ -654,30 +664,32 @@ static unsigned int st_mode2sce_mode(unsigned int st_mode)
   unsigned int sce_mode; // [esp+0h] [ebp-4h]
 
   sce_mode = 0;
-  if ( (st_mode & 0xF000) == 40960 )
-    sce_mode = 0x4000;
-  if ( (st_mode & 0xF000) == 0x8000 )
-    sce_mode |= 0x2000u;
-  if ( (st_mode & 0xF000) == 0x4000 )
-    sce_mode |= 0x1000u;
-  if ( (st_mode & 1) != 0 )
-    LOBYTE(sce_mode) = sce_mode | 1;
-  if ( (st_mode & 2) != 0 )
-    LOBYTE(sce_mode) = sce_mode | 2;
-  if ( (st_mode & 4) != 0 )
-    LOBYTE(sce_mode) = sce_mode | 4;
-  if ( (st_mode & 8) != 0 )
-    LOBYTE(sce_mode) = sce_mode | 8;
-  if ( (st_mode & 0x10) != 0 )
-    LOBYTE(sce_mode) = sce_mode | 0x10;
-  if ( (st_mode & 0x20) != 0 )
-    LOBYTE(sce_mode) = sce_mode | 0x20;
-  if ( (st_mode & 0x40) != 0 )
-    LOBYTE(sce_mode) = sce_mode | 0x40;
-  if ( (st_mode & 0x80u) != 0 )
-    LOBYTE(sce_mode) = sce_mode | 0x80;
-  if ( (st_mode & 0x100) != 0 )
-    sce_mode |= 0x100u;
+#ifdef S_ISLNK
+  if ( S_ISLNK(st_mode) )
+    sce_mode |= 0x4000;
+#endif
+  if ( S_ISREG(st_mode) )
+    sce_mode |= 0x2000;
+  if ( S_ISDIR(st_mode) )
+    sce_mode |= 0x1000;
+  if ( (st_mode & S_IXOTH) != 0 )
+    sce_mode |= 1;
+  if ( (st_mode & S_IWOTH) != 0 )
+    sce_mode |= 2;
+  if ( (st_mode & S_IROTH) != 0 )
+    sce_mode |= 4;
+  if ( (st_mode & S_IXGRP) != 0 )
+    sce_mode |= 8;
+  if ( (st_mode & S_IWGRP) != 0 )
+    sce_mode |= 0x10;
+  if ( (st_mode & S_IRGRP) != 0 )
+    sce_mode |= 0x20;
+  if ( (st_mode & S_IXUSR) != 0 )
+    sce_mode |= 0x40;
+  if ( (st_mode & S_IWUSR) != 0 )
+    sce_mode |= 0x80;
+  if ( (st_mode & S_IRUSR) != 0 )
+    sce_mode |= 0x100;
   return sce_mode;
 }
 
@@ -719,7 +731,7 @@ static DSP_BUF *recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, uns
 {
   char *v8; // [esp-4h] [ebp-45Ch]
   struct sce_stat data; // [esp+0h] [ebp-458h] BYREF
-  char path[1025]; // [esp+40h] [ebp-418h] BYREF
+  char path[PATH_MAX + 1]; // [esp+40h] [ebp-418h] BYREF
   int r; // [esp+444h] [ebp-14h]
   char *s2; // [esp+448h] [ebp-10h]
   unsigned int len; // [esp+44Ch] [ebp-Ch]
@@ -751,7 +763,7 @@ static DSP_BUF *recv_drfp_getstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, uns
 static DSP_BUF *recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int ino; // eax
-  char path[1025]; // [esp+0h] [ebp-414h] BYREF
+  char path[PATH_MAX + 1]; // [esp+0h] [ebp-414h] BYREF
   int v9; // [esp+404h] [ebp-10h]
   char *name; // [esp+408h] [ebp-Ch]
   unsigned int result; // [esp+40Ch] [ebp-8h]
@@ -767,7 +779,7 @@ static DSP_BUF *recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsi
     ino = get_ino(path);
     if ( is_opened_ino(ino) )
     {
-      result = drfp_err(0x10u);
+      result = drfp_err(EBUSY);
       return send_drfp(desc, db, dh, 0xDu, seq, result, 0, 0);
     }
     v9 = remove(path);
@@ -784,8 +796,8 @@ static DSP_BUF *recv_drfp_remove(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsi
 static DSP_BUF *recv_drfp_rename(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   int ino; // eax
-  char newpath[1025]; // [esp+0h] [ebp-81Ch] BYREF
-  char oldpath[1025]; // [esp+404h] [ebp-418h] BYREF
+  char newpath[PATH_MAX + 1]; // [esp+0h] [ebp-81Ch] BYREF
+  char oldpath[PATH_MAX + 1]; // [esp+404h] [ebp-418h] BYREF
   int r; // [esp+808h] [ebp-14h]
   char *name; // [esp+80Ch] [ebp-10h]
   char *oldname; // [esp+810h] [ebp-Ch]
@@ -804,19 +816,19 @@ static DSP_BUF *recv_drfp_rename(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsi
     ino = get_ino(oldpath);
     if ( is_opened_ino(ino) )
     {
-      result = drfp_err(0x10u);
+      result = drfp_err(EBUSY);
       return send_drfp(desc, db, dh, 0x1Fu, seq, result, 0, 0);
     }
     if ( is_found(newpath) )
     {
       if ( is_file(oldpath) && is_dir(newpath) )
       {
-        result = drfp_err(0x15u);
+        result = drfp_err(EISDIR);
       }
       else if ( is_dir(oldpath) )
       {
         if ( is_file(newpath) )
-          result = drfp_err(0x14u);
+          result = drfp_err(ENOTDIR);
       }
       return send_drfp(desc, db, dh, 0x1Fu, seq, result, 0, 0);
     }
@@ -839,7 +851,7 @@ static DSP_BUF *recv_drfp_chdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
   if ( (unsigned int)arglen <= 4 )
     return db;
   seq = *args;
-  v6 = drfp_err(0x26u);
+  v6 = drfp_err(ENOSYS);
   return send_drfp(desc, db, dh, 0x21u, seq, v6, 0, 0);
 }
 
@@ -847,7 +859,7 @@ static DSP_BUF *recv_drfp_rmdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
 {
   int ino; // eax
   char *v9; // [esp-4h] [ebp-418h]
-  char path[1025]; // [esp+0h] [ebp-414h] BYREF
+  char path[PATH_MAX + 1]; // [esp+0h] [ebp-414h] BYREF
   int v11; // [esp+404h] [ebp-10h]
   char *name; // [esp+408h] [ebp-Ch]
   unsigned int result; // [esp+40Ch] [ebp-8h]
@@ -873,14 +885,14 @@ LABEL_8:
     result = drfp_err(errno);
     return send_drfp(desc, db, dh, 0x21u, seq, result, 0, 0);
   }
-  result = drfp_err(0x10u);
+  result = drfp_err(EBUSY);
   return send_drfp(desc, db, dh, 0x21u, seq, result, 0, 0);
 }
 
 static DSP_BUF *recv_drfp_mkdir(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsigned int *args, int arglen)
 {
   char *v8; // [esp-4h] [ebp-41Ch]
-  char path[1025]; // [esp+0h] [ebp-418h] BYREF
+  char path[PATH_MAX + 1]; // [esp+0h] [ebp-418h] BYREF
   int r; // [esp+404h] [ebp-14h]
   char *s2; // [esp+408h] [ebp-10h]
   unsigned int result; // [esp+40Ch] [ebp-Ch]
@@ -937,7 +949,7 @@ static DSP_BUF *recv_drfp_dclose(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsi
   }
   else
   {
-    v9 = drfp_err(9u);
+    v9 = drfp_err(EBADF);
   }
   return send_drfp(desc, db, dh, 0x15u, seq, v9, 0, 0);
 }
@@ -968,7 +980,7 @@ static DSP_BUF *recv_drfp_close(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
   }
   else
   {
-    v9 = drfp_err(9u);
+    v9 = drfp_err(EBADF);
   }
   return send_drfp(desc, db, dh, 3u, seq, v9, 0, 0);
 }
@@ -1009,12 +1021,12 @@ static DSP_BUF *recv_drfp_read(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsign
     }
     else
     {
-      v10 = drfp_err(0xCu);
+      v10 = drfp_err(ENOMEM);
     }
   }
   else
   {
-    v10 = drfp_err(9u);
+    v10 = drfp_err(EBADF);
   }
   *(_DWORD *)data = len;
   send_drfp(desc, db, dh, 5u, seq, v10, data, len + 4);
@@ -1046,7 +1058,11 @@ static DSP_BUF *recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
   {
     if ( len != arglen - 12 )
       return db;
+#ifndef _WIN32
     r = write(fd, argsa, len);
+#else
+    r = send(fd, (void *)argsa, len, 0);
+#endif
     if ( r >= 0 )
     {
       v10 = 0;
@@ -1060,7 +1076,7 @@ static DSP_BUF *recv_drfp_write(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
   }
   else
   {
-    v10 = drfp_err(9u);
+    v10 = drfp_err(EBADF);
   }
   return send_drfp(desc, db, dh, 7u, seq, v10, &len, 4u);
 }
@@ -1100,7 +1116,7 @@ static DSP_BUF *recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsign
     }
     else
     {
-      result = drfp_err(0x1Bu);
+      result = drfp_err(EFBIG);
       if ( lseek(fd, v8, 0) == -1 )
       {
         result = drfp_err(errno);
@@ -1110,7 +1126,7 @@ static DSP_BUF *recv_drfp_seek(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsign
   }
   else
   {
-    result = drfp_err(9u);
+    result = drfp_err(EBADF);
   }
   return send_drfp(desc, db, dh, 9u, seq, result, &pos, 4u);
 }
@@ -1144,7 +1160,7 @@ static DSP_BUF *recv_drfp_seek64(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsi
   if ( fd >= 0 )
   {
     if ( hioff )
-      result = drfp_err(0x1Bu);
+      result = drfp_err(EFBIG);
     curpos = lseek(fd, 0, 1);
     if ( curpos == -1 )
     {
@@ -1167,7 +1183,7 @@ static DSP_BUF *recv_drfp_seek64(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsi
   }
   else
   {
-    result = drfp_err(9u);
+    result = drfp_err(EBADF);
   }
   pos[0] = lopos;
   pos[1] = hipos;
@@ -1198,7 +1214,7 @@ static DSP_BUF *recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
     dirstream = handle_to_dir(handle);
     if ( !dirstream )
     {
-      result = drfp_err(9u);
+      result = drfp_err(EBADF);
       goto LABEL_15;
     }
     dent = readdir(dirstream);
@@ -1234,7 +1250,7 @@ static DSP_BUF *recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
     if ( !result )
       goto LABEL_15;
   }
-  result = drfp_err(0xCu);
+  result = drfp_err(ENOMEM);
   len = 0;
 LABEL_15:
   send_drfp(desc, db, dh, 0x17u, seq, result, sce_dent, len);
@@ -1248,8 +1264,8 @@ static DSP_BUF *recv_drfp_symlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, uns
   char *v8; // [esp-4h] [ebp-81Ch]
   unsigned int result; // [esp+0h] [ebp-818h]
   unsigned int seq; // [esp+4h] [ebp-814h]
-  char newpath[1025]; // [esp+8h] [ebp-810h] BYREF
-  char existpath[1025]; // [esp+40Ch] [ebp-40Ch] BYREF
+  char newpath[PATH_MAX + 1]; // [esp+8h] [ebp-810h] BYREF
+  char existpath[PATH_MAX + 1]; // [esp+40Ch] [ebp-40Ch] BYREF
   char *newname; // [esp+810h] [ebp-8h]
   char *existname; // [esp+814h] [ebp-4h]
 
@@ -1281,8 +1297,8 @@ static DSP_BUF *recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, un
   unsigned int len_1; // [esp+0h] [ebp-81Ch]
   unsigned int result; // [esp+4h] [ebp-818h]
   unsigned int seq; // [esp+8h] [ebp-814h]
-  char newpath[1025]; // [esp+Ch] [ebp-810h] BYREF
-  char existpath[1025]; // [esp+410h] [ebp-40Ch] BYREF
+  char newpath[PATH_MAX + 1]; // [esp+Ch] [ebp-810h] BYREF
+  char existpath[PATH_MAX + 1]; // [esp+410h] [ebp-40Ch] BYREF
   char *newname; // [esp+814h] [ebp-8h]
   char *existname; // [esp+818h] [ebp-4h]
 
@@ -1307,7 +1323,9 @@ static DSP_BUF *recv_drfp_readlink(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, un
     newname = newpath;
   }
 #else
-  result = drfp_err(0x18u);
+  // TODO: dsnetm 1.23.4 win32 always returns 0 for readlink
+  // However, it results in an empty string
+  result = drfp_err(EMFILE);
   len_1 = 0;
   newname = 0;
 #endif
@@ -1318,7 +1336,7 @@ static DSP_BUF *recv_drfp_chstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsi
 {
   char *v8; // [esp-4h] [ebp-474h]
   struct stat data; // [esp+4h] [ebp-46Ch] BYREF
-  char path[1025]; // [esp+5Ch] [ebp-414h] BYREF
+  char path[PATH_MAX + 1]; // [esp+5Ch] [ebp-414h] BYREF
   unsigned int v11; // [esp+460h] [ebp-10h]
   char *name; // [esp+464h] [ebp-Ch]
   unsigned int result; // [esp+468h] [ebp-8h]
@@ -1347,7 +1365,7 @@ static DSP_BUF *recv_drfp_chstat(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsi
     }
   }
   if ( (v11 & 2) != 0 || (v11 & 4) != 0 || (v11 & 8) != 0 || (v11 & 0x10) != 0 || (v11 & 0x20) != 0 || (v11 & 0x40) != 0 )
-    result = drfp_err(0x26u);
+    result = drfp_err(ENOSYS);
   return send_drfp(desc, db, dh, 0x1Bu, seq, result, 0, 0);
 }
 

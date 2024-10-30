@@ -38,6 +38,9 @@ int ds_send_netmp1(DS_DESC *desc, int code, int result, int pri, int proto)
 
 int ds_reset(DS_DESC *desc, void *ptr, int len)
 {
+#ifdef _WIN32
+  ds_now_resetting = 1;
+#endif
   if ( !desc )
     return -1;
   if ( (desc->type & 2) == 0 )

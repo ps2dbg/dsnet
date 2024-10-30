@@ -15,6 +15,7 @@ int ds_raw_kbd()
   int fd; // [esp+44h] [ebp-4h]
 
   fd = 0;
+  // TODO: dsnetm 1.23.4 win32 just returns 0 here
 #ifndef _WIN32
   old = &oterm_area;
   if ( oterm )
@@ -46,6 +47,9 @@ int ds_resume_kbd()
     r = 1;
   }
   oterm = NULL;
+#else
+  // TODO: dsnetm 1.23.4 win32 just returns 1 here
+  r = 1;
 #endif
   return r;
 }

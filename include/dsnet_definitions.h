@@ -27,7 +27,8 @@
 #include <unistd.h>
 
 #ifdef _WIN32
-#include <winsock.h>
+#include <winsock2.h>
+#include <conio.h>
 #define realpath(N,R) _fullpath((R),(N),PATH_MAX)
 #else
 #include <arpa/inet.h>
@@ -41,6 +42,30 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <termios.h>
+#endif
+
+#ifdef _WIN32
+typedef void * sig_t;
+#endif
+
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
+#ifndef O_NONBLOCK
+#define O_NONBLOCK 0
+#endif
+
+#ifndef O_TEXT
+#define O_TEXT 0
+#endif
+
+#ifndef PATH_MAX
+#ifdef MAX_PATH
+#define PATH_MAX MAX_PATH
+#else
+#define PATH_MAX 1024
+#endif
 #endif
 
 #define qmemcpy memcpy

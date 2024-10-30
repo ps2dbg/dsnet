@@ -1061,7 +1061,7 @@ int pload_cmd(int ac, char **av)
   unsigned int id = 0;
   void *stream = NULL;
   byte *buf = NULL;
-  char path[1024];
+  char path[PATH_MAX];
   int ret = -1;
   int pload;
 

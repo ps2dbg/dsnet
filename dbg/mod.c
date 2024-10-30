@@ -283,8 +283,8 @@ static void load_mod_symbols(IMOD *p)
   int flags; // ebx
   char *dp; // [esp+4h] [ebp-808h]
   char *sp; // [esp+8h] [ebp-804h]
-  char path[1024]; // [esp+Ch] [ebp-800h] BYREF
-  char buf[1024]; // [esp+40Ch] [ebp-400h] BYREF
+  char path[PATH_MAX]; // [esp+Ch] [ebp-800h] BYREF
+  char buf[PATH_MAX]; // [esp+40Ch] [ebp-400h] BYREF
 
 #ifdef DSNET_COMPILING_E
   if ( !ds_strncmp("host0:", p->args, 6) )

@@ -5,6 +5,22 @@ static int getaddr_net(char *name, struct sockaddr_in *sin);
 static int setup_net(int s);
 static DS_DESC *ds_open_dev(char *name, DS_RECV_FUNC *recv_func);
 
+#ifdef _WIN32
+static int bWSock = 0;
+
+static void PrepareWinSock()
+{
+  struct WSAData WSAData; // [esp+0h] [ebp-198h] BYREF
+
+  if ( !bWSock )
+  {
+    if ( WSAStartup(2u, &WSAData) )
+      exit(1);
+    bWSock = 1;
+  }
+}
+#endif
+
 static int getport_net(char *portp)
 {
   int v1; // eax
@@ -124,6 +140,7 @@ static int setup_net(int s)
   hold = 1;
   if ( setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (const void *)&hold, 4u) < 0 )
     return ds_error("!setsockopt(KEEPALIVE)");
+#ifndef _WIN32
   hold = 1;
   if ( setsockopt(s, IPPROTO_TCP, TCP_NODELAY, (const void *)&hold, 4u) < 0 )
     return ds_error("!setsockopt(TCP_NODELAY)");
@@ -133,6 +150,14 @@ static int setup_net(int s)
     v3 = strerror(errno);
     ds_error("setsockopt(IP_TOS) - %s (ignored)", v3);
   }
+#else
+  protoent = getprotobyname("tcp");
+  if ( !protoent )
+    return ds_error("!getprotobyname(tcp)");
+  hold = 1;
+  if ( setsockopt(s, protoent->p_proto, 1, (const void *)&hold, 4) < 0 )
+    return ds_error("!setsockopt(TCP_NODELAY)");
+#endif
 
 #ifndef _WIN32
   flag = fcntl(s, F_GETFL);
@@ -149,10 +174,10 @@ static DS_DESC *ds_open_dev(char *name, DS_RECV_FUNC *recv_func)
 {
   int fd; // [esp+0h] [ebp-4h]
 
-  fd = open(name, 2050);
+  fd = open(name, O_TEXT | O_NONBLOCK | O_RDWR);
   if ( fd >= 0 )
   {
-    if ( ds_ioctl(fd, 1093009410, 0) >= 0 || errno == 32 )
+    if ( ds_ioctl(fd, 1093009410, 0) >= 0 || errno == EPIPE )
     {
       return ds_add_select_list(2, fd, name, 0, recv_func);
     }
@@ -180,7 +205,10 @@ DS_DESC *ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
   struct sockaddr_in sin; // [esp+408h] [ebp-68h] BYREF
   struct stat stbuf; // [esp+418h] [ebp-58h] BYREF
 
-  if ( targetp && stat(targetp, &stbuf) >= 0 && (stbuf.st_mode & 0xF000) == 0x2000 )
+#ifdef _WIN32
+  PrepareWinSock();
+#endif
+  if ( targetp && stat(targetp, &stbuf) >= 0 && S_ISCHR(stbuf.st_mode) )
     return ds_open_dev(targetp, recv_func);
   if ( getaddr_net(targetp, &sin) < 0 )
     return 0;
@@ -191,8 +219,13 @@ DS_DESC *ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
       ds_error("ds_connect - too many refused");
       return 0;
     }
+#ifndef _WIN32
     fd = socket(PF_INET, SOCK_STREAM, 0);
     if ( fd < 0 )
+#else
+    fd = WSASocketA(2, 1, 0, 0, 0, 1u);
+    if ( fd == -1 )
+#endif
     {
       ds_error("!socket");
       return 0;
@@ -200,8 +233,16 @@ DS_DESC *ds_connect_net(char *targetp, DS_RECV_FUNC *recv_func)
     if ( !connect(fd, (const struct sockaddr *)&sin, sizeof(sin)) )
       break;
     close(fd);
-    if ( errno != 111 )
+#ifndef _WIN32
+    if ( errno != ECONNREFUSED )
+#else
+    // NOTE: In dsnetm 1.23.4 win32 port, this condition was inverted.
+    if ( errno != WSAECONNREFUSED )
+#endif
     {
+#ifdef _WIN32
+      ds_printf("ds_connect_net28\n");
+#endif
       ds_error("!unable to connect");
       return 0;
     }
@@ -230,6 +271,9 @@ DS_DESC *ds_listen_net(char *portp, int (*accept_func)(DS_DESC *desc))
   int fd; // [esp+404h] [ebp-14h]
   struct sockaddr_in sin; // [esp+408h] [ebp-10h] BYREF
 
+#ifdef _WIN32
+  PrepareWinSock();
+#endif
   ds_bzero(&sin, sizeof(sin));
   sin.sin_family = AF_INET;
   sin.sin_port = getport_net(portp);
@@ -238,8 +282,14 @@ DS_DESC *ds_listen_net(char *portp, int (*accept_func)(DS_DESC *desc))
   if ( !sin.sin_port )
     return 0;
 
+#ifndef _WIN32
   fd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-  if (fd < 0) {
+  if ( fd < 0 )
+#else
+  fd = WSASocketA(2, 1, 0, 0, 0, 1u);
+  if ( fd == -1 )
+#endif
+  {
     ds_error("!socket");
     return 0;
   }

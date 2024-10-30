@@ -399,7 +399,7 @@ static int IsPA()
   if ( !ispa_32 )
   {
     v0 = 0;
-    if ( stat("/dev/sam0", &stbuf) >= 0 && (stbuf.st_mode & 0xF000) == 0x2000 )
+    if ( stat("/dev/sam0", &stbuf) >= 0 && S_ISCHR(stbuf.st_mode) )
       v0 = 1;
     ispa_32 = v0;
   }
@@ -447,10 +447,16 @@ static unsigned int GetPLXRegister(unsigned int sam_fd)
   void *p_2; // [esp+0h] [ebp-8h]
   unsigned int base; // [esp+4h] [ebp-4h] BYREF
 
+#ifndef _WIN32
   ds_ioctl(sam_fd, 0x53414D05u, &base);
+#else
+  ioctlsocket(sam_fd, 0x53414D05u, (void *)&base);
+#endif
 #ifndef _WIN32
   p = mmap(0, 0x1000u, 3, 1, sam_fd, base);
 #else
+  // TODO: dsnetm 1.23.4 win32 always returns 0 for mmap
+  // However, it results in invalid memory access
   p = (void *)-1;
 #endif
   if ( p != (void *)-1 )
@@ -458,7 +464,11 @@ static unsigned int GetPLXRegister(unsigned int sam_fd)
     plcrs = (unsigned int *)((char *)p + (base & 0xFFF));
     *(_DWORD *)((char *)p + (base & 0xFFF) + 4) = 268435457;
     plcrs[61] = 1;
+#ifndef _WIN32
     ds_ioctl(sam_fd, 0x53414D06u, &base);
+#else
+    ioctlsocket(sam_fd, 0x53414D06u, (void *)&base);
+#endif
 #ifndef _WIN32
     p_1 = mmap(0, 0x100000u, 3, 1, sam_fd, base);
 #else
@@ -467,7 +477,11 @@ static unsigned int GetPLXRegister(unsigned int sam_fd)
     if ( p_1 != (void *)-1 )
     {
       screg = (unsigned int *)((char *)p_1 + (base & 0xFFF));
+#ifndef _WIN32
       ds_ioctl(sam_fd, 0x53414D07u, &base);
+#else
+      ioctlsocket(sam_fd, 0x53414D05u, (void *)&base);
+#endif
 #ifndef _WIN32
       p_2 = mmap(0, 0x10000000u, 3, 1, sam_fd, base);
 #else
@@ -476,7 +490,7 @@ static unsigned int GetPLXRegister(unsigned int sam_fd)
       if ( p_2 != (void *)-1 )
       {
         prgn2 = (unsigned int *)((char *)p_2 + (base & 0xFFF));
-        mem_fd = open("/dev/mem", 0);
+        mem_fd = open("/dev/mem", O_RDONLY);
 #ifndef _WIN32
         pmem = (char *)mmap(0, 0x200000u, 1, 2, mem_fd, 209715200);
 #else
@@ -495,7 +509,7 @@ unsigned int ds_open_sam()
 {
   if ( !IsPA() )
     return 6;
-  sam_fd = open("/dev/sam0", 2);
+  sam_fd = open("/dev/sam0", O_RDWR);
   if ( !GetPLXRegister(sam_fd) )
     return 0;
   close(sam_fd);

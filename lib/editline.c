@@ -2,7 +2,7 @@
 
 static char isearch_buf[1024];
 static char *isearch_ptr;
-static char cbuf[1025];
+static char cbuf[PATH_MAX + 1];
 
 static int once_40 = 1;
 static int cmdmode_41 = 0;
@@ -90,7 +90,7 @@ static int ds_load_history()
   DS_HISTBUF *v2; // edx
   DS_HIST *v3; // ebx
   DS_HIST *tail; // ecx
-  char path[1025]; // [esp+8h] [ebp-428h] BYREF
+  char path[PATH_MAX + 1]; // [esp+8h] [ebp-428h] BYREF
   int v6; // [esp+40Ch] [ebp-24h]
   int siz; // [esp+410h] [ebp-20h] BYREF
   char *q; // [esp+414h] [ebp-1Ch]
@@ -376,7 +376,7 @@ LABEL_181:
       }
       if ( v22 > 31 )
       {
-        if ( isearch_ptr >= &isearch_buf[1023] )
+        if ( isearch_ptr >= &isearch_buf[sizeof(isearch_buf) - 1] )
           goto LABEL_181;
         *isearch_ptr++ = v22;
         *isearch_ptr = 0;
@@ -754,7 +754,7 @@ LABEL_117:
 
 static void print_char(int ch)
 {
-  if ( (unsigned int)cbuf_len > 0x400 )
+  if ( (unsigned int)cbuf_len > (sizeof(cbuf) - 2) )
     flush_char();
   cbuf[cbuf_len++] = ch;
 }

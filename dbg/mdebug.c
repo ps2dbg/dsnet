@@ -400,9 +400,9 @@ static char *set_abs_path(char *fname)
 {
   size_t v2;
   char *r;
-  char path[1024];
+  char path[PATH_MAX];
 
-  if ( !ds_abs_path(path, 1024, fname) )
+  if ( !ds_abs_path(path, sizeof(path), fname) )
     return 0;
 
   r = ds_alloc(strlen(path) + 1 );
@@ -894,9 +894,9 @@ static char *search_source_file(char *fname, char *obj_path, char *src_dirs)
   char *q_1; // [esp+8h] [ebp-808h]
   char *p; // [esp+Ch] [ebp-804h]
   char *p_1; // [esp+Ch] [ebp-804h]
-  char tmp[1024]; // [esp+10h] [ebp-800h] BYREF
-  char obj_dir[1024]; // [esp+410h] [ebp-400h] BYREF
-  static char path[1024];
+  char tmp[PATH_MAX]; // [esp+10h] [ebp-800h] BYREF
+  char obj_dir[PATH_MAX]; // [esp+410h] [ebp-400h] BYREF
+  static char path[PATH_MAX];
 
   if ( *fname == 47 || !*src_dirs )
     return fname;

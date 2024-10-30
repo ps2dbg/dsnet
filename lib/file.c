@@ -1,8 +1,6 @@
 #include "dsnet_prototypes.h"
 
-#ifndef _WIN32
 static sig_t sigint;
-#endif
 static int kbd_raw = 0;
 
 int ds_ioctl(int fd, int cmd, void *arg)
@@ -10,6 +8,7 @@ int ds_ioctl(int fd, int cmd, void *arg)
 #ifndef _WIN32
   return ioctl(fd, cmd, arg);
 #else
+  // TODO: dsnetm 1.23.4 win32 always returns 0 for ioctl
   ds_error("ioctl not supported on this platform");
   return 0;
 #endif
@@ -17,7 +16,7 @@ int ds_ioctl(int fd, int cmd, void *arg)
 
 void *ds_fopen(char *fname, char *mode)
 {
-  char path[1025]; // [esp+0h] [ebp-408h] BYREF
+  char path[PATH_MAX + 1]; // [esp+0h] [ebp-408h] BYREF
   void *r; // [esp+404h] [ebp-4h]
 
   ds_tilde_expand(path, fname);
@@ -29,7 +28,7 @@ void *ds_fopen(char *fname, char *mode)
 
 void *ds_fopen_low(char *fname, char *mode)
 {
-  char path[1025]; // [esp+0h] [ebp-404h] BYREF
+  char path[PATH_MAX + 1]; // [esp+0h] [ebp-404h] BYREF
 
   ds_tilde_expand(path, fname);
   return fopen(path, mode);
@@ -77,21 +76,19 @@ int ds_fseek(void *stream, int offset, int whence)
   int r; // [esp+0h] [ebp-4h]
   int whencea; // [esp+14h] [ebp+10h]
 
-  if ( whence == 1 )
+  switch ( whence )
   {
-    whencea = 1;
-  }
-  else if ( whence > 1 )
-  {
-    if ( whence != 2 )
-      return ds_error("ds_fseek: invalid whence");
-    whencea = 2;
-  }
-  else
-  {
-    if ( whence )
-      return ds_error("ds_fseek: invalid whence");
-    whencea = 0;
+  case 0:
+    whencea = SEEK_SET;
+    break;
+  case 1:
+    whencea = SEEK_CUR;
+    break;
+  case 2:
+    whencea = SEEK_CUR;
+    break;
+  default:
+    return ds_error("ds_fseek: invalid whence");
   }
   r = fseek((FILE *)stream, offset, whencea);
   if ( r == -1 )
@@ -114,7 +111,7 @@ void *ds_fload(void *stream, int whence, int off, int siz, int cnt)
 
 int ds_fsize(char *fname, int *psize)
 {
-  char path[1025]; // [esp+0h] [ebp-45Ch] BYREF
+  char path[PATH_MAX + 1]; // [esp+0h] [ebp-45Ch] BYREF
   struct stat stbuf; // [esp+404h] [ebp-58h] BYREF
 
   ds_tilde_expand(path, fname);
@@ -128,16 +125,15 @@ void *ds_popen(char *cmd, char *type)
 {
   void *r; // [esp+0h] [ebp-4h]
 
-#ifndef _WIN32
   sigint = signal(SIGINT, SIG_IGN);
   kbd_raw = ds_resume_kbd();
+#ifndef _WIN32
   r = popen(cmd, type);
+#else
+  r = _popen(cmd, type);
+#endif
   if ( !r )
     ds_error("!popen(\"%s\", \"%s\")", cmd, type);
-#else
-  r = NULL;
-  ds_error("popen not supported on this platform");
-#endif
   return r;
 }
 
@@ -146,19 +142,21 @@ int ds_pclose(void *stream)
   int r; // [esp+0h] [ebp-4h]
 
   r = 0;
-#ifndef _WIN32
   if ( stream )
+#ifndef _WIN32
     r = pclose((FILE *)stream);
+#else
+    r = _pclose((FILE *)stream);
+#endif
   if ( kbd_raw )
     ds_raw_kbd();
   signal(SIGINT, sigint);
-#endif
   return r;
 }
 
 int ds_access(char *fname, int rmode)
 {
-  char path[1025]; // [esp+0h] [ebp-408h] BYREF
+  char path[PATH_MAX + 1]; // [esp+0h] [ebp-408h] BYREF
   int mode; // [esp+404h] [ebp-4h]
 
   mode = 0;

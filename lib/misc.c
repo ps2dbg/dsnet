@@ -18,7 +18,9 @@ int (*ds_check_reserved_name_func)(char *name) = NULL;
 
 static int *pstatus_by_child = NULL;
 
+#ifndef _WIN32
 static void sigchld(int arg);
+#endif
 static int read_kbd(int kbd, int escape);
 static int read_dev(int dev);
 static int write_dev(int dev);
@@ -183,6 +185,9 @@ int ds_fork()
 
 #ifndef _WIN32
   pid = fork();
+#else
+  pid = 1;
+#endif
   if ( pid <= 0 )
   {
     if ( pid < 0 )
@@ -199,13 +204,9 @@ int ds_fork()
   close(0);
   close(1);
   close(2);
-  open("/dev/null", 0);
-  open("/dev/null", 1);
-  open("/dev/null", 1);
-#else
-  ds_error("!fork");
-  ds_exit(140);
-#endif
+  open("/dev/null", O_RDONLY);
+  open("/dev/null", O_WRONLY);
+  open("/dev/null", O_WRONLY);
   return 0;
 }
 
@@ -229,12 +230,16 @@ int ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
   int pid; // [esp+4h] [ebp-8h]
   char *shell; // [esp+8h] [ebp-4h]
 
-#ifndef _WIN32
   shell = getenv("SHELL");
   if ( !shell )
     shell = "/bin/sh";
   pstatus_by_child = pstatus;
+
+#ifndef _WIN32
   pid = fork();
+#else
+  pid = 1;
+#endif
   if ( pid < 0 )
     return ds_error("!fork");
   if ( !pid )
@@ -250,23 +255,36 @@ int ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
     exit(1);
   }
   signal(SIGINT, SIG_IGN);
+#ifndef _WIN32
   signal(SIGCHLD /* This was 17 (SIGSTOP), which was incorrect */, (sig_t)sigchld);
-  return 0;
-#else
-  return ds_error("Fork not supported on this platform");
 #endif
+  return 0;
 }
 
 int ds_read(int fd, void *ptr, int n)
 {
   int r; // [esp+0h] [ebp-4h]
 
+#ifndef _WIN32
   r = read(fd, ptr, n);
+#else
+  r = recv(fd, ptr, n, 0);
+#endif
   if ( r < 0 )
   {
     ds_errno = errno;
-    if ( errno != 11 && errno != 32 && errno != 104 )
+    switch ( ds_errno )
+    {
+    case EAGAIN:
+    case EPIPE:
+#ifndef _WIN32
+    case ECONNRESET:
+#endif
+      break;
+    default:
       ds_error("!ds_read");
+      break;
+    }
   }
   return r;
 }
@@ -275,12 +293,28 @@ int ds_write(int fd, void *ptr, int n)
 {
   int r; // [esp+0h] [ebp-4h]
 
+#ifndef _WIN32
   r = write(fd, ptr, n);
+#else
+  if ( ds_now_resetting == 1 )
+    Sleep(5u);
+  r = send(fd, ptr, n, 0);
+#endif
   if ( r < 0 )
   {
     ds_errno = errno;
-    if ( errno != 11 && errno != 32 && errno != 104 )
+    switch ( ds_errno )
+    {
+    case EAGAIN:
+    case EPIPE:
+#ifndef _WIN32
+    case ECONNRESET:
+#endif
+      break;
+    default:
       ds_error("!ds_write");
+      break;
+    }
   }
   return r;
 }
@@ -303,10 +337,10 @@ char *ds_getenv(char *env)
 
 void ds_bzero(void *ptr, int len)
 {
-#ifdef _WIN32
-  memset(ptr, 0, len);
-#else
+#ifndef _WIN32
   bzero(ptr, len);
+#else
+  memset(ptr, 0, len);
 #endif
 }
 
@@ -357,9 +391,10 @@ char *ds_tilde_expand(char *buf, char *str)
   *dp = 0;
   if ( *sp == 47 )
     ++sp;
-#ifndef _WIN32
+
   if ( user[0] )
   {
+#ifndef _WIN32
     pw = getpwnam(user);
     if ( !pw )
       return strcpy(buf, str);
@@ -367,9 +402,11 @@ char *ds_tilde_expand(char *buf, char *str)
     strcat(buf, "/");
     strcat(buf, sp);
     return buf;
+#else
+    return strcpy(buf, str);
+#endif
   }
   else
-#endif
   {
     home = getenv("HOME");
     if ( !home )
@@ -416,7 +453,11 @@ static int read_kbd(int kbd, int escape)
   q = &kbdq;
   if ( kbdq.len > 255 )
     return 0;
+#ifndef _WIN32
   if ( read(kbd, &ch, 1u) != 1 )
+#else
+  if ( recv(kbd, &ch, 1, 0) != 1 )
+#endif
     return ds_error("!read kbd");
   if ( escape == ch )
     return 1;
@@ -436,7 +477,11 @@ static int read_dev(int dev)
   q = &devq;
   if ( devq.len > 255 )
     return 0;
+#ifndef _WIN32
   if ( read(dev, &ch, 1u) != 1 )
+#else
+  if ( recv(dev, &ch, 1, 0) != 1 )
+#endif
     return ds_error("!read dev");
   v2 = q;
   q->buf[LOBYTE(q->put)] = ch;
@@ -456,7 +501,11 @@ static int write_dev(int dev)
   ch = q->buf[LOBYTE(q->get)];
   ++q->get;
   --q->len;
+#ifndef _WIN32
   if ( write(dev, &ch, 1u) == 1 )
+#else
+  if ( send(dev, &ch, 1, 0) == 1 )
+#endif
     return 0;
   else
     return ds_error("!write dev");
@@ -473,7 +522,11 @@ static int write_dsp(int dsp)
   ch = q->buf[LOBYTE(q->get)];
   ++q->get;
   --q->len;
+#ifndef _WIN32
   if ( write(dsp, &ch, 1u) == 1 )
+#else
+  if ( send(dsp, &ch, 1, 0) == 1 )
+#endif
     return 0;
   else
     return ds_error("!write dsp");
@@ -483,7 +536,7 @@ DS_DESC *ds_open_comport(char *name, DS_RECV_FUNC *recv_func)
 {
   int fd; // [esp+0h] [ebp-4h]
 
-  fd = open(name, 2050);
+  fd = open(name, O_TEXT | O_NONBLOCK | O_RDWR);
   if ( fd >= 0 )
     return ds_add_select_list(32, fd, name, 0, recv_func);
   ds_error("!open(%s)", name);
@@ -494,7 +547,7 @@ DS_DESC *ds_open_netdev(char *name, DS_RECV_FUNC *recv_func)
 {
   int fd; // [esp+0h] [ebp-4h]
 
-  fd = open(name, 2050);
+  fd = open(name, O_TEXT | O_NONBLOCK | O_RDWR);
   if ( fd >= 0 )
     return ds_add_select_list(64, fd, name, 0, recv_func);
   ds_error("!open(%s)", name);
@@ -509,7 +562,7 @@ int ds_comp_main(char *device, int escape)
   int kbd; // [esp+114h] [ebp-8h]
   int dev; // [esp+118h] [ebp-4h]
 
-  dev = open(device, 2050);
+  dev = open(device, O_TEXT | O_NONBLOCK | O_RDWR);
   if ( dev < 0 )
     return ds_error("!open(%s)", device);
   kbd = ds_raw_kbd();
@@ -528,7 +581,7 @@ int ds_comp_main(char *device, int escape)
       FD_SET(dev, &wfds);
     if ( devq.len > 0 )
       FD_SET(dsp, &wfds);
-    if ( select(256, &rfds, &wfds, 0, 0) < 0 )
+    if ( select(FD_SETSIZE, &rfds, &wfds, 0, 0) < 0 )
       return ds_error("!select");
   }
   while ( (!FD_ISSET(kbd, &rfds)

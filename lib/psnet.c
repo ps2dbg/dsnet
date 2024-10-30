@@ -215,7 +215,7 @@ int ds_read_psnet(DS_DESC *desc, char *buf, int len)
           *((_BYTE *)&p->rcv_hdr.mag + i) = *((_BYTE *)&p->rcv_hdr.mag + i + 1);
         --p->rcv_ptr;
         --p->rcv_len;
-        errno = 11;
+        errno = EAGAIN;
         return -1;
       }
       if ( p->rcv_hdr.len <= 0x1Fu )
@@ -230,7 +230,7 @@ int ds_read_psnet(DS_DESC *desc, char *buf, int len)
       if ( sum != p->rcv_hdr.sum )
       {
         p->rcv_len = 0;
-        errno = 11;
+        errno = EAGAIN;
         return -1;
       }
       v11 = p->rcv_hdr.len;
@@ -257,7 +257,7 @@ int ds_read_psnet(DS_DESC *desc, char *buf, int len)
       if ( v11 > v7 )
       {
 LABEL_12:
-        errno = 11;
+        errno = EAGAIN;
         return -1;
       }
     }
@@ -265,7 +265,7 @@ LABEL_12:
     {
       p->rcv_len = 0;
       p->rcv_buf = (char *)ds_free(p->rcv_buf);
-      errno = 11;
+      errno = EAGAIN;
       return -1;
     }
   }

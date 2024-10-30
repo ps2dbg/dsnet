@@ -14,7 +14,7 @@ static struct __anon_struct_135 {CMD_ENTRY *head; CMD_ENTRY *tail;} cmd_list;
 static struct __anon_struct_136 {DS_OPTION *head; DS_OPTION *tail;} ds_option_list;
 static struct __anon_struct_137 {ALIAS *head; ALIAS *tail;} aliases;
 
-char path_46[1025] = {0};
+char path_46[PATH_MAX + 1] = {0};
 char show_arg_77[1024] = {0};
 static int (*last_func_88)() = &ds_help_cmd;
 
@@ -51,6 +51,7 @@ static int ds_path_or_symbol_completion(DS_HISTBUF *hb, char *str);
 
 int ds_shell_cmd(int ac, char **av)
 {
+#ifndef _WIN32
   char *v4; // eax
   char *v5; // eax
   char *v7; // eax
@@ -58,9 +59,7 @@ int ds_shell_cmd(int ac, char **av)
   int v9; // eax
   int n; // [esp+0h] [ebp-428h]
   int i; // [esp+4h] [ebp-424h]
-#ifndef _WIN32
   sig_t sigint; // [esp+8h] [ebp-420h]
-#endif
   int r; // [esp+Ch] [ebp-41Ch]
   int r_1; // [esp+Ch] [ebp-41Ch]
   int fd; // [esp+10h] [ebp-418h]
@@ -88,7 +87,6 @@ int ds_shell_cmd(int ac, char **av)
     *bp = 0;
     av[1] = buf;
   }
-#ifndef _WIN32
   shell = getenv("SHELL");
   if ( !shell )
     shell = "/bin/sh";
@@ -134,10 +132,11 @@ LABEL_30:
   }
   if ( raw )
     ds_raw_kbd();
-#else
-  r = ds_error("Fork not supported on this platform");
-#endif
   return r;
+#else
+  ds_printf("ds_shell_cmd\n");
+  return ds_error("exec error ds_shell_cmd");
+#endif
 }
 
 char *ds_ref_option_str(char *name)
@@ -539,8 +538,8 @@ static int read_option(char *fname)
 
 int ds_read_option_file()
 {
-  char cwd[1025]; // [esp+0h] [ebp-80Ch] BYREF
-  char fname[1025]; // [esp+404h] [ebp-408h] BYREF
+  char cwd[PATH_MAX + 1]; // [esp+0h] [ebp-80Ch] BYREF
+  char fname[PATH_MAX + 1]; // [esp+404h] [ebp-408h] BYREF
   char *home; // [esp+808h] [ebp-4h]
 
   if ( !*ds_program_name )
@@ -553,7 +552,7 @@ int ds_read_option_file()
     goto LABEL_11;
   if ( read_option(fname) < 0 )
     return -1;
-  if ( !getcwd(cwd, 0x3FFu) )
+  if ( !getcwd(cwd, sizeof(cwd) - 2) )
     return ds_error("!getcwd");
   if ( !strcmp(home, cwd) )
     return 0;
@@ -567,9 +566,9 @@ LABEL_11:
 
 int ds_read_startup_file()
 {
-  char line[1125]; // [esp+0h] [ebp-C74h] BYREF
-  char cwd[1025]; // [esp+468h] [ebp-80Ch] BYREF
-  char fname[1025]; // [esp+86Ch] [ebp-408h] BYREF
+  char line[PATH_MAX + 1 + 100]; // [esp+0h] [ebp-C74h] BYREF
+  char cwd[PATH_MAX + 1]; // [esp+468h] [ebp-80Ch] BYREF
+  char fname[PATH_MAX + 1]; // [esp+86Ch] [ebp-408h] BYREF
   char *home; // [esp+C70h] [ebp-4h]
 
   if ( !*ds_program_name )
@@ -582,7 +581,7 @@ int ds_read_startup_file()
     goto LABEL_9;
   sprintf(line, "source %s", fname);
   ds_cmd_execute(line, 0);
-  if ( !getcwd(cwd, 0x3FFu) )
+  if ( !getcwd(cwd, sizeof(cwd) - 2) )
     return ds_error("!getcwd");
   if ( !strcmp(home, cwd) )
     return 0;
@@ -624,7 +623,7 @@ int ds_source_cmd(int ac, char **av)
     if ( aca > 0 && **ava == 45 )
       return ds_error("Usage: source <fname>");
     if ( aca > 0 )
-      strncpy(path_46, *ava, 0x400u);
+      strncpy(path_46, *ava, sizeof(path_46) - 1);
   }
   stream = ds_fopen(path_46, "r");
   if ( !stream )
@@ -701,7 +700,7 @@ int ds_source_cmd(int ac, char **av)
 int ds_cd_cmd(int ac, char **av)
 {
   char *v3; // eax
-  char path[1025]; // [esp+0h] [ebp-408h] BYREF
+  char path[PATH_MAX + 1]; // [esp+0h] [ebp-408h] BYREF
   char *dir; // [esp+404h] [ebp-4h]
   int aca; // [esp+410h] [ebp+8h]
   char **ava; // [esp+414h] [ebp+Ch]
@@ -1824,11 +1823,11 @@ static int ds_path_completion(DS_HISTBUF *hb, char *path)
   int n; // [esp+70h] [ebp-C20h]
   struct dirent *dirp_3; // [esp+74h] [ebp-C1Ch]
   DIR *dp; // [esp+78h] [ebp-C18h]
-  char dname[1025]; // [esp+7Ch] [ebp-C14h] BYREF
+  char dname[PATH_MAX + 1]; // [esp+7Ch] [ebp-C14h] BYREF
   char *p; // [esp+480h] [ebp-810h]
-  char cn[1025]; // [esp+484h] [ebp-80Ch] BYREF
+  char cn[PATH_MAX + 1]; // [esp+484h] [ebp-80Ch] BYREF
   char *name; // [esp+888h] [ebp-408h]
-  char buf[1025]; // [esp+88Ch] [ebp-404h] BYREF
+  char buf[PATH_MAX + 1]; // [esp+88Ch] [ebp-404h] BYREF
 
   r = 0;
   ds_tilde_expand(buf, path);
@@ -1881,7 +1880,7 @@ static int ds_path_completion(DS_HISTBUF *hb, char *path)
       strcpy(buf, dname);
       strcat(buf, "/");
       strcat(buf, cn);
-      if ( stat(buf, &stbuf) >= 0 && (stbuf.st_mode & 0xF000) == 0x4000 )
+      if ( stat(buf, &stbuf) >= 0 && S_ISDIR(stbuf.st_mode) )
         ds_editline(hb, 47, 0);
       r = 1;
     }

@@ -1,13 +1,15 @@
 #include "dsnet_prototypes.h"
 
 DS_DESC_LIST ds_select_list = { NULL, NULL };
+#ifdef _WIN32
+int ds_now_resetting = 0;
+#endif
 static int desc_id = 0;
 static int dev_desc_id = -1;
 
 static unsigned __int8 last_38 = 0u;
 
 static int xrecv_common(DS_DESC *desc, DSP_BUF *db);
-static int xrecv_kbd(DS_DESC *desc);
 static int xrecv_dev(DS_DESC *desc);
 static int xsend_dev(DS_DESC *desc);
 static int xrecv_net(DS_DESC *desc);
@@ -396,6 +398,7 @@ LABEL_59:
   return -1;
 }
 
+#ifndef _WIN32
 static int xrecv_kbd(DS_DESC *desc)
 {
   int n; // [esp+0h] [ebp-10h]
@@ -476,6 +479,133 @@ LABEL_31:
   else
     return -1;
 }
+#else
+
+#ifdef _WIN32
+static int __cdecl xrecv_kbd(DS_DESC *desc, char a2)
+{
+  int n; // [esp+Ch] [ebp-2Ch]
+  struct xrecv_kbd_dat_struct dat; // [esp+10h] [ebp-28h] BYREF
+  DSP_BUF *db; // [esp+28h] [ebp-10h]
+
+  dat.str[0] = a2;
+  n = 1;
+  if ( last_38 == 27 )
+  {
+    switch ( dat.str[0] )
+    {
+      case '[':
+        last_38 = 91;
+        return 0;
+      case '/':
+        dat.str[0] = 18;
+        break;
+      case '?':
+        dat.str[0] = 19;
+        break;
+      default:
+        dat.str[1] = dat.str[0];
+        dat.str[0] = 27;
+        n = 2;
+        break;
+    }
+    goto LABEL_28;
+  }
+  if ( (unsigned __int8)last_38 > 0x1Bu )
+  {
+    if ( last_38 == 91 )
+    {
+      if ( dat.str[0] == 66 )
+      {
+        dat.str[0] = 14;
+        goto LABEL_28;
+      }
+      if ( dat.str[0] > 0x42u )
+      {
+        if ( dat.str[0] == 67 )
+        {
+          dat.str[0] = 6;
+          goto LABEL_28;
+        }
+        if ( dat.str[0] == 68 )
+        {
+          dat.str[0] = 2;
+          goto LABEL_28;
+        }
+      }
+      else if ( dat.str[0] == 65 )
+      {
+        dat.str[0] = 16;
+        goto LABEL_28;
+      }
+      dat.str[2] = dat.str[0];
+      dat.str[1] = 91;
+      dat.str[0] = 27;
+      n = 3;
+    }
+  }
+  else if ( !last_38 && dat.str[0] == 27 )
+  {
+    last_38 = 27;
+    return 0;
+  }
+LABEL_28:
+  last_38 = 0;
+  dat.zero = 0;
+  db = ds_alloc_buf(1040, 72, &dat, n + 4);
+  if ( db )
+    return xrecv_common(desc, db);
+  else
+    return -1;
+}
+
+static int __cdecl xrecv_kbd2(DS_DESC *desc)
+{
+  int result; // eax
+  int v2; // [esp+4h] [ebp-4h]
+
+  while ( 1 )
+  {
+    result = _kbhit();
+    if ( !result )
+      return result;
+    v2 = _getch();
+    if ( v2 != 224 )
+      goto LABEL_14;
+    xrecv_kbd(desc, 27);
+    xrecv_kbd(desc, 91);
+    v2 = _getch();
+    if ( v2 == 75 )
+    {
+      xrecv_kbd(desc, 68);
+    }
+    else if ( v2 > 75 )
+    {
+      if ( v2 == 77 )
+      {
+        xrecv_kbd(desc, 67);
+      }
+      else if ( v2 == 80 )
+      {
+        xrecv_kbd(desc, 66);
+      }
+      else
+      {
+LABEL_14:
+        xrecv_kbd(desc, v2);
+      }
+    }
+    else
+    {
+      if ( v2 != 72 )
+        goto LABEL_14;
+      xrecv_kbd(desc, 65);
+    }
+  }
+}
+#endif
+
+#endif
 
 static int xrecv_dev(DS_DESC *desc)
 {
@@ -515,7 +645,7 @@ static int xrecv_dev(DS_DESC *desc)
             return ds_error("xrecv_dev: paritial read");
           }
         }
-        else if ( errno == 32 )
+        else if ( errno == EPIPE )
         {
           ds_free_buf(db);
           return -3;
@@ -536,7 +666,7 @@ static int xrecv_dev(DS_DESC *desc)
       return ds_error("xrecv_dev - too short (%d)", nbytes);
     }
   }
-  else if ( errno == 32 )
+  else if ( errno == EPIPE )
   {
     return -3;
   }
@@ -550,9 +680,16 @@ int ds_reset_info(DS_DESC *desc)
 {
   int r; // [esp+0h] [ebp-4h]
 
+#ifdef _WIN32
+  ds_now_resetting = 0;
+#endif
   if ( desc->type != 2 )
     return -1;
+#ifndef _WIN32
   r = ds_ioctl(desc->fd, 0x41260003u, 0);
+#else
+  r = ioctlsocket(desc->fd, 0x41260003u, 0);
+#endif
   if ( r >= 0 )
     return r;
   else
@@ -637,7 +774,7 @@ static int xrecv_net(DS_DESC *desc)
       r = ds_read(desc->fd, desc->rptr, nbytes);
     if ( r < 0 )
     {
-      if ( errno == 11 )
+      if ( errno == EAGAIN )
         return 0;
       else
         return -1;
@@ -673,7 +810,7 @@ static int xrecv_net(DS_DESC *desc)
       r_1 = ds_read(desc->fd, desc->rptr, n_2);
     if ( r_1 < 0 )
     {
-      if ( errno == 11 )
+      if ( errno == EAGAIN )
         return 0;
       else
         return -1;
@@ -717,7 +854,7 @@ static int xrecv_comport(DS_DESC *desc)
       return -1;
     }
   }
-  else if ( errno == 11 )
+  else if ( errno == EAGAIN )
   {
     return 0;
   }
@@ -787,7 +924,7 @@ static int xsend_net(DS_DESC *desc)
       return 0;
     }
   }
-  else if ( errno == 11 )
+  else if ( errno == EAGAIN )
   {
     return 0;
   }
@@ -853,7 +990,7 @@ LABEL_20:
       return 0;
     goto LABEL_20;
   }
-  if ( errno == 11 )
+  if ( errno == EAGAIN )
     return 0;
   else
     return -1;
@@ -958,9 +1095,18 @@ int ds_select_desc(int sec, int usec)
 
   for ( p = ds_select_list.head; p; p = p->forw )
   {
-    FD_SET(p->fd, &rfds);
-    if ( (p->type & 0x7A) != 0 && (p->sque.head || p->sbuf) )
-      FD_SET(p->fd, &wfds);
+#ifdef _WIN32
+    if ( p->type == 1 )
+    {
+      xrecv_kbd2(p);
+    }
+    else
+#endif
+    {
+      FD_SET(p->fd, &rfds);
+      if ( (p->type & 0x7A) != 0 && (p->sque.head || p->sbuf) )
+        FD_SET(p->fd, &wfds);
+    }
   }
 
   if ( sec >= 0 && usec >= 0 )
@@ -970,7 +1116,7 @@ int ds_select_desc(int sec, int usec)
     tval.tv_usec = usec;
   }
 
-  r = select(256, &rfds, &wfds, 0, tv);
+  r = select(FD_SETSIZE, &rfds, &wfds, 0, tv);
   if ( r < 0 )
   {
     if ( errno == EINTR )
@@ -996,9 +1142,11 @@ int ds_select_desc(int sec, int usec)
     {
       switch ( p->type )
       {
+#ifndef _WIN32
         case 1:
           xrecv_kbd(p);
           break;
+#endif
         case 2:
           if ( xrecv_dev(p) == -3 )
             ds_close_desc(p);
@@ -1016,6 +1164,8 @@ int ds_select_desc(int sec, int usec)
           break;
         case 64:
           xrecv_netdev(p);
+          break;
+        default:
           break;
       }
     }

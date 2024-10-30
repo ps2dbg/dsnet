@@ -25,9 +25,9 @@ int DataFileRead1()
   fp = fopen("./GIF_REF_V0.pdat", "rb");
   if ( fp )
   {
-    fseek(fp, 0, 2);
+    fseek(fp, 0, SEEK_END);
     gif.m_size1 = ftell(fp);
-    fseek(fp, 0, 0);
+    fseek(fp, 0, SEEK_SET);
     gif.m_buff1 = (unsigned __int8 *)calloc(gif.m_size1, 1u);
     if ( gif.m_buff1 )
     {
@@ -70,21 +70,21 @@ int DataFileRead2()
         fp4 = fopen("./GIF_REF_tex_swap1_read1.pdat", "rb");
         if ( fp4 )
         {
-          fseek(fp1, 0, 2);
+          fseek(fp1, 0, SEEK_END);
           gif.m_size1 = ftell(fp1);
-          fseek(fp1, 0, 0);
+          fseek(fp1, 0, SEEK_SET);
           gif.m_buff1 = (unsigned __int8 *)calloc(gif.m_size1, 1u);
-          fseek(fp2, 0, 2);
+          fseek(fp2, 0, SEEK_END);
           gif.m_size2 = ftell(fp2);
-          fseek(fp2, 0, 0);
+          fseek(fp2, 0, SEEK_SET);
           gif.m_buff2 = (unsigned __int8 *)calloc(gif.m_size2, 1u);
-          fseek(fp3, 0, 2);
+          fseek(fp3, 0, SEEK_END);
           gif.m_size3 = ftell(fp3);
-          fseek(fp3, 0, 0);
+          fseek(fp3, 0, SEEK_SET);
           gif.m_buff3 = (unsigned __int8 *)calloc(gif.m_size3, 1u);
-          fseek(fp4, 0, 2);
+          fseek(fp4, 0, SEEK_END);
           gif.m_size4 = ftell(fp4);
-          fseek(fp4, 0, 0);
+          fseek(fp4, 0, SEEK_SET);
           gif.m_buff4 = (unsigned __int8 *)calloc(gif.m_size4, 1u);
           if ( gif.m_buff1 )
           {
