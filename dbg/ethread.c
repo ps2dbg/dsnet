@@ -230,7 +230,6 @@ int dt_cmd(int ac, char **av)
   {
     if ( (mode_4 & 2) != 0 )
     {
-      cnt = (int)&listhdr[1];
       p_result = (DBGP_EE_THREADLIST_DATA *)&listhdr[1].result;
       tcbhdr = (DBGP_HDR *)ds_alloc(768 + sizeof(DBGP_HDR));
       if ( !tcbhdr )
@@ -240,7 +239,7 @@ int dt_cmd(int ac, char **av)
       }
       if ( (mode_4 & 1) != 0 )
       {
-        for ( pv = 0; *(_DWORD *)cnt > pv; ++pv )
+        for ( pv = 0; pv < *(_DWORD *)(&listhdr[1]); ++pv )
         {
           r = get_tcb(tcbhdr, p_result->id);
           if ( !r )
@@ -483,7 +482,7 @@ void disp_thread_list(DBGP_EE_THREADLIST_DATA *pdata)
 int ds_cmd(int ac, char **av)
 {
   int j_3; // [esp+0h] [ebp-20h]
-  unsigned int pv; // [esp+4h] [ebp-1Ch] BYREF
+  _BYTE *pv; // [esp+4h] [ebp-1Ch] BYREF
   DBGP_HDR *hdr; // [esp+8h] [ebp-18h]
   DBGP_EE_THREADID_DATA *tid; // [esp+Ch] [ebp-14h]
   DBGP_EE_SEMABLOCK_DATA *data; // [esp+10h] [ebp-10h]
@@ -503,9 +502,9 @@ int ds_cmd(int ac, char **av)
     aca = ac - 1;
     for ( ava = av + 1; aca > 0 && **ava == 45; ++ava )
     {
-      for ( pv = (unsigned int)(*ava + 1); *(_BYTE *)pv; ++pv )
+      for ( pv = *ava + 1; *pv; ++pv )
       {
-        if ( *(_BYTE *)pv != 118 )
+        if ( *pv != 118 )
           return ds_error("Usage: ds [-v] [<sid>]");
         mode_19 = 2;
         code_17 = 1;
@@ -515,11 +514,13 @@ int ds_cmd(int ac, char **av)
     }
     if ( aca > 0 )
     {
-      if ( ds_scan_digit_word(*ava, &pv) )
+      unsigned int val;
+
+      if ( ds_scan_digit_word(*ava, &val) )
         return -1;
-      if ( pv > 0xFF )
+      if ( val > 0xFF )
         return ds_error("Sema id must be smaller than %d.", 256);
-      sid_18 = pv;
+      sid_18 = val;
       mode_19 = 2;
       code_17 = 0;
     }
@@ -535,6 +536,8 @@ int ds_cmd(int ac, char **av)
     data = (DBGP_EE_SEMABLOCK_DATA *)&hdr[1].result;
     for ( i_3 = 0; header->count > i_3; ++i_3 )
     {
+      int val;
+
       ds_printf(
         "sid %3d count %3d maxcount %3d attr %08x option %08x numwait %3d\n",
         data->id,
@@ -543,9 +546,9 @@ int ds_cmd(int ac, char **av)
         data->attr,
         data->option,
         data->numWaitThreads);
-      pv = data->numWaitThreads;
+      val = data->numWaitThreads;
       tid = (DBGP_EE_THREADID_DATA *)++data;
-      for ( j_3 = 0; (int)pv > j_3; ++j_3 )
+      for ( j_3 = 0; (int)val > j_3; ++j_3 )
       {
         if ( mode_19 != 1 )
           ds_printf("tid %3d\n", tid->id);

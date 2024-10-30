@@ -1997,28 +1997,33 @@ LABEL_117:
         }
         else
         {
-          hilo = (quad *)ds_cqw(src);
+          unsigned int tmp1;
+          unsigned int tmp2;
+          unsigned int tmp3;
+          unsigned int tmp4;
+
+          tmp1 = ds_cqw(src);
           ds_qshr(&src, src, x);
-          v85 = (quad *)ds_cqw(src);
+          tmp2 = ds_cqw(src);
           ds_qshr(&src, src, x);
-          wz = ds_cqw(src);
+          tmp3 = ds_cqw(src);
           ds_qshr(&src, src, x);
-          kind = ds_cqw(src);
+          tmp4 = ds_cqw(src);
           if ( f_xyzw )
           {
             ds_printf(" $%-8s (xyzw) = ", reg->name);
-            ds_printf("    0x%W", hilo);
-            ds_printf("    0x%W", v85);
-            ds_printf("    0x%W", wz);
-            ds_printf("    0x%W", kind);
+            ds_printf("    0x%W", tmp1);
+            ds_printf("    0x%W", tmp2);
+            ds_printf("    0x%W", tmp3);
+            ds_printf("    0x%W", tmp4);
           }
           else
           {
             ds_printf(" $%-8s (wzyx) = ", reg->name);
-            ds_printf("    0x%W", kind);
-            ds_printf("    0x%W", wz);
-            ds_printf("    0x%W", v85);
-            ds_printf("    0x%W", hilo);
+            ds_printf("    0x%W", tmp4);
+            ds_printf("    0x%W", tmp3);
+            ds_printf("    0x%W", tmp2);
+            ds_printf("    0x%W", tmp1);
           }
         }
 LABEL_116:

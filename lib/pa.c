@@ -597,9 +597,7 @@ static void copy_gif_record(unsigned __int8 *dst, unsigned int stop, unsigned in
 {
   unsigned int v4; // eax
   int v5; // ebx
-  void *dest; // [esp+Ch] [ebp-A8h]
-  void *desta; // [esp+Ch] [ebp-A8h]
-  void *destb; // [esp+Ch] [ebp-A8h]
+  unsigned int dest; // [esp+Ch] [ebp-A8h]
   unsigned int stopaddr; // [esp+18h] [ebp-9Ch]
   unsigned __int8 *end; // [esp+20h] [ebp-94h]
   unsigned __int8 *s; // [esp+24h] [ebp-90h]
@@ -625,19 +623,19 @@ static void copy_gif_record(unsigned __int8 *dst, unsigned int stop, unsigned in
     if ( pre )
       v5 = mid + 1;
     if ( post )
-      dest = (void *)(32 * (v5 + 1));
+      dest = 32 * (v5 + 1);
     else
-      dest = (void *)(32 * v5);
+      dest = 32 * v5;
     if ( stopaddr > 0xFFFFFFF )
       stopaddr -= 0x10000000;
-    if ( (unsigned int)dest + stopaddr <= 0x10000000 )
+    if ( dest + stopaddr <= 0x10000000 )
     {
-      dma_copy(0xC800000u, stopaddr, (unsigned int)dest);
+      dma_copy(0xC800000u, stopaddr, dest);
     }
     else
     {
       dma_copy(0xC800000u, stopaddr, 0x10000000 - stopaddr);
-      dma_copy(478150656 - stopaddr, 0, (unsigned int)dest + stopaddr - 0x10000000);
+      dma_copy(478150656 - stopaddr, 0, dest + stopaddr - 0x10000000);
     }
     s_1 = (unsigned __int8 *)pmem;
     if ( pre == 2 )
@@ -659,8 +657,7 @@ static void copy_gif_record(unsigned __int8 *dst, unsigned int stop, unsigned in
     }
     while ( 1 )
     {
-      desta = (void *)mid--;
-      if ( (int)desta <= 0 )
+      if ( (int)(mid--) <= 0 )
         break;
       memcpy(dst, s_1 + 5, 0xAu);
       ConvertGIF((gifdata_t *)dst);
@@ -724,8 +721,7 @@ static void copy_gif_record(unsigned __int8 *dst, unsigned int stop, unsigned in
     }
     while ( 1 )
     {
-      destb = (void *)mid--;
-      if ( (int)destb <= 0 )
+      if ( (int)(mid--) <= 0 )
         break;
       wcopy(buf, (unsigned int *)s_2, 0x20u);
       memcpy(dst, (char *)&buf[1] + 1, 0xAu);
@@ -911,9 +907,7 @@ static void copy_eegs_record(unsigned __int8 *dst, unsigned int stop, unsigned i
 {
   unsigned int v4; // eax
   int v5; // ebx
-  void *dest; // [esp+Ch] [ebp-A8h]
-  void *desta; // [esp+Ch] [ebp-A8h]
-  void *destb; // [esp+Ch] [ebp-A8h]
+  unsigned int dest; // [esp+Ch] [ebp-A8h]
   unsigned int stopaddr; // [esp+18h] [ebp-9Ch]
   unsigned __int8 *end; // [esp+20h] [ebp-94h]
   unsigned __int8 *s; // [esp+24h] [ebp-90h]
@@ -939,19 +933,19 @@ static void copy_eegs_record(unsigned __int8 *dst, unsigned int stop, unsigned i
     if ( pre )
       v5 = mid + 1;
     if ( post )
-      dest = (void *)(32 * (v5 + 1));
+      dest = 32 * (v5 + 1);
     else
-      dest = (void *)(32 * v5);
+      dest = 32 * v5;
     if ( stopaddr > 0xFFFFFFF )
       stopaddr -= 0x10000000;
-    if ( (unsigned int)dest + stopaddr <= 0x10000000 )
+    if ( dest + stopaddr <= 0x10000000 )
     {
-      dma_copy(0xC800000u, stopaddr, (unsigned int)dest);
+      dma_copy(0xC800000u, stopaddr, dest);
     }
     else
     {
       dma_copy(0xC800000u, stopaddr, 0x10000000 - stopaddr);
-      dma_copy(478150656 - stopaddr, 0, (unsigned int)dest + stopaddr - 0x10000000);
+      dma_copy(478150656 - stopaddr, 0, dest + stopaddr - 0x10000000);
     }
     s_1 = (unsigned __int8 *)pmem;
     if ( pre == 2 )
@@ -970,8 +964,7 @@ static void copy_eegs_record(unsigned __int8 *dst, unsigned int stop, unsigned i
     }
     while ( 1 )
     {
-      desta = (void *)mid--;
-      if ( (int)desta <= 0 )
+      if ( (int)(mid--) <= 0 )
         break;
       memcpy(dst, s_1 + 5, 0xAu);
       memcpy(dst + 10, s_1 + 26, 5u);
@@ -1024,8 +1017,7 @@ static void copy_eegs_record(unsigned __int8 *dst, unsigned int stop, unsigned i
     }
     while ( 1 )
     {
-      destb = (void *)mid--;
-      if ( (int)destb <= 0 )
+      if ( (int)(mid--) <= 0 )
         break;
       wcopy(buf, (unsigned int *)s_2, 0x20u);
       memcpy(dst, (char *)&buf[1] + 1, 0xAu);

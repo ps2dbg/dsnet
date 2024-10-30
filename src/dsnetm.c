@@ -442,16 +442,18 @@ LABEL_54:
   ds_reset(dev_desc, &nh[1], n);
   if ( n == 34 )
   {
-    v8 = (DS_DESC *)&nh[2];
-    if ( *(_DWORD *)&nh[2].code != -1 || v8->back != (struct _ds_desc *)-1 )
+    unsigned int *tmp;
+
+    tmp = (unsigned int *)&nh[2];
+    if ( tmp[0] != -1 || tmp[1] != -1 )
     {
-      param[0] = (unsigned int)v8->forw;
-      param[1] = (unsigned int)v8->back;
+      param[0] = tmp[0];
+      param[1] = tmp[1];
     }
-    if ( v8->id != -1 || v8->type != -1 )
+    if ( tmp[2] != -1 || tmp[3] != -1 )
     {
-      param[2] = v8->id;
-      param[3] = v8->type;
+      param[2] = tmp[2];
+      param[3] = tmp[3];
     }
   }
   if ( !opt_nci->val )
