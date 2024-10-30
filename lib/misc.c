@@ -249,7 +249,7 @@ int ds_cmd_execution_for_filesv(char *cmd, int *pstatus)
       if ( fd > 2 )
         close(fd);
     }
-    execlp(shell, shell, "-c", cmd, 0);
+    execlp(shell, shell, "-c", cmd, NULL);
     v4 = strerror(errno);
     printf("execlp - %s\n", v4);
     exit(1);

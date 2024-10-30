@@ -105,7 +105,7 @@ int ds_shell_cmd(int ac, char **av)
         v5 = shell;
       else
         v5 = av[1];
-      execlp(shell, shell, "-c", v5, 0);
+      execlp(shell, shell, "-c", v5, NULL);
       v7 = strerror(errno);
       printf("execlp - %s\n", v7);
       exit(1);
