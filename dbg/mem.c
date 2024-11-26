@@ -1137,10 +1137,11 @@ fmt_err:
 
   for (int i = 0; i < EI_NIDENT ; ++i ) {
     // support both EI_ABIVERSION 0 and 1
-    if (i == EI_ABIVERSION && (ehdr->ident[i] != 0 && ehdr->ident[i] != 1)) {
-      ds_printf("EI_ABIVERSION identification error: it is neither 0 nor 1\n");
-      goto exit;
-    } else {
+    if (i == EI_ABIVERSION) {
+      if (ehdr->ident[i] != 0 && ehdr->ident[i] != 1) {
+        ds_printf("EI_ABIVERSION identification error: it is neither 0 nor 1\n");
+        goto exit;
+      }
       continue;
     }
 
