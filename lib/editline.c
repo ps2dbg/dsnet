@@ -206,7 +206,7 @@ static char *isearch(DS_HISTBUF *hb, int f_force, int *ppos)
     n = strlen(isearch_buf);
     dir = isearch_dir;
     if (!f_force && !strncmp(isearch_buf, hb->ptr, n)) {
-        *ppos = hb->ptr - 16 - (char *)hb;
+        *ppos = hb->ptr - hb->buf;
         return hb->buf;
     }
     if (n <= 0)
@@ -225,7 +225,7 @@ static char *isearch(DS_HISTBUF *hb, int f_force, int *ppos)
                 return 0;
         }
     }
-    q = &hp->buf[hb->ptr - 16 - (char *)hb];
+    q = &hp->buf[hb->ptr - hb->buf];
     if (dir <= 0) {
         if (!hb->buf[0])
             q = &hp->buf[strlen(hp->buf)];
@@ -247,7 +247,7 @@ static char *isearch(DS_HISTBUF *hb, int f_force, int *ppos)
         }
     } else {
         q_1 = q + 1;
-        if (!hp->buf[hb->ptr - 16 - (char *)hb])
+        if (!hp->buf[hb->ptr - hb->buf])
             goto LABEL_23;
         while (hp) {
             while (*q_1 && strncmp(isearch_buf, q_1, n))
@@ -264,7 +264,7 @@ static char *isearch(DS_HISTBUF *hb, int f_force, int *ppos)
         }
     }
     hb->curr = hp;
-    *ppos = q_1 - 12 - (char *)hp;
+    *ppos = q_1 - hp->buf;
     return hp->buf;
 }
 
