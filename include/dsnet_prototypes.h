@@ -248,7 +248,7 @@ extern char *ds_additional_prompt_str;
 
 extern int ds_prompt();
 extern int ds_save_history();
-extern int ds_editline(DS_HISTBUF *hb, int ch, char *rp);
+extern int ds_editline(DS_HISTBUF *hb, char ch, char *rp);
 
 // root/dsnet/lib/expr.c
 
