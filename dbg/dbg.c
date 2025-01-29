@@ -781,7 +781,7 @@ static DSP_BUF *recv_dbgp(DS_DESC *desc, DSP_BUF *db)
             return ds_free_buf(db);
         break;
         case DBGP_TYPE_XGKTCTLR:
-            if (len != sizeof(DBGP_XGKT_DATA)) {
+            if (len != sizeof(DBGP_XGKT_CTL)) {
               goto einval;
             }
             break;
