@@ -145,9 +145,9 @@ int dt_cmd(int ac, char **av)
     else
     {
       aca = ac - 1;
-      for ( ava = av + 1; aca > 0 && **ava == 45; ++ava )
+      for ( ava = av + 1; aca > 0 && **ava == '-'; ++ava )
       {
-        for ( c = (*ava + 1); c; ++c )
+        for ( c = (*ava + 1); *c; ++c )
         {
           switch ( *c )
           {
