@@ -329,26 +329,37 @@ int ds_editline(DS_HISTBUF *hb, char ch, char *rp)
         switch (ch) {
             case '$':
                 ch = 5;
+                break;
             case '/':
                 ch = 18;
+                break;
             case '0':
                 ch = 1;
+                break;
             case '?':
                 ch = 19;
+                break;
             case 'D':
                 ch = 11;
+                break;
             case 'h':
                 ch = 2;
+                break;
             case 'j':
                 ch = 14;
+                break;
             case 'k':
                 ch = 16;
+                break;
             case 'l':
                 ch = 6;
+                break;
             case 'p':
                 ch = 25;
+                break;
             case 'x':
                 ch = 4;
+                break;
             default:
                 cmdmode = 0;
                 if (ch > 31 || ch != 127) {
