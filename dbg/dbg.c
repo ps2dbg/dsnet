@@ -3108,19 +3108,19 @@ int main(int ac, char **av)
 #endif /* DSNET_COMPILING_E */
   ds_cmd_install("bpfunc", "<adr>", "set break point function", bpfunc_cmd);
   ds_add_help(0, dbg_help);
-  ds_help_completion_func = (int (*)())dbg_help_completion;
+  ds_help_completion_func = dbg_help_completion;
   ds_add_show_arg("dbconf", show_dbconf);
   ds_add_show_arg("symbol", show_symbol);
   ds_add_show_arg("mdebug", show_mdebug);
   ds_cmd_standard_install(1);
-  ds_rdwr_mem_align_func = (int (*)())rdwr_mem_align;
-  ds_load_mem_func = (int (*)())load_mem;
-  ds_store_mem_func = (int (*)())store_mem;
-  ds_load_quad_reg_func = (int (*)())load_quad_reg;
-  ds_store_quad_reg_func = (int (*)())store_quad_reg;
-  ds_symbol_to_value_func = (int (*)())symbol_to_value;
-  ds_symbol_completion_func = (int (*)())symbol_completion;
-  ds_check_reserved_name_func = (int (*)())check_reserved_name;
+  ds_rdwr_mem_align_func = rdwr_mem_align;
+  ds_load_mem_func = load_mem;
+  ds_store_mem_func = store_mem;
+  ds_load_quad_reg_func = load_quad_reg;
+  ds_store_quad_reg_func = store_quad_reg;
+  ds_symbol_to_value_func = symbol_to_value;
+  ds_symbol_completion_func = symbol_completion;
+  ds_check_reserved_name_func = check_reserved_name;
   if ( port_name )
   {
     if ( !ds_listen_net(port_name, start_console) )
@@ -3131,7 +3131,7 @@ int main(int ac, char **av)
   dsm_waiting = 1;
   to_sec = 120;
   to_usec = 0;
-  ds_drfp_err_func = (void (*)())drfp_error;
+  ds_drfp_err_func = drfp_error;
   while ( 1 )
   {
     r = ds_select_desc(to_sec, to_usec);

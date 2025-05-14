@@ -16,7 +16,7 @@ static struct __anon_struct_137 {ALIAS *head; ALIAS *tail;} aliases;
 
 char path_46[PATH_MAX + 1] = {0};
 char show_arg_77[1024] = {0};
-static int (*last_func_88)() = &ds_help_cmd;
+static int (*last_func_88)(int ac, char **av) = &ds_help_cmd;
 
 static int cmd_max_na = 0;
 DS_OPTION *ds_opt_hex_radix = NULL;
