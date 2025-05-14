@@ -210,7 +210,7 @@ int main(int ac, char **av)
 #endif /* DSNET_COMPILING_I */
     ds_exit(135);
   dsm_waiting = 1;
-  ds_drfp_err_func = (void (*)())drfp_error;
+  ds_drfp_err_func = drfp_error;
   while ( 1 )
   {
     r = ds_select_desc(to_sec, to_usec);

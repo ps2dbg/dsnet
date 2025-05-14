@@ -133,7 +133,7 @@ extern int look_iopmod(
         DS_ELF_SHDR *shdr,
         int id,
         int base,
-        void (*clear_func)());
+        void (*clear_func)(int));
 extern int load_symbol(void *stream, DS_ELF_EHDR *ehdr, DS_ELF_SHDR *shdr, int symndx, int strndx, int id, int base);
 extern int address_to_func(unsigned int adr, unsigned int *padr0, unsigned int *padr1);
 extern int address_to_symbol(char *buf, unsigned int adr, int force_delta);

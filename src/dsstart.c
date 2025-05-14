@@ -564,7 +564,7 @@ int main(int ac, char **av)
     _p_5 = p++;
     _p_5->pri = -32;
     _p_5->proto = proto_drfp;
-    ds_drfp_err_func = (void (*)())drfp_error;
+    ds_drfp_err_func = drfp_error;
   }
   if ( ds_send_netmp(target_desc, 0, 0, protos, (char *)p - (char *)protos) < 0 )
     ds_exit(135);

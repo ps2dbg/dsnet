@@ -376,7 +376,7 @@ int look_eemod(
         DS_ELF_SHDR *shdr,
         int id,
         int base,
-        void (*clear_func)())
+        void (*clear_func)(int))
 {
   int i; // [esp+4h] [ebp-Ch]
   EEMOD *eemod; // [esp+8h] [ebp-8h]
@@ -433,7 +433,7 @@ int look_iopmod(
         DS_ELF_SHDR *shdr,
         int id,
         int base,
-        void (*clear_func)())
+        void (*clear_func)(int))
 {
   int i; // [esp+4h] [ebp-Ch]
   IOPMOD *iopmod; // [esp+8h] [ebp-8h]
@@ -528,9 +528,9 @@ int load_symbol(void *stream, DS_ELF_EHDR *ehdr, DS_ELF_SHDR *shdr, int symndx, 
   for ( i = 0; v10 > i; ++i )
     ++psym;
 #ifdef DSNET_COMPILING_E
-  ida = look_eemod(stream, ehdr, shdr, id, base, (void (*)())clear_symbol_with_id);
+  ida = look_eemod(stream, ehdr, shdr, id, base, clear_symbol_with_id);
 #elif DSNET_COMPILING_I
-  ida = look_iopmod(stream, ehdr, shdr, id, base, (void (*)())clear_symbol_with_id);
+  ida = look_iopmod(stream, ehdr, shdr, id, base, clear_symbol_with_id);
 #endif /* DSNET_COMPILING_I */
   syms = (SYMS *)ds_alloc(sizeof(SYMS));
   if ( !syms )
