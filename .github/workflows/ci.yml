@@ -57,6 +57,10 @@
           }
         },
         {
+          "name" : "Mark all git directories safe",
+          "run" : "git config --global --add safe.directory '*'"
+        },
+        {
           "name" : "Configure project",
           "run" : "cmake -S . -B build"
         },
@@ -127,6 +131,10 @@
           "with" : {
             "submodules" : "recursive"
           }
+        },
+        {
+          "name" : "Mark all git directories safe",
+          "run" : "git config --global --add safe.directory '*'"
         },
         {
           "name" : "Set up base environment",
