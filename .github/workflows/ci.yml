@@ -29,13 +29,27 @@
     }
   },
   "env" : {
-    "CMAKE_GENERATOR" : "Ninja"
+    "CMAKE_GENERATOR" : "Ninja",
+    "HOMEBREW_NO_ANALYTICS" : "1",
+    "HOMEBREW_NO_AUTO_UPDATE" : "1",
+    "HOMEBREW_NO_INSTALL_UPGRADE" : "1",
+    "HOMEBREW_NO_INSTALL_CLEANUP" : "1",
+    "DEBIAN_FRONTEND" : "noninteractive",
+    "TZ" : "Japan"
   },
   "jobs" : {
     "build-ubuntu" : {
-      "runs-on" : "ubuntu-24.04",
+      "runs-on" : "ubuntu-latest",
       "timeout-minutes" : 20,
+      "container" : {
+        "image" : "ubuntu:20.04",
+        "options" : "--user 0"
+      },
       "steps" : [
+        {
+          "name" : "Set up base environment",
+          "run" : "apt-get -y update && apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install build-essential p7zip-full cmake git ninja-build"
+        },
         {
           "uses" : "actions/checkout@v4",
           "with" : {
@@ -43,32 +57,11 @@
           }
         },
         {
-          "run" : "sudo apt-get update"
-        },
-        {
-          "run" : "sudo apt-get install build-essential"
-        },
-        {
-          "uses" : "actions/setup-python@v5",
-          "with" : {
-            "python-version" : "3.x"
-          }
-        },
-        {
-          "uses" : "actions/cache@v4",
-          "with" : {
-            "path" : "~/.cache/pip",
-            "key" : "${{ runner.os }}-pip",
-            "restore-keys" : "${{ runner.os }}-pip"
-          }
-        },
-        {
-          "run" : "python -m pip install --upgrade ninja"
-        },
-        {
+          "name" : "Configure project",
           "run" : "cmake -S . -B build"
         },
         {
+          "name" : "Build project",
           "run" : "cmake --build build"
         },
         {
@@ -85,13 +78,11 @@
       ]
     },
     "build-win32" : {
-      "runs-on" : "ubuntu-24.04",
+      "runs-on" : "ubuntu-latest",
       "timeout-minutes" : 20,
-      "env" : {
-        "HOMEBREW_NO_ANALYTICS" : "1",
-        "HOMEBREW_NO_AUTO_UPDATE" : "1",
-        "HOMEBREW_NO_INSTALL_UPGRADE" : "1",
-        "HOMEBREW_NO_INSTALL_CLEANUP" : "1"
+      "container" : {
+        "image" : "ghcr.io/homebrew/ubuntu20.04:latest",
+        "options" : "--user 0"
       },
       "strategy" : {
         "fail-fast" : false,
@@ -139,20 +130,20 @@
         },
         {
           "name" : "Set up base environment",
-          "run" : "sudo apt-get install build-essential"
+          "run" : "apt-get -y update && apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install build-essential"
         },
         {
           "name" : "Set up Homebrew environment for Github Actions",
-          "run" : "echo \"/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin\" >> $GITHUB_PATH"
+          "run" : "printf '%s\\n' '/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin' >> $GITHUB_PATH"
         },
         {
           "name" : "Set up default build tools",
-          "run" : "brew install make nasm ninja cmake"
+          "run" : "sudo -H -E -u linuxbrew bash -c 'cd /home/linuxbrew && /home/linuxbrew/.linuxbrew/bin/brew install p7zip make nasm ninja cmake'"
         },
         {
           "name" : "Set up mingw-w64 for GCC",
           "if" : "matrix.platform.compiler == 'gcc'",
-          "run" : "brew install mingw-w64"
+          "run" : "sudo -H -E -u linuxbrew bash -c 'cd /home/linuxbrew && /home/linuxbrew/.linuxbrew/bin/brew install mingw-w64'"
         },
         {
           "name" : "Set up mingw-w64 for Clang",
@@ -181,7 +172,7 @@
       ]
     },
     "build-macos" : {
-      "runs-on" : "macos-13",
+      "runs-on" : "macos-latest",
       "timeout-minutes" : 20,
       "strategy" : {
         "fail-fast" : false
@@ -231,8 +222,12 @@
     },
     "create-release" : {
       "needs" : ["build-ubuntu", "build-win32", "build-macos"],
-      "runs-on" : "ubuntu-24.04",
+      "runs-on" : "ubuntu-latest",
       "timeout-minutes" : 20,
+      "container" : {
+        "image" : "ubuntu:20.04",
+        "options" : "--user 0"
+      },
       "if" : "github.ref == 'refs/heads/main'",
       "steps" : [
         {
