@@ -473,7 +473,7 @@ static int xrecv_kbd(DS_DESC *desc)
 LABEL_31:
   last_38 = 0;
   dat.zero = 0;
-  db = ds_alloc_buf(1040, 72, &dat, n + 4);
+  db = ds_alloc_buf(1040, 72, &dat, (sizeof(dat) - sizeof(dat.str)) + n);
   if ( db )
     return xrecv_common(desc, db);
   else
@@ -552,7 +552,7 @@ static int __cdecl xrecv_kbd(DS_DESC *desc, char a2)
 LABEL_28:
   last_38 = 0;
   dat.zero = 0;
-  db = ds_alloc_buf(1040, 72, &dat, n + 4);
+  db = ds_alloc_buf(1040, 72, &dat, (sizeof(dat) - sizeof(dat.str)) + n);
   if ( db )
     return xrecv_common(desc, db);
   else
@@ -837,11 +837,11 @@ static int xrecv_comport(DS_DESC *desc)
   DECI2_HDR *dh; // [esp+108h] [ebp-8h]
   DSP_BUF *db; // [esp+10Ch] [ebp-4h]
 
-  n = ds_read(desc->fd, dat.str, 256);
+  n = ds_read(desc->fd, dat.str, sizeof(dat.str));
   if ( n > 0 )
   {
     dat.zero = 0;
-    db = ds_alloc_buf(1042, 72, &dat, n + 4);
+    db = ds_alloc_buf(1042, 72, &dat, (sizeof(dat) - sizeof(dat.str)) + n);
     if ( db )
     {
       dh = (DECI2_HDR *)db->buf;

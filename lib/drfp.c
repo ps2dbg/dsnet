@@ -88,7 +88,7 @@ static void drfp_errmsg(int proto, char *tag, char *fname, char *err)
     v6 = strlen(path) + 7 + v5;
     v7 = strlen(err);
     len = v7 + 3 + v6 + 1;
-    msg = (char *)ds_alloc(v7 + 3 + v6 + 15);
+    msg = (char *)ds_alloc(len + 14);
     if ( msg )
     {
       ds_bzero(msg, 4u);
@@ -1223,7 +1223,7 @@ static DSP_BUF *recv_drfp_dread(DS_DESC *desc, DSP_BUF *db, DECI2_HDR *dh, unsig
       result = 0;
       goto LABEL_15;
     }
-    len = strlen(dent->d_name) + 69; /* TODO: calculate size using sizeof */
+    len = strlen(dent->d_name) + sizeof(struct sce_dirent) + 5; /* TODO: calculate size using sizeof */
     sce_dent = (struct sce_dirent *)ds_alloc(len);
     if ( !sce_dent )
       break;

@@ -55,10 +55,10 @@ static void send_char(int ch)
   dat.zero = 0;
   dat.str[0] = ch;
 #ifdef DSNET_COMPILING_D
-  db = ds_alloc_buf(1041, (unsigned __int8)kbd_node, &dat, 5);
+  db = ds_alloc_buf(1041, (unsigned __int8)kbd_node, &dat, sizeof(dat));
 #endif /* DSNET_COMPILING_D */
 #ifdef DSNET_COMPILING_M
-  db = ds_alloc_buf(1040, (unsigned __int8)kbd_node, &dat, 5);
+  db = ds_alloc_buf(1040, (unsigned __int8)kbd_node, &dat, sizeof(dat));
 #endif /* DSNET_COMPILING_M */
   if ( db )
     ds_send_desc(target_desc, db);

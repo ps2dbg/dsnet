@@ -507,7 +507,7 @@ int ds_subst_cmd(int ac, char **av)
           re = ds_compile_re(s1);
           if ( re )
           {
-            rerp_3 = (RERP *)ds_alloc(20);
+            rerp_3 = (RERP *)ds_alloc(sizeof(RERP));
             if ( rerp_3 )
             {
               ds_bzero(rerp_3, sizeof(RERP));

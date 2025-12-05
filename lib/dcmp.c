@@ -94,7 +94,7 @@ DSP_BUF *ds_send_dcmp_error(DS_DESC *desc, DSP_BUF *odb, int code)
   if ( (unsigned int)len > 0x10 )
     len = 16;
   memcpy(&data[4], odh, len + 8);
-  db = ds_alloc_buf(1, odh->source, data, 28);
+  db = ds_alloc_buf(1, odh->source, data, sizeof(data));
   if ( !db )
     return odb;
   ds_send_desc(desc, db);

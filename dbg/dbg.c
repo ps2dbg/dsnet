@@ -333,7 +333,7 @@ static void flush_tty_buf()
   ttyq.get = 0;
   ttyq.put = 0;
   wv = 1;
-  db = ds_alloc_buf(TARGET_TTYP, 72, &wv, 4);
+  db = ds_alloc_buf(TARGET_TTYP, 72, &wv, sizeof(wv));
   if ( db )
     ds_send_desc(target_desc, db);
 }
@@ -376,7 +376,7 @@ static void normal_input(int code)
   {
     dat.zero = 0;
     dat.code = v3;
-    p = ds_alloc_buf(TARGET_TTYP, TARGET_DID, &dat, 5);
+    p = ds_alloc_buf(TARGET_TTYP, TARGET_DID, &dat, sizeof(dat));
     if ( p )
       ds_send_desc(target_desc, p);
   }
@@ -1059,7 +1059,7 @@ static int rdwr_mem_align(int code, int align, int cpuid, int space, unsigned in
     else
       v8 = 0;
     nw = v8;
-    db = alloc_dbgp(v18, DBGP_GROUP_SYSTEM, v20, 0, 0, 1, (void **)&mh, v8 + 12);
+    db = alloc_dbgp(v18, DBGP_GROUP_SYSTEM, v20, 0, 0, 1, (void **)&mh, v8 + sizeof(DBGP_MEM));
     if ( !db )
       return -1;
     mh->space = v17;
@@ -1154,7 +1154,7 @@ int get_tcb(DBGP_HDR *phdr, int tid)
   int id; // [esp+8h] [ebp-4h]
 
   id = 0;
-  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_THREAD, DBGP_EE_THREAD_TYPE_TCB, phdr->code, 0, 0, (void **)&ptid, 4);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_THREAD, DBGP_EE_THREAD_TYPE_TCB, phdr->code, 0, 0, (void **)&ptid, sizeof(int));
   if ( !db )
     return -1;
   *ptid = tid;
@@ -1183,7 +1183,7 @@ int get_semablock(DBGP_HDR *phdr, int sid)
   int id; // [esp+8h] [ebp-4h]
 
   id = 0;
-  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_THREAD, DBGP_EE_THREAD_TYPE_SEMABLOCK, phdr->code, 0, 0, (void **)&psid, 4);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_THREAD, DBGP_EE_THREAD_TYPE_SEMABLOCK, phdr->code, 0, 0, (void **)&psid, sizeof(int));
   if ( !db )
     return -1;
   *psid = sid;
@@ -1214,7 +1214,7 @@ int load_word_registers(unsigned int *masks, unsigned int *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, (unsigned __int8)nr, (void **)&rh, 8 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, (unsigned __int8)nr, (void **)&rh, (sizeof(DBGP_REG) + sizeof(unsigned int)) * nr);
     if ( !db )
       return -1;
     if ( i > 9 )
@@ -1278,7 +1278,7 @@ int store_word_registers(unsigned int *masks, unsigned int *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, (unsigned __int8)nr, (void **)&rh, 8 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, (unsigned __int8)nr, (void **)&rh, (sizeof(DBGP_REG) + sizeof(unsigned int)) * nr);
     if ( !db )
       return -1;
     if ( i > 9 )
@@ -1338,7 +1338,7 @@ static int load_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, (unsigned __int8)nr, (void **)&rh, 20 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_GETREG, 0, 0, (unsigned __int8)nr, (void **)&rh, (sizeof(DBGP_REG) + sizeof(quad)) * nr);
     if ( !db )
       return -1;
     if ( i > 10 )
@@ -1400,7 +1400,7 @@ static int store_quad_registers_id(int id, unsigned int *masks, quad *pv, int n)
     nr = n;
     if ( dbconf.nreg < n )
       nr = dbconf.nreg;
-    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, (unsigned __int8)nr, (void **)&rh, 20 * nr);
+    db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTREG, 0, 0, (unsigned __int8)nr, (void **)&rh, (sizeof(DBGP_REG) + sizeof(quad)) * nr);
     if ( !db )
       return -1;
     if ( i > 10 )
@@ -1590,7 +1590,7 @@ int put_brkpt(DBGP_BRKPT_DATA *bps, int n)
   DBGP_BRKPT_DATA *dp; // [esp+4h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+8h] [ebp-4h]
 
-  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTBRKPT, 0, 0, (unsigned __int8)n, (void **)&dp, 8 * n);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_PUTBRKPT, 0, 0, (unsigned __int8)n, (void **)&dp, sizeof(DBGP_BRKPT_DATA) * n);
   if ( !db )
     return -1;
   for ( i = 0; n > i; ++i )
@@ -1856,7 +1856,7 @@ LABEL_46:
     if ( v15 == 6 )
     {
       v15 = 66;
-      n += 4;
+      n += sizeof(unsigned int);
     }
     else if ( v15 > 6u )
     {
@@ -2228,7 +2228,7 @@ static int dbgctl(int id, int flag)
   unsigned int *wp; // [esp+0h] [ebp-8h] BYREF
   DSP_BUF *db; // [esp+4h] [ebp-4h]
 
-  db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_DBGCTL, 0, 0, 0, (void **)&wp, 4);
+  db = alloc_dbgp(id, DBGP_GROUP_SYSTEM, DBGP_TYPE_DBGCTL, 0, 0, 0, (void **)&wp, sizeof(unsigned int));
   if ( !db )
     return -1;
   *wp = flag;
@@ -2300,7 +2300,7 @@ static int xgkt_cmd(int ac, char **av)
     return -1;
   if ( setup_xgkt(fname, cnt, off) )
     return -1;
-  db = alloc_dbgp(DBGP_CPUID_VU1, DBGP_GROUP_SYSTEM, DBGP_TYPE_XGKTCTL, 0, 0, 0, (void **)&xc, 12);
+  db = alloc_dbgp(DBGP_CPUID_VU1, DBGP_GROUP_SYSTEM, DBGP_TYPE_XGKTCTL, 0, 0, 0, (void **)&xc, sizeof(DBGP_XGKT_CTL));
   if ( !db )
     return -1;
   xc->flag = opt_xgkt_flag->val;
@@ -2357,7 +2357,7 @@ static int storeimage_cmd(int ac, char **av)
     return -1;
   rdimg_seq = 0;
   rdimg_len = 0;
-  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_RDIMG, 0, 0, 0, (void **)&pp, 16);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_RDIMG, 0, 0, 0, (void **)&pp, sizeof(DBGP_RDIMG));
   if ( !db )
     return -1;
   pp->sbp = sbp;
@@ -2391,7 +2391,7 @@ static int bpfunc_cmd(int ac, char **av)
     return ds_error("Usage: bpfunc <adr>");
   if ( ds_eval_word(*ava, &adr) )
     return -1;
-  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_SETBPFUNC, 0, 0, 0, (void **)&wp, 4);
+  db = alloc_dbgp(DBGP_CPUID_CPU, DBGP_GROUP_SYSTEM, DBGP_TYPE_SETBPFUNC, 0, 0, 0, (void **)&wp, sizeof(unsigned int));
   if ( !db )
     return -1;
   *wp = adr;
