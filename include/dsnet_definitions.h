@@ -1409,7 +1409,7 @@ typedef struct {
 
 struct xrecv_kbd_dat_struct {
     unsigned int zero;
-    unsigned __int8 str[3];
+    unsigned __int8 str[4];
 };
 struct xrecv_comport_dat_struct {
     unsigned int zero;

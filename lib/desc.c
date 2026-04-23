@@ -471,6 +471,7 @@ static int xrecv_kbd(DS_DESC *desc)
     }
   }
 LABEL_31:
+  dat.str[n] = 0;
   last_38 = 0;
   dat.zero = 0;
   db = ds_alloc_buf(1040, 72, &dat, (sizeof(dat) - sizeof(dat.str)) + n);
